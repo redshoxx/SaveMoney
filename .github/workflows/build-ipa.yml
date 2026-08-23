@@ -24,24 +24,62 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: '22'
+          package-manager-cache: false
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        id: install
+        continue-on-error: true
+        run: |
+          mkdir -p ci-logs
+          set +e
+          npm install --no-audit --no-fund 2>&1 | tee ci-logs/install.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
 
       - name: Typecheck
-        run: npm run typecheck
+        id: typecheck
+        if: always()
+        continue-on-error: true
+        run: |
+          mkdir -p ci-logs
+          set +e
+          npm run typecheck 2>&1 | tee ci-logs/typecheck.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
 
       - name: Generate native iOS project
-        run: npx expo prebuild --platform ios --clean --no-install
+        id: prebuild
+        if: always()
+        continue-on-error: true
+        run: |
+          mkdir -p ci-logs
+          set +e
+          npx expo prebuild --platform ios --clean --no-install 2>&1 | tee ci-logs/prebuild.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
 
       - name: Install CocoaPods
-        working-directory: ios
-        run: pod install --repo-update
-
-      - name: Build unsigned device app
+        id: pods
+        if: always() && steps.prebuild.outcome == 'success'
+        continue-on-error: true
         working-directory: ios
         run: |
-          set -euo pipefail
+          set +e
+          pod install --repo-update 2>&1 | tee ../ci-logs/pods.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
+
+      - name: Build unsigned device app
+        id: xcode
+        if: always() && steps.pods.outcome == 'success'
+        continue-on-error: true
+        working-directory: ios
+        run: |
+          set +e
           xcodebuild \
             -workspace SparFlow.xcworkspace \
             -scheme SparFlow \
@@ -51,21 +89,33 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            build
+            build 2>&1 | tee ../ci-logs/xcodebuild.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
 
       - name: Package IPA
+        id: package
+        if: always() && steps.xcode.outcome == 'success'
+        continue-on-error: true
         working-directory: ios
         run: |
-          set -euo pipefail
-          APP_PATH="build/Build/Products/Release-iphoneos/SparFlow.app"
-          test -d "$APP_PATH"
-          rm -rf Payload SparFlow.ipa
-          mkdir Payload
-          cp -R "$APP_PATH" Payload/SparFlow.app
-          zip -qry SparFlow.ipa Payload
-          mv SparFlow.ipa ../SparFlow.ipa
+          set +e
+          {
+            APP_PATH="build/Build/Products/Release-iphoneos/SparFlow.app"
+            test -d "$APP_PATH" || exit 20
+            rm -rf Payload SparFlow.ipa
+            mkdir Payload
+            cp -R "$APP_PATH" Payload/SparFlow.app
+            zip -qry SparFlow.ipa Payload
+            mv SparFlow.ipa ../SparFlow.ipa
+          } 2>&1 | tee ../ci-logs/package.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
 
       - name: Upload IPA artifact
+        if: steps.package.outcome == 'success'
         uses: actions/upload-artifact@v6
         with:
           name: SparFlow-SideStore-IPA
@@ -73,7 +123,7 @@ jobs:
           if-no-files-found: error
 
       - name: Publish tagged build to GitHub Release
-        if: startsWith(github.ref, 'refs/tags/')
+        if: steps.package.outcome == 'success' && startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -81,3 +131,55 @@ jobs:
           gh release view "$TAG" >/dev/null 2>&1 || \
             gh release create "$TAG" --title "SparFlow $TAG" --notes "Unsigned iPhone IPA for SideStore sideloading."
           gh release upload "$TAG" SparFlow.ipa --clobber
+
+      - name: Publish diagnostic report
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          {
+            echo "SparFlow iOS CI diagnostic"
+            echo "commit: ${GITHUB_SHA}"
+            echo "run: ${GITHUB_RUN_NUMBER}"
+            echo
+            echo "install:   ${{ steps.install.outcome }} (exit ${{ steps.install.outputs.exit_code }})"
+            echo "typecheck: ${{ steps.typecheck.outcome }} (exit ${{ steps.typecheck.outputs.exit_code }})"
+            echo "prebuild:  ${{ steps.prebuild.outcome }} (exit ${{ steps.prebuild.outputs.exit_code }})"
+            echo "pods:      ${{ steps.pods.outcome }} (exit ${{ steps.pods.outputs.exit_code }})"
+            echo "xcode:     ${{ steps.xcode.outcome }} (exit ${{ steps.xcode.outputs.exit_code }})"
+            echo "package:   ${{ steps.package.outcome }} (exit ${{ steps.package.outputs.exit_code }})"
+            echo
+            for file in ci-logs/install.log ci-logs/typecheck.log ci-logs/prebuild.log ci-logs/pods.log ci-logs/xcodebuild.log ci-logs/package.log; do
+              if [ -f "$file" ]; then
+                echo "===== $file (last 160 lines) ====="
+                tail -n 160 "$file"
+                echo
+              fi
+            done
+          } > ci-report.txt
+
+          encoded=$(base64 < ci-report.txt | tr -d '\n')
+          existing_sha=$(gh api "repos/${GITHUB_REPOSITORY}/contents/ci-report.txt?ref=ci-diagnostics" --jq '.sha' 2>/dev/null || true)
+
+          if [ -n "$existing_sha" ]; then
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/ci-report.txt" \
+              -f message="ci: update diagnostic report [skip ci]" \
+              -f content="$encoded" \
+              -f branch="ci-diagnostics" \
+              -f sha="$existing_sha" >/dev/null
+          else
+            gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/ci-report.txt" \
+              -f message="ci: add diagnostic report [skip ci]" \
+              -f content="$encoded" \
+              -f branch="ci-diagnostics" >/dev/null
+          fi
+
+      - name: Enforce clean build
+        if: always()
+        run: |
+          test "${{ steps.install.outcome }}" = "success"
+          test "${{ steps.typecheck.outcome }}" = "success"
+          test "${{ steps.prebuild.outcome }}" = "success"
+          test "${{ steps.pods.outcome }}" = "success"
+          test "${{ steps.xcode.outcome }}" = "success"
+          test "${{ steps.package.outcome }}" = "success"
