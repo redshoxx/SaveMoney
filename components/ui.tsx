@@ -17,7 +17,13 @@ export function Symbol({
   if (process.env.EXPO_OS !== 'ios') {
     return <Text style={{ fontSize: size * 0.78, color, fontWeight: '800' }}>•</Text>;
   }
-  return <Image source={`sf:${name}`} style={{ width: size, height: size }} tintColor={color} />;
+
+  // expo-image currently types tintColor as string | null, while React Native
+  // navigation exposes ColorValue. Navigation tab colors are strings at runtime;
+  // dynamic native colors fall back to the app text color for the SF Symbol.
+  const tintColor = typeof color === 'string' ? color : colors.text;
+
+  return <Image source={`sf:${name}`} style={{ width: size, height: size }} tintColor={tintColor} />;
 }
 
 export function Card({ children, style }: PropsWithChildren<{ style?: object }>) {
