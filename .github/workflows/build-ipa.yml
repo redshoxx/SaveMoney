@@ -66,7 +66,7 @@ jobs:
           mv SparFlow.ipa ../SparFlow.ipa
 
       - name: Upload IPA artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: SparFlow-SideStore-IPA
           path: SparFlow.ipa
