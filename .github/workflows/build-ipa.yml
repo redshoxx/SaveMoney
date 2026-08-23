@@ -1,0 +1,81 @@
+name: Build SideStore IPA
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  ios-unsigned:
+    name: Build unsigned iPhone IPA
+    runs-on: macos-26
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Generate native iOS project
+        run: npx expo prebuild --platform ios --clean --no-install
+
+      - name: Install CocoaPods
+        working-directory: ios
+        run: pod install --repo-update
+
+      - name: Build unsigned device app
+        working-directory: ios
+        run: |
+          set -euo pipefail
+          xcodebuild \
+            -workspace SparFlow.xcworkspace \
+            -scheme SparFlow \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            build
+
+      - name: Package IPA
+        working-directory: ios
+        run: |
+          set -euo pipefail
+          APP_PATH="build/Build/Products/Release-iphoneos/SparFlow.app"
+          test -d "$APP_PATH"
+          rm -rf Payload SparFlow.ipa
+          mkdir Payload
+          cp -R "$APP_PATH" Payload/SparFlow.app
+          zip -qry SparFlow.ipa Payload
+          mv SparFlow.ipa ../SparFlow.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SparFlow-SideStore-IPA
+          path: SparFlow.ipa
+          if-no-files-found: error
+
+      - name: Publish tagged build to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="${GITHUB_REF_NAME}"
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --title "SparFlow $TAG" --notes "Unsigned iPhone IPA for SideStore sideloading."
+          gh release upload "$TAG" SparFlow.ipa --clobber
