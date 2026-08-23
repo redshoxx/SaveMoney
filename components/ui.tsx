@@ -1,10 +1,19 @@
 import { Image } from 'expo-image';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { ActivityIndicator, Pressable, Text, View } from 'react-native';
+import type { ColorValue } from 'react-native';
 
 import { colors, radius, shadow } from '@/constants/theme';
 
-export function Symbol({ name, size = 20, color = colors.text }: { name: string; size?: number; color?: string }) {
+export function Symbol({
+  name,
+  size = 20,
+  color = colors.text,
+}: {
+  name: string;
+  size?: number;
+  color?: ColorValue;
+}) {
   if (process.env.EXPO_OS !== 'ios') {
     return <Text style={{ fontSize: size * 0.78, color, fontWeight: '800' }}>•</Text>;
   }
