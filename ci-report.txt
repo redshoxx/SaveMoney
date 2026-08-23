@@ -1,0 +1,41 @@
+SparFlow iOS CI diagnostic
+commit: 6fb2cd28b72084bb61b492c2ef0b0fa49616b164
+run: 11
+
+install:   success (exit 0)
+typecheck: success (exit 0)
+prebuild:  failure (exit 1)
+pods:      skipped (exit )
+xcode:     skipped (exit )
+package:   skipped (exit )
+
+===== ci-logs/install.log (last 160 lines) =====
+npm warn ERESOLVE overriding peer dependency
+npm warn deprecated uuid@7.0.3: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+
+added 558 packages in 26s
+
+===== ci-logs/typecheck.log (last 160 lines) =====
+
+> sparflow@1.0.0 typecheck
+> tsc --noEmit
+
+
+===== ci-logs/prebuild.log (last 160 lines) =====
+- Creating native directory (./ios)
+✔ Created native directory
+- Updating package.json
+✔ Updated package.json
+- Running prebuild
+✖ Prebuild failed
+Error: [ios.dangerous]: withIosDangerousBaseMod: Crc error - 265203895 - 1715677947
+Error: [ios.dangerous]: withIosDangerousBaseMod: Crc error - 265203895 - 1715677947
+    at n._parseChunkEnd (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:514593)
+    at e.process (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:40580)
+    at t.exports (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:419827)
+    at e.read [as image/png] (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:1865)
+    at Jimp.parseBitmap (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:125704)
+    at Jimp.parseBitmap (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:8514)
+    at /Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:7613
+    at FSReqCallback.readFileAfterClose [as oncomplete] (node:internal/fs/read/context:68:3)
+
