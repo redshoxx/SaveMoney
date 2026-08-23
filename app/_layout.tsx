@@ -14,17 +14,18 @@ export default function RootLayout() {
           headerTintColor: colors.text,
           headerStyle: { backgroundColor: colors.background },
           contentStyle: { backgroundColor: colors.background },
+          headerBackButtonDisplayMode: 'minimal',
         }}
       >
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen
           name="add-goal"
-          options={{ title: 'Neues Sparziel', presentation: 'modal', headerBackTitle: 'Fertig' }}
+          options={{ title: 'Neues Sparziel', presentation: 'modal' }}
         />
         <Stack.Screen
           name="add-challenge"
-          options={{ title: 'Eigene Challenge', presentation: 'modal', headerBackTitle: 'Fertig' }}
+          options={{ title: 'Eigene Challenge', presentation: 'modal' }}
         />
       </Stack>
     </AppStoreProvider>
