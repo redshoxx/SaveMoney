@@ -1,0 +1,62 @@
+SparFlow iOS CI diagnostic
+commit: 10b793baecf433970d115b012b034c7d3a408b02
+run: 29
+version: 2.0.0
+build: 29
+
+install:   success (exit 0)
+typecheck: failure (exit 2)
+prebuild:  failure (exit 1)
+pods:      skipped (exit )
+xcode:     skipped (exit )
+package:   skipped (exit )
+
+===== NATIVE VERSION GRAPH =====
+sparflow@2.0.0 /Users/runner/work/SaveMoney/SaveMoney
+├─┬ expo-router@57.0.16
+│ ├─┬ @expo/ui@57.0.13
+│ │ └── react-native-worklets@0.10.1 deduped
+│ ├─┬ react-native-drawer-layout@4.2.10
+│ │ └── react-native-reanimated@4.5.1 deduped
+│ └── react-native-reanimated@4.5.1 deduped
+├─┬ expo@57.0.16
+│ └─┬ expo-modules-core@57.0.13
+│   └── react-native-worklets@0.10.1 deduped
+├─┬ react-native-reanimated@4.5.1
+│ └── react-native-worklets@0.10.1 deduped
+└── react-native-worklets@0.10.1
+
+
+===== ci-logs/install.log (last 160 lines) =====
+npm warn ERESOLVE overriding peer dependency
+npm warn deprecated uuid@7.0.3: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+
+added 558 packages in 29s
+
+===== ci-logs/typecheck.log (last 160 lines) =====
+
+> sparflow@2.0.0 typecheck
+> tsc --noEmit
+
+app/(tabs)/index.tsx(90,166): error TS18048: 'store.primaryGoal' is possibly 'undefined'.
+app/(tabs)/index.tsx(94,1020): error TS18048: 'store.primaryGoal' is possibly 'undefined'.
+app/(tabs)/index.tsx(100,529): error TS18048: 'store.primaryGoal' is possibly 'undefined'.
+
+===== ci-logs/prebuild.log (last 160 lines) =====
+- Creating native directory (./ios)
+✔ Created native directory
+- Updating package.json
+✔ Updated package.json
+- Running prebuild
+✖ Prebuild failed
+Error: [ios.dangerous]: withIosDangerousBaseMod: Crc error - -1073803287 - 1553299653
+Error: [ios.dangerous]: withIosDangerousBaseMod: Crc error - -1073803287 - 1553299653
+    at n._parseChunkEnd (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:514593)
+    at e.process (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:40580)
+    at t.exports (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:419827)
+    at e.read [as image/png] (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:1865)
+    at Jimp.parseBitmap (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:125704)
+    at Jimp.parseBitmap (/Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:8514)
+    at /Users/runner/work/SaveMoney/SaveMoney/node_modules/jimp-compact/dist/jimp.js:1:7613
+    at FSReqCallback.readFileAfterClose [as oncomplete] (node:internal/fs/read/context:68:3)
+
