@@ -149,6 +149,9 @@ jobs:
             echo "xcode:     ${{ steps.xcode.outcome }} (exit ${{ steps.xcode.outputs.exit_code }})"
             echo "package:   ${{ steps.package.outcome }} (exit ${{ steps.package.outputs.exit_code }})"
             echo
+            echo "===== NATIVE VERSION GRAPH ====="
+            npm ls react-native-reanimated react-native-worklets --all || true
+            echo
             if [ -f ci-logs/xcodebuild.log ]; then
               echo "===== XCODE ERROR SUMMARY ====="
               grep -n -C 8 -E '(^|[[:space:]])(fatal )?error:|BUILD FAILED|The following build commands failed|ExpoWorkletsBridgeProvider' ci-logs/xcodebuild.log | tail -n 240 || true
@@ -164,20 +167,11 @@ jobs:
           } > ci-report.txt
 
           encoded=$(base64 < ci-report.txt | tr -d '\n')
-          existing_sha=$(gh api "repos/${GITHUB_REPOSITORY}/contents/ci-report.txt?ref=ci-diagnostics" --jq '.sha' 2>/dev/null || true)
-
-          if [ -n "$existing_sha" ]; then
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/ci-report.txt" \
-              -f message="ci: update diagnostic report [skip ci]" \
-              -f content="$encoded" \
-              -f branch="ci-diagnostics" \
-              -f sha="$existing_sha" >/dev/null
-          else
-            gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/ci-report.txt" \
-              -f message="ci: add diagnostic report [skip ci]" \
-              -f content="$encoded" \
-              -f branch="ci-diagnostics" >/dev/null
-          fi
+          report_path="ci-reports/run-${GITHUB_RUN_NUMBER}-${GITHUB_SHA}.txt"
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${report_path}" \
+            -f message="ci: add diagnostic report for run ${GITHUB_RUN_NUMBER} [skip ci]" \
+            -f content="$encoded" \
+            -f branch="ci-diagnostics" >/dev/null
 
       - name: Enforce clean build
         if: always()
