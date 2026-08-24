@@ -166,9 +166,9 @@ jobs:
             gh release create "$AUTO_TAG" --title "SparFlow SideStore Auto Update" --notes "Latest automatic SideStore build."
           gh release upload "$AUTO_TAG" SparFlow.ipa --clobber
 
-          IPA_SIZE=$(stat -f%z SparFlow.ipa)
-          RELEASE_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${AUTO_TAG}/SparFlow.ipa"
+          export IPA_SIZE=$(stat -f%z SparFlow.ipa)
+          export RELEASE_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          export DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${AUTO_TAG}/SparFlow.ipa"
 
           node - <<'NODE'
           const fs = require('fs');
@@ -194,10 +194,6 @@ jobs:
             -f content="$SOURCE_B64" \
             -f sha="$SOURCE_SHA" \
             -f branch="main" >/dev/null
-        env:
-          RELEASE_DATE: ${{ github.event.repository.updated_at }}
-          DOWNLOAD_URL: https://github.com/${{ github.repository }}/releases/download/sidestore-latest/SparFlow.ipa
-          IPA_SIZE: '0'
 
       - name: Publish diagnostic report
         if: always()
