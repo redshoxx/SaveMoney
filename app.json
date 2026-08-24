@@ -4,7 +4,6 @@
     "slug": "sparflow",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
     "scheme": "sparflow",
     "userInterfaceStyle": "light",
     "ios": {
@@ -16,11 +15,7 @@
       }
     },
     "android": {
-      "package": "com.redshoxx.sparflow",
-      "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#F5F7F4"
-      }
+      "package": "com.redshoxx.sparflow"
     },
     "plugins": [
       "expo-router",
