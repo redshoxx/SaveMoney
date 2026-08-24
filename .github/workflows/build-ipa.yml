@@ -16,6 +16,10 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: sidestore-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   ios-unsigned:
     name: Build unsigned iPhone IPA
@@ -49,71 +53,24 @@ jobs:
           echo "SparFlow $VERSION ($BUILD_NUMBER)"
 
       - name: Install dependencies
-        id: install
-        continue-on-error: true
-        run: |
-          mkdir -p ci-logs
-          set +e
-          npm install --no-audit --no-fund 2>&1 | tee ci-logs/install.log
-          status=${PIPESTATUS[0]}
-          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
-          exit "$status"
+        run: npm install --no-audit --no-fund
 
       - name: Typecheck
-        id: typecheck
-        if: always()
-        continue-on-error: true
-        run: |
-          mkdir -p ci-logs
-          set +e
-          npm run typecheck 2>&1 | tee ci-logs/typecheck.log
-          status=${PIPESTATUS[0]}
-          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
-          exit "$status"
+        run: npm run typecheck
 
       - name: Generate native iOS project
-        id: prebuild
-        if: always()
-        continue-on-error: true
-        run: |
-          mkdir -p ci-logs
-          set +e
-          npx expo prebuild --platform ios --clean --no-install 2>&1 | tee ci-logs/prebuild.log
-          status=${PIPESTATUS[0]}
-          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
-          exit "$status"
+        run: npx expo prebuild --platform ios --clean --no-install
 
       - name: Patch WidgetKit container background
-        id: widget_patch
-        if: always() && steps.prebuild.outcome == 'success'
-        continue-on-error: true
-        run: |
-          mkdir -p ci-logs
-          set +e
-          npm run patch:widget-native 2>&1 | tee ci-logs/widget-patch.log
-          status=${PIPESTATUS[0]}
-          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
-          exit "$status"
+        run: npm run patch:widget-native
 
       - name: Install CocoaPods
-        id: pods
-        if: always() && steps.widget_patch.outcome == 'success'
-        continue-on-error: true
         working-directory: ios
-        run: |
-          set +e
-          pod install --repo-update 2>&1 | tee ../ci-logs/pods.log
-          status=${PIPESTATUS[0]}
-          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
-          exit "$status"
+        run: pod install --repo-update
 
       - name: Build unsigned device app
-        id: xcode
-        if: always() && steps.pods.outcome == 'success'
-        continue-on-error: true
         working-directory: ios
         run: |
-          set +e
           xcodebuild \
             -workspace SparFlow.xcworkspace \
             -scheme SparFlow \
@@ -123,57 +80,40 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            build 2>&1 | tee ../ci-logs/xcodebuild.log
-          status=${PIPESTATUS[0]}
-          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
-          exit "$status"
+            build
 
       - name: Package IPA
-        id: package
-        if: always() && steps.xcode.outcome == 'success'
-        continue-on-error: true
         working-directory: ios
         run: |
-          set +e
-          {
-            APP_PATH="build/Build/Products/Release-iphoneos/SparFlow.app"
-            test -d "$APP_PATH" || exit 20
-            rm -rf Payload SparFlow.ipa
-            mkdir Payload
-            cp -R "$APP_PATH" Payload/SparFlow.app
-            zip -qry SparFlow.ipa Payload
-            mv SparFlow.ipa ../SparFlow.ipa
-          } 2>&1 | tee ../ci-logs/package.log
-          status=${PIPESTATUS[0]}
-          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
-          exit "$status"
+          APP_PATH="build/Build/Products/Release-iphoneos/SparFlow.app"
+          test -d "$APP_PATH"
+          rm -rf Payload SparFlow.ipa
+          mkdir Payload
+          cp -R "$APP_PATH" Payload/SparFlow.app
+          zip -qry SparFlow.ipa Payload
+          mv SparFlow.ipa ../SparFlow.ipa
 
       - name: Upload IPA artifact
-        if: steps.package.outcome == 'success'
         uses: actions/upload-artifact@v6
         with:
           name: SparFlow-SideStore-IPA
           path: SparFlow.ipa
           if-no-files-found: error
 
-      - name: Publish stable tagged build
-        if: steps.package.outcome == 'success' && startsWith(github.ref, 'refs/tags/')
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          TAG="${GITHUB_REF_NAME}"
-          cp assets/icon.png SparFlow-icon.png
-          gh release view "$TAG" >/dev/null 2>&1 || \
-            gh release create "$TAG" --title "SparFlow $TAG" --notes "Unsigned iPhone IPA for SideStore sideloading."
-          gh release upload "$TAG" SparFlow.ipa SparFlow-icon.png --clobber
-
       - name: Publish automatic SideStore update
-        if: steps.package.outcome == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
         env:
           GH_TOKEN: ${{ github.token }}
           VERSION: ${{ steps.metadata.outputs.version }}
           BUILD_NUMBER: ${{ steps.metadata.outputs.build_number }}
         run: |
+          # Do not let an older concurrent build overwrite a newer main version.
+          CURRENT_VERSION=$(gh api "repos/${GITHUB_REPOSITORY}/contents/app.json?ref=main" --jq .content | base64 --decode | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).expo.version))")
+          if [ "$CURRENT_VERSION" != "$VERSION" ]; then
+            echo "Skipping stale release $VERSION; main is already $CURRENT_VERSION"
+            exit 0
+          fi
+
           AUTO_TAG="sidestore-latest"
           cp assets/icon.png SparFlow-icon.png
           gh release view "$AUTO_TAG" >/dev/null 2>&1 || \
@@ -184,35 +124,31 @@ jobs:
           export RELEASE_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
           export DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${AUTO_TAG}/SparFlow.ipa"
 
+          gh api "repos/${GITHUB_REPOSITORY}/contents/sidestore-source.json?ref=main" --jq .content | base64 --decode > sidestore-source.live.json
+
           node - <<'NODE'
           const fs = require('fs');
-          const source = JSON.parse(fs.readFileSync('sidestore-source.json', 'utf8'));
+          const source = JSON.parse(fs.readFileSync('sidestore-source.live.json', 'utf8'));
           const app = source.apps[0];
-          const description = 'Widget-Fix und aktueller automatischer SparFlow-Build.';
           const next = {
             version: process.env.VERSION,
             date: process.env.RELEASE_DATE,
-            localizedDescription: description,
+            localizedDescription: 'Minimalistisches SparFlow mit verbessertem iPhone-Widget.',
             downloadURL: process.env.DOWNLOAD_URL,
             size: Number(process.env.IPA_SIZE),
             minOSVersion: '16.4'
           };
 
-          // SideStore requires every visible version string to be unique.
-          // Also strip legacy buildVersion fields while preserving the newest
-          // historical entry for each distinct version.
-          const seenVersions = new Set([next.version]);
+          const seen = new Set([next.version]);
           const previous = (app.versions || [])
-            .map(({ buildVersion, ...version }) => version)
-            .filter((version) => {
-              if (!version.version || seenVersions.has(version.version)) return false;
-              seenVersions.add(version.version);
+            .map(({ buildVersion, ...entry }) => entry)
+            .filter((entry) => {
+              if (!entry.version || seen.has(entry.version)) return false;
+              seen.add(entry.version);
               return true;
             });
-          app.versions = [next, ...previous].slice(0, 12);
 
-          // Rueckwaertskompatible AltSource-Felder fuer SideStore-Versionen,
-          // die bei reinen versions[]-Feeds Update-Probleme haben.
+          app.versions = [next, ...previous].slice(0, 12);
           app.version = next.version;
           app.versionDate = next.date;
           app.versionDescription = next.localizedDescription;
@@ -222,6 +158,13 @@ jobs:
           fs.writeFileSync('sidestore-source.json', JSON.stringify(source, null, 2) + '\n');
           NODE
 
+          # Check main once more after the upload in case a newer app commit arrived.
+          CURRENT_VERSION=$(gh api "repos/${GITHUB_REPOSITORY}/contents/app.json?ref=main" --jq .content | base64 --decode | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).expo.version))")
+          if [ "$CURRENT_VERSION" != "$VERSION" ]; then
+            echo "Main changed to $CURRENT_VERSION during publish; source update skipped."
+            exit 0
+          fi
+
           SOURCE_SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/sidestore-source.json?ref=main" --jq .sha)
           SOURCE_B64=$(base64 < sidestore-source.json | tr -d '\n')
           gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/sidestore-source.json" \
@@ -230,57 +173,13 @@ jobs:
             -f sha="$SOURCE_SHA" \
             -f branch="main" >/dev/null
 
-      - name: Publish diagnostic report
-        if: always()
+      - name: Publish stable tagged build
+        if: startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          {
-            echo "SparFlow iOS CI diagnostic"
-            echo "commit: ${GITHUB_SHA}"
-            echo "run: ${GITHUB_RUN_NUMBER}"
-            echo "version: ${{ steps.metadata.outputs.version }}"
-            echo "build: ${{ steps.metadata.outputs.build_number }}"
-            echo
-            echo "install:      ${{ steps.install.outcome }} (exit ${{ steps.install.outputs.exit_code }})"
-            echo "typecheck:    ${{ steps.typecheck.outcome }} (exit ${{ steps.typecheck.outputs.exit_code }})"
-            echo "prebuild:     ${{ steps.prebuild.outcome }} (exit ${{ steps.prebuild.outputs.exit_code }})"
-            echo "widget patch: ${{ steps.widget_patch.outcome }} (exit ${{ steps.widget_patch.outputs.exit_code }})"
-            echo "pods:         ${{ steps.pods.outcome }} (exit ${{ steps.pods.outputs.exit_code }})"
-            echo "xcode:        ${{ steps.xcode.outcome }} (exit ${{ steps.xcode.outputs.exit_code }})"
-            echo "package:      ${{ steps.package.outcome }} (exit ${{ steps.package.outputs.exit_code }})"
-            echo
-            echo "===== NATIVE VERSION GRAPH ====="
-            npm ls react-native-reanimated react-native-worklets --all || true
-            echo
-            if [ -f ci-logs/xcodebuild.log ]; then
-              echo "===== XCODE ERROR SUMMARY ====="
-              grep -n -C 8 -E '(^|[[:space:]])(fatal )?error:|BUILD FAILED|The following build commands failed|ExpoWorkletsBridgeProvider' ci-logs/xcodebuild.log | tail -n 240 || true
-              echo
-            fi
-            for file in ci-logs/install.log ci-logs/typecheck.log ci-logs/prebuild.log ci-logs/widget-patch.log ci-logs/pods.log ci-logs/xcodebuild.log ci-logs/package.log; do
-              if [ -f "$file" ]; then
-                echo "===== $file (last 160 lines) ====="
-                tail -n 160 "$file"
-                echo
-              fi
-            done
-          } > ci-report.txt
-
-          encoded=$(base64 < ci-report.txt | tr -d '\n')
-          report_path="ci-reports/run-${GITHUB_RUN_NUMBER}-${GITHUB_SHA}.txt"
-          gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/${report_path}" \
-            -f message="ci: add diagnostic report for run ${GITHUB_RUN_NUMBER} [skip ci]" \
-            -f content="$encoded" \
-            -f branch="ci-diagnostics" >/dev/null
-
-      - name: Enforce clean build
-        if: always()
-        run: |
-          test "${{ steps.install.outcome }}" = "success"
-          test "${{ steps.typecheck.outcome }}" = "success"
-          test "${{ steps.prebuild.outcome }}" = "success"
-          test "${{ steps.widget_patch.outcome }}" = "success"
-          test "${{ steps.pods.outcome }}" = "success"
-          test "${{ steps.xcode.outcome }}" = "success"
-          test "${{ steps.package.outcome }}" = "success"
+          TAG="${GITHUB_REF_NAME}"
+          cp assets/icon.png SparFlow-icon.png
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --title "SparFlow $TAG" --notes "Unsigned iPhone IPA for SideStore sideloading."
+          gh release upload "$TAG" SparFlow.ipa SparFlow-icon.png --clobber
