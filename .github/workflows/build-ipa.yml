@@ -150,9 +150,10 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           TAG="${GITHUB_REF_NAME}"
+          cp assets/icon.png SparFlow-icon.png
           gh release view "$TAG" >/dev/null 2>&1 || \
             gh release create "$TAG" --title "SparFlow $TAG" --notes "Unsigned iPhone IPA for SideStore sideloading."
-          gh release upload "$TAG" SparFlow.ipa --clobber
+          gh release upload "$TAG" SparFlow.ipa SparFlow-icon.png --clobber
 
       - name: Publish automatic SideStore update
         if: steps.package.outcome == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main'
@@ -162,9 +163,10 @@ jobs:
           BUILD_NUMBER: ${{ steps.metadata.outputs.build_number }}
         run: |
           AUTO_TAG="sidestore-latest"
+          cp assets/icon.png SparFlow-icon.png
           gh release view "$AUTO_TAG" >/dev/null 2>&1 || \
             gh release create "$AUTO_TAG" --title "SparFlow SideStore Auto Update" --notes "Latest automatic SideStore build."
-          gh release upload "$AUTO_TAG" SparFlow.ipa --clobber
+          gh release upload "$AUTO_TAG" SparFlow.ipa SparFlow-icon.png --clobber
 
           export IPA_SIZE=$(stat -f%z SparFlow.ipa)
           export RELEASE_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
