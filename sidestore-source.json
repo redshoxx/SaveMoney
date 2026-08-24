@@ -12,11 +12,11 @@
       "versions": [
         {
           "version": "2.0.0",
-          "buildVersion": "40",
-          "date": "2026-08-24T09:42:26Z",
+          "buildVersion": "41",
+          "date": "2026-08-24T09:43:14Z",
           "localizedDescription": "Automatischer SparFlow-Build aus dem aktuellen main-Stand.",
           "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-          "size": 13767510,
+          "size": 15225925,
           "minOSVersion": "16.4"
         },
         {
