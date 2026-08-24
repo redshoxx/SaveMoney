@@ -1,6 +1,6 @@
 SparFlow iOS CI diagnostic
-commit: 250dad38560657d1f43739bd543bc15621f706fc
-run: 14
+commit: 485c7a863f3eb7dba0b78c9d2f71151485c78834
+run: 13
 
 install:   success (exit 0)
 typecheck: success (exit 0)
@@ -13,7 +13,7 @@ package:   skipped (exit )
 npm warn ERESOLVE overriding peer dependency
 npm warn deprecated uuid@7.0.3: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
 
-added 558 packages in 25s
+added 558 packages in 30s
 
 ===== ci-logs/typecheck.log (last 160 lines) =====
 
@@ -153,7 +153,7 @@ solutions to build the project.
 `yarn ios`
 =============================================================
 
-Pod install took 40 [s] to run
+Pod install took 61 [s] to run
 Integrating client project
 
 [!] Please close any current Xcode sessions and use `SparFlow.xcworkspace` for this project from now on.
@@ -192,145 +192,145 @@ Pod installation complete! There are 104 dependencies from the Podfile and 103 t
 [!] hermes-engine has added 1 script phase. Please inspect before executing a build. See `https://guides.cocoapods.org/syntax/podspec.html#script_phases` for more information.
 
 ===== ci-logs/xcodebuild.log (last 160 lines) =====
-    builtin-swiftHeaderTool -arch arm64 /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-Swift.h -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/DerivedSources/ExpoSQLite-Swift.h
+    export STRINGSDATA_ROOT\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build
+    export STRINGS_FILE_INFOPLIST_RENAME\=YES
+    export STRINGS_FILE_OUTPUT_ENCODING\=binary
+    export STRING_CATALOG_GENERATE_SYMBOLS\=NO
+    export STRIP_BITCODE_FROM_COPIED_FILES\=YES
+    export STRIP_INSTALLED_PRODUCT\=NO
+    export STRIP_STYLE\=debugging
+    export STRIP_SWIFT_SYMBOLS\=YES
+    export SUPPORTED_DEVICE_FAMILIES\=1,2
+    export SUPPORTED_PLATFORMS\=iphoneos\ iphonesimulator
+    export SUPPORTS_MACCATALYST\=YES
+    export SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD\=YES
+    export SUPPORTS_TEXT_BASED_API\=NO
+    export SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD\=YES
+    export SUPPRESS_WARNINGS\=NO
+    export SWIFT_ACTIVE_COMPILATION_CONDITIONS\=\ 
+    export SWIFT_COMPILATION_MODE\=wholemodule
+    export SWIFT_EMIT_CONST_VALUE_PROTOCOLS\=AnyResolverProviding\ AppEntity\ AppEnum\ AppExtension\ AppIntent\ AppIntentsPackage\ AppShortcutProviding\ AppShortcutsProvider\ DynamicOptionsProvider\ EntityQuery\ ExtensionPointDefining\ IntentValueQuery\ Resolver\ TransientEntity\ _AssistantIntentsProvider\ _GenerativeFunctionExtractable\ _IntentValueRepresentable
+    export SWIFT_EMIT_LOC_STRINGS\=NO
+    export SWIFT_EMIT_MODULE_INTERFACE\=NO
+    export SWIFT_ENABLE_EXPLICIT_MODULES\=NO
+    export SWIFT_INCLUDE_PATHS\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoRouter\ \ \"/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesCore\"\ \"/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesJSI\"\ \"/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/RNScreens\"
+    export SWIFT_INSTALL_OBJC_HEADER\=YES
+    export SWIFT_OPTIMIZATION_LEVEL\=-O
+    export SWIFT_PLATFORM_TARGET_PREFIX\=ios
+    export SWIFT_RESPONSE_FILE_PATH_normal_arm64\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Objects-normal/arm64/ExpoRouter.SwiftFileList
+    export SWIFT_VERSION\=5.9
+    export SYMROOT\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products
+    export SYSTEM_ADMIN_APPS_DIR\=/Applications/Utilities
+    export SYSTEM_APPS_DIR\=/Applications
+    export SYSTEM_CORE_SERVICES_DIR\=/System/Library/CoreServices
+    export SYSTEM_DEMOS_DIR\=/Applications/Extras
+    export SYSTEM_DEVELOPER_APPS_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/Applications
+    export SYSTEM_DEVELOPER_BIN_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/usr/bin
+    export SYSTEM_DEVELOPER_DEMOS_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/Applications/Utilities/Built\ Examples
+    export SYSTEM_DEVELOPER_DIR\=/Applications/Xcode_26.6.app/Contents/Developer
+    export SYSTEM_DEVELOPER_DOC_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/ADC\ Reference\ Library
+    export SYSTEM_DEVELOPER_GRAPHICS_TOOLS_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/Applications/Graphics\ Tools
+    export SYSTEM_DEVELOPER_JAVA_TOOLS_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/Applications/Java\ Tools
+    export SYSTEM_DEVELOPER_PERFORMANCE_TOOLS_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/Applications/Performance\ Tools
+    export SYSTEM_DEVELOPER_RELEASENOTES_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/ADC\ Reference\ Library/releasenotes
+    export SYSTEM_DEVELOPER_TOOLS\=/Applications/Xcode_26.6.app/Contents/Developer/Tools
+    export SYSTEM_DEVELOPER_TOOLS_DOC_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/ADC\ Reference\ Library/documentation/DeveloperTools
+    export SYSTEM_DEVELOPER_TOOLS_RELEASENOTES_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/ADC\ Reference\ Library/releasenotes/DeveloperTools
+    export SYSTEM_DEVELOPER_USR_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/usr
+    export SYSTEM_DEVELOPER_UTILITIES_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/Applications/Utilities
+    export SYSTEM_DEXT_INSTALL_PATH\=/System/Library/DriverExtensions
+    export SYSTEM_DOCUMENTATION_DIR\=/Library/Documentation
+    export SYSTEM_KEXT_INSTALL_PATH\=/System/Library/Extensions
+    export SYSTEM_LIBRARY_DIR\=/System/Library
+    export TAPI_DEMANGLE\=YES
+    export TAPI_ENABLE_PROJECT_HEADERS\=NO
+    export TAPI_LANGUAGE\=objective-c
+    export TAPI_LANGUAGE_STANDARD\=compiler-default
+    export TAPI_USE_SRCROOT\=YES
+    export TAPI_VERIFY_MODE\=Pedantic
+    export TARGETED_DEVICE_FAMILY\=1,2
+    export TARGETNAME\=ExpoRouter
+    export TARGET_BUILD_DIR\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoRouter
+    export TARGET_NAME\=ExpoRouter
+    export TARGET_TEMP_DIR\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build
+    export TEMP_DIR\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build
+    export TEMP_FILES_DIR\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build
+    export TEMP_FILE_DIR\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build
+    export TEMP_ROOT\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex
+    export TEMP_SANDBOX_DIR\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/TemporaryTaskSandboxes
+    export TEST_FRAMEWORK_SEARCH_PATHS\=\ /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/Library/Frameworks\ /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk/Developer/Library/Frameworks
+    export TEST_LIBRARY_SEARCH_PATHS\=\ /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib
+    export TOOLCHAINS\=com.apple.dt.toolchain.Metal.32023.883\ com.apple.dt.toolchain.XcodeDefault
+    export TOOLCHAIN_DIR\=/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.SVoqTe/Metal.xctoolchain
+    export TOOLCHAIN_VERSION\=32023.883
+    export TREAT_MISSING_BASELINES_AS_TEST_FAILURES\=NO
+    export TREAT_MISSING_SCRIPT_PHASE_OUTPUTS_AS_ERRORS\=NO
+    export UID\=501
+    export UNINSTALLED_PRODUCTS_DIR\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/UninstalledProducts
+    export UNSTRIPPED_PRODUCT\=NO
+    export USER\=runner
+    export USER_APPS_DIR\=/Users/runner/Applications
+    export USER_LIBRARY_DIR\=/Users/runner/Library
+    export USE_DYNAMIC_NO_PIC\=YES
+    export USE_HEADERMAP\=YES
+    export USE_HEADER_SYMLINKS\=NO
+    export USE_HERMES\=true
+    export USE_RECURSIVE_SCRIPT_INPUTS_IN_SCRIPT_PHASES\=YES
+    export VALIDATE_DEVELOPMENT_ASSET_PATHS\=YES_ERROR
+    export VALIDATE_PRODUCT\=YES
+    export VALID_ARCHS\=arm64\ arm64e\ armv7\ armv7s
+    export VERBOSE_PBXCP\=NO
+    export VERSION_INFO_BUILDER\=runner
+    export VERSION_INFO_FILE\=ExpoRouter_vers.c
+    export VERSION_INFO_STRING\=\"@\(\#\)PROGRAM:ExpoRouter\ \ PROJECT:Pods-\"
+    export WORKSPACE_DIR\=/Users/runner/work/SaveMoney/SaveMoney/ios
+    export WRAP_ASSET_PACKS_IN_SEPARATE_DIRECTORIES\=NO
+    export XCODE_APP_SUPPORT_DIR\=/Applications/Xcode_26.6.app/Contents/Developer/Library/Xcode
+    export XCODE_PRODUCT_BUILD_VERSION\=17F113
+    export XCODE_VERSION_ACTUAL\=2660
+    export XCODE_VERSION_MAJOR\=2600
+    export XCODE_VERSION_MINOR\=2660
+    export XPCSERVICES_FOLDER_PATH\=/XPCServices
+    export YACC\=yacc
+    export _DISCOVER_COMMAND_LINE_LINKER_INPUTS\=YES
+    export _DISCOVER_COMMAND_LINE_LINKER_INPUTS_INCLUDE_WL\=YES
+    export _LD_MULTIARCH\=YES
+    export __DIAGNOSE_DEPRECATED_ARCHS\=YES
+    export __ORIGINAL_SDK_DEFINED_LLVM_TARGET_TRIPLE_SYS\=ios
+    export arch\=undefined_arch
+    export variant\=normal
+    /bin/sh -c /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Script-46EB2E00017C00.sh
 
-Copy /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSQLite/ExpoSQLite.swiftmodule/arm64-apple-ios.swiftmodule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite.swiftmodule (in target 'ExpoSQLite' from project 'Pods')
-    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite.swiftmodule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSQLite/ExpoSQLite.swiftmodule/arm64-apple-ios.swiftmodule
-
-Copy /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSQLite/ExpoSQLite.swiftmodule/arm64-apple-ios.swiftdoc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite.swiftdoc (in target 'ExpoSQLite' from project 'Pods')
-    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite.swiftdoc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSQLite/ExpoSQLite.swiftmodule/arm64-apple-ios.swiftdoc
-
-Copy /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSQLite/ExpoSQLite.swiftmodule/arm64-apple-ios.abi.json /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite.abi.json (in target 'ExpoSQLite' from project 'Pods')
-    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite.abi.json /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSQLite/ExpoSQLite.swiftmodule/arm64-apple-ios.abi.json
-
-Copy /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSQLite/ExpoSQLite.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite.swiftsourceinfo (in target 'ExpoSQLite' from project 'Pods')
-    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
-    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -resolve-src-symlinks -rename /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite.swiftsourceinfo /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSQLite/ExpoSQLite.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo
-
-ScanDependencies /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/sqlite3.o /Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-sqlite/ios/sqlite3.c normal arm64 c com.apple.compilers.llvm.clang.1_0.compiler (in target 'ExpoSQLite' from project 'Pods')
-    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
-    
-    Using response file: /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/7187679823f38a2a940e0043cdf9d637-common-args.resp
-    
-    builtin-ScanDependencies -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/sqlite3.o.scan -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x c -ivfsstatcache /Users/runner/work/SaveMoney/SaveMoney/ios/build/SDKStatCaches.noindex/iphoneos26.5-23F81a-688ef53f1462e2c8f657fdc38a81448fee66e23052a0157c865c76b268046726.sdkstatcache -target arm64-apple-ios16.4 -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Werror\=deprecated-objc-isa-usage -Werror\=objc-root-class -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-implicit-fallthrough -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -fstrict-aliasing -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wstrict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability @/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/7187679823f38a2a940e0043cdf9d637-common-args.resp -include /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoSQLite/ExpoSQLite-prefix.pch -MMD -MT dependencies -MF /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/sqlite3.d --serialize-diagnostics /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/sqlite3.dia -c /Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-sqlite/ios/sqlite3.c -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/sqlite3.o
-
-ScanDependencies /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-dummy.o /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoSQLite/ExpoSQLite-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler (in target 'ExpoSQLite' from project 'Pods')
+CompileC /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-dummy.o /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoSQLite/ExpoSQLite-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler (in target 'ExpoSQLite' from project 'Pods')
     cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
     
     Using response file: /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/e6072d4f65d7061329687fe24e3d63a7-common-args.resp
     
-    builtin-ScanDependencies -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-dummy.o.scan -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -ivfsstatcache /Users/runner/work/SaveMoney/SaveMoney/ios/build/SDKStatCaches.noindex/iphoneos26.5-23F81a-688ef53f1462e2c8f657fdc38a81448fee66e23052a0157c865c76b268046726.sdkstatcache -target arm64-apple-ios16.4 -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Wno-implicit-atomic-properties -Werror\=deprecated-objc-isa-usage -Wno-objc-interface-ivars -Werror\=objc-root-class -Wno-arc-repeated-use-of-weak -Wimplicit-retain-self -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wdeprecated-implementations -Wno-implicit-fallthrough -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wstrict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability @/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/e6072d4f65d7061329687fe24e3d63a7-common-args.resp -include /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoSQLite/ExpoSQLite-prefix.pch -MMD -MT dependencies -MF /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-dummy.d --serialize-diagnostics /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-dummy.dia -c /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoSQLite/ExpoSQLite-dummy.m -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-dummy.o
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -ivfsstatcache /Users/runner/work/SaveMoney/SaveMoney/ios/build/SDKStatCaches.noindex/iphoneos26.5-23F81a-688ef53f1462e2c8f657fdc38a81448fee66e23052a0157c865c76b268046726.sdkstatcache -target arm64-apple-ios16.4 -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Wno-implicit-atomic-properties -Werror\=deprecated-objc-isa-usage -Wno-objc-interface-ivars -Werror\=objc-root-class -Wno-arc-repeated-use-of-weak -Wimplicit-retain-self -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wdeprecated-implementations -Wno-implicit-fallthrough -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wstrict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability @/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/e6072d4f65d7061329687fe24e3d63a7-common-args.resp -include /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoSQLite/ExpoSQLite-prefix.pch -MMD -MT dependencies -MF /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-dummy.d --serialize-diagnostics /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-dummy.dia -c /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoSQLite/ExpoSQLite-dummy.m -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoSQLite.build/Objects-normal/arm64/ExpoSQLite-dummy.o
 
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ptrcheck-E2R46NEXCFT7B4O3FLFARYNMM.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ptrcheck-E2R46NEXCFT7B4O3FLFARYNMM.scan
+ExtractAppIntentsMetadata (in target 'ExpoRouter' from project 'Pods')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.SVoqTe/Metal.xctoolchain --module-name ExpoRouter --sdk-root /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 16.4 --bundle-identifier org.cocoapods.ExpoRouter --output /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoRouter/ExpoRouter.appintents --target-triple arm64-apple-ios16.4 --binary-file /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoRouter/libExpoRouter.a --dependency-file /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Objects-normal/arm64/ExpoRouter_libtool_dependency_info.dat --stringsdata-file /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Objects-normal/arm64/ExpoRouter.SwiftFileList --metadata-file-list /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/ExpoRouter.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/ExpoRouter.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Objects-normal/arm64/ExpoRouter.SwiftConstValuesFileList --force --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+2026-08-24 07:49:30.789 appintentsmetadataprocessor[21949:60780] Starting appintentsmetadataprocessor export
+2026-08-24 07:49:30.831 appintentsmetadataprocessor[21949:60780] Extracted no relevant App Intents symbols, skipping writing output
 
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdarg-63U0XPMUVABPQMB2573O9XXW8.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdarg-63U0XPMUVABPQMB2573O9XXW8.scan
+CompileC /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoWorkletsBridgeProvider.o /Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-modules-core/ios/WorkletsAdapter/ExpoWorkletsBridgeProvider.mm normal arm64 objective-c++ com.apple.compilers.llvm.clang.1_0.compiler (in target 'ExpoModulesWorkletsAdapter' from project 'Pods')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
+    
+    Using response file: /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/af3fcb34312c57c0f52879cdce924b91-common-args.resp
+    
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c++ -ivfsstatcache /Users/runner/work/SaveMoney/SaveMoney/ios/build/SDKStatCaches.noindex/iphoneos26.5-23F81a-688ef53f1462e2c8f657fdc38a81448fee66e23052a0157c865c76b268046726.sdkstatcache -target arm64-apple-ios16.4 -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Wno-implicit-atomic-properties -Werror\=deprecated-objc-isa-usage -Wno-objc-interface-ivars -Werror\=objc-root-class -Wno-arc-repeated-use-of-weak -Wimplicit-retain-self -Wno-non-virtual-dtor -Wno-overloaded-virtual -Wno-exit-time-destructors -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wdeprecated-implementations -Wno-c++11-extensions -Wno-implicit-fallthrough -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -Winvalid-offsetof -Wno-sign-conversion -Winfinite-recursion -Wmove -Wcomma -Wblock-capture-autoreleasing -Wstrict-prototypes -Wrange-loop-analysis -Wno-semicolon-before-method-body -Wunguarded-availability @/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/af3fcb34312c57c0f52879cdce924b91-common-args.resp -include /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoModulesWorkletsAdapter/ExpoModulesWorkletsAdapter-prefix.pch -MMD -MT dependencies -MF /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoWorkletsBridgeProvider.d --serialize-diagnostics /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoWorkletsBridgeProvider.dia -c /Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-modules-core/ios/WorkletsAdapter/ExpoWorkletsBridgeProvider.mm -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoWorkletsBridgeProvider.o
+/Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-modules-core/ios/WorkletsAdapter/ExpoWorkletsBridgeProvider.mm:236:19: error: no member named 'executeSync' in 'worklets::WorkletRuntime'
+  236 |   workletRuntime->executeSync([worklet, arguments](jsi::Runtime &rt) -> jsi::Value {
+      |   ~~~~~~~~~~~~~~~~^
+1 error generated.
 
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_AvailabilityInternal-7HAQBOZC3VJU7267HM7G78EE.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_AvailabilityInternal-7HAQBOZC3VJU7267HM7G78EE.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stddef-2KM1W7WNAC0IW4VGZFJ4B8LBJ.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stddef-2KM1W7WNAC0IW4VGZFJ4B8LBJ.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_float-Z5KKUSUZ3SNG90O5JPZPC22K.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_float-Z5KKUSUZ3SNG90O5JPZPC22K.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_AvailabilityInternal-4VRRIKAE1RC07BW293BTJFYVE.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_AvailabilityInternal-4VRRIKAE1RC07BW293BTJFYVE.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdbool-S4T9NWBWBB9W1LOYLXCIH362.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdbool-S4T9NWBWBB9W1LOYLXCIH362.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ptrauth-ARWWVELBB5PJPEE7CY1NT1VVY.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ptrauth-ARWWVELBB5PJPEE7CY1NT1VVY.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdarg-1F0AG1T9ELM2GLRQH9SCOVBH3.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdarg-1F0AG1T9ELM2GLRQH9SCOVBH3.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation1-BELB7PW6JNO7L7Z0W106GJ6R6.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation1-BELB7PW6JNO7L7Z0W106GJ6R6.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ptrcheck-6GLI0YMHR6WUHCEKIZOQ8LKS6.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ptrcheck-6GLI0YMHR6WUHCEKIZOQ8LKS6.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stddef-EHHLQHG8DZT5A8PU5T4X1RTAY.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stddef-EHHLQHG8DZT5A8PU5T4X1RTAY.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation1-8960AU0TWRJ3MDJSPJ58E5PC1.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation1-8960AU0TWRJ3MDJSPJ58E5PC1.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation2-4YXFBTOWADJLB730GVYZCR0L4.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation2-4YXFBTOWADJLB730GVYZCR0L4.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_limits-E88HOMIT9YI7E9W6FX54E9NH2.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_limits-E88HOMIT9YI7E9W6FX54E9NH2.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation2-CCBN0GJVDX8TAKKG019XP9N6W.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation2-CCBN0GJVDX8TAKKG019XP9N6W.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdbool-722VE0PBQBYU7DROD5LG86YVW.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdbool-722VE0PBQBYU7DROD5LG86YVW.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdint-665AJGPVHMYNF03AL8RIN4ZBR.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdint-665AJGPVHMYNF03AL8RIN4ZBR.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdint-DV719U6PN7XQQMTPU03BLEB0Y.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_stdint-DV719U6PN7XQQMTPU03BLEB0Y.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation3-25K251X3Y8HO7CF5S0YA1QWDS.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation3-25K251X3Y8HO7CF5S0YA1QWDS.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation3-7D4IKNM6B2IX1ANF3ASTU175K.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_DarwinFoundation3-7D4IKNM6B2IX1ANF3ASTU175K.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_inttypes-C1CDD7Q4WOZFMKAMXGEGKU1U5.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_inttypes-C1CDD7Q4WOZFMKAMXGEGKU1U5.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_inttypes-2GID7EOX8KEIT6SILQUD0GK44.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_inttypes-2GID7EOX8KEIT6SILQUD0GK44.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Darwin-77PEO8T88HJTSW393KU2L44MQ.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Darwin-77PEO8T88HJTSW393KU2L44MQ.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_limits-7G0MPDNO6EZENJBSKYYIJR372.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/_Builtin_limits-7G0MPDNO6EZENJBSKYYIJR372.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ObjectiveC-9RYKEC00UURTA6Z6UOYYUDYY3.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ObjectiveC-9RYKEC00UURTA6Z6UOYYUDYY3.scan
-
-PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Darwin-33GY05KH00UR9K0TXLWH1KIF9.scan
-    cd /
-    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Darwin-33GY05KH00UR9K0TXLWH1KIF9.scan
+ScanDependencies /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoModulesWorkletsAdapter-dummy.o /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoModulesWorkletsAdapter/ExpoModulesWorkletsAdapter-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler (in target 'ExpoModulesWorkletsAdapter' from project 'Pods')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
+    
+    Using response file: /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/e6072d4f65d7061329687fe24e3d63a7-common-args.resp
+    
+    builtin-ScanDependencies -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoModulesWorkletsAdapter-dummy.o.scan -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -ivfsstatcache /Users/runner/work/SaveMoney/SaveMoney/ios/build/SDKStatCaches.noindex/iphoneos26.5-23F81a-688ef53f1462e2c8f657fdc38a81448fee66e23052a0157c865c76b268046726.sdkstatcache -target arm64-apple-ios16.4 -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Wno-implicit-atomic-properties -Werror\=deprecated-objc-isa-usage -Wno-objc-interface-ivars -Werror\=objc-root-class -Wno-arc-repeated-use-of-weak -Wimplicit-retain-self -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wdeprecated-implementations -Wno-implicit-fallthrough -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wstrict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability @/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/e6072d4f65d7061329687fe24e3d63a7-common-args.resp -include /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoModulesWorkletsAdapter/ExpoModulesWorkletsAdapter-prefix.pch -MMD -MT dependencies -MF /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoModulesWorkletsAdapter-dummy.d --serialize-diagnostics /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoModulesWorkletsAdapter-dummy.dia -c /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoModulesWorkletsAdapter/ExpoModulesWorkletsAdapter-dummy.m -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoModulesWorkletsAdapter-dummy.o
 
 warning: Run script build phase '[CP-User] [Hermes] Replace Hermes for the right configuration, if needed' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'hermes-engine' from project 'Pods')
 note: Run script build phase '[CP-User] [RNDeps] Replace React Native Dependencies for the right configuration, if needed' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ReactNativeDependencies' from project 'Pods')
