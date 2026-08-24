@@ -1,17 +1,16 @@
 # SparFlow
 
-Eine lokal-first Spar-App für iPhone. Schnell sparen, klare Ziele verfolgen, Challenges starten und spielerisch sparen — ohne Account und ohne Cloud-Zwang.
+Eine minimalistische, lokal-first Spar-App für iPhone. Ziel: in möglichst wenigen Schritten Geld sparen, Ziele verfolgen und Sparroutinen nutzen — ohne Account und ohne Cloud-Zwang.
 
 ## Funktionen
 
-- **iPhone-first Oberfläche** mit Bottom-Navigation und großen Touch-Flächen
-- **Sparziele** mit Zielbetrag, Farbe, Symbol, Meilensteinen und Prognose
-- **Spar-Aktionen**, No-Spend-Days und Spar-Roulette
-- **Challenge-Vorlagen** plus eigene tägliche, wöchentliche, Aktions- und Zufalls-Challenges
-- **Gamification** mit Level, XP, Erfolgen und Spar-Serie
-- **Wochen-/Monatsstatistiken**, Verlauf und Was-wäre-wenn-Rechner
-- **Lokale Sparregeln** für wiederkehrende Sparroutinen
-- **iOS-Homescreen-Widget** in Small und Medium mit Gesamtbetrag, Hauptziel, Fortschritt, Level und Sparserie
+- **3-Tab-Navigation:** Heute, Sparen, Einstellungen
+- **Schnell sparen** mit großen Beträgen und eigenem Betrag
+- **Sparziele** mit Fortschritt und schnellen Einzahlungen
+- **Challenges**, Sparideen, No-Spend und Roulette als optionale Zusatzfunktionen
+- **Sparregeln** für wiederkehrende Routinen
+- **Statistiken, Verlauf, Erfolge und Was-wäre-wenn-Rechner**
+- **Lokale App-Einstellungen** für Haptik, Schnell-Sparen, Monatsinfo, Gamification und Zielanzeige
 - **Lokale SQLite-Datenbank** über `expo-sqlite`
 - **Keine Registrierung**, kein Tracking, kein Backend für die Grundfunktionen
 - **SideStore-Workflow** mit automatischem Update-Feed
@@ -32,21 +31,6 @@ npm install
 npx expo start
 ```
 
-Das echte Widget benötigt einen nativen iOS-Build und läuft nicht in Expo Go.
-
-## iPhone-Widget
-
-SparFlow registriert über `expo-widgets` eine WidgetKit-Extension mit zwei Größen:
-
-- **Klein:** Gesamtbetrag, Hauptziel, Fortschritt und Sparserie
-- **Mittel:** Gesamtbetrag, Hauptziel, Restbetrag, Fortschritt, Level und Sparserie
-
-Die App schreibt nach jedem Daten-Reload einen neuen Widget-Snapshot. Dadurch werden Sparaktionen, Challenge-Schritte, Zieländerungen und andere Buchungen an WidgetKit weitergegeben.
-
-Auf dem iPhone: Homescreen lange gedrückt halten → **Bearbeiten / +** → **Widgets** → **SparFlow** → Größe wählen → **Widget hinzufügen**.
-
-Hinweis für SideStore: Das Widget ist eine zusätzliche App-Extension und benötigt beim Sideloading einen zusätzlichen App-ID/Extension-Slot. Die gemeinsame Datenübertragung zwischen App und Widget verwendet eine iOS App Group.
-
 ## SideStore installieren und Updates erhalten
 
 Die App-Source muss nur einmal in SideStore hinzugefügt werden:
@@ -61,14 +45,7 @@ Direkter SideStore-Link:
 sidestore://source?url=https://raw.githubusercontent.com/redshoxx/SaveMoney/main/sidestore-source.json
 ```
 
-Danach erkennt SideStore neue SparFlow-Builds über diese Source. Jeder erfolgreiche Push auf `main`:
-
-1. erzeugt automatisch eine neue iOS-Buildnummer,
-2. baut eine unsigned `SparFlow.ipa`,
-3. aktualisiert das GitHub-Release `sidestore-latest`,
-4. aktualisiert `sidestore-source.json` mit Version, Buildnummer, Datum, Dateigröße und Download-URL.
-
-SideStore zeigt danach ein Update für SparFlow an. Die tatsächliche Installation des Updates wird weiterhin in SideStore bestätigt; iOS erlaubt hier kein vollständig unsichtbares Silent-Update einer sideloaded App.
+Jeder erfolgreiche Push auf `main` baut eine unsigned `SparFlow.ipa`, aktualisiert das Release `sidestore-latest` und schreibt die neue sichtbare Version in `sidestore-source.json`.
 
 ## Manuelle IPA über GitHub Actions
 
@@ -76,8 +53,6 @@ SideStore zeigt danach ein Update für SparFlow an. Die tatsächliche Installati
 2. **Run workflow** starten.
 3. Nach erfolgreichem Lauf das Artifact **SparFlow-SideStore-IPA** herunterladen.
 4. ZIP entpacken und `SparFlow.ipa` in SideStore importieren.
-
-Bei einem Git-Tag wie `v2.0.0` wird zusätzlich eine versionierte GitHub Release mit `SparFlow.ipa` erstellt.
 
 ## Lokale Daten
 
@@ -88,8 +63,9 @@ Die Datei `sparflow.db` enthält unter anderem:
 - `contributions`
 - `saving_rules`
 - `no_spend_days`
+- `app_settings`
 
-Einzahlungen werden separat protokolliert. Dadurch bleiben Gesamtstand, Verlauf, XP, Serien und Statistiken nachvollziehbar.
+Einzahlungen werden separat protokolliert. Dadurch bleiben Gesamtstand, Verlauf, Serien und Statistiken nachvollziehbar.
 
 ## Projektstruktur
 
@@ -98,11 +74,10 @@ app/                  Expo Router Screens
 components/           Wiederverwendbare UI-Bausteine
 constants/            Farben und Design Tokens
 data/                 Challenge- und Spar-Aktions-Vorlagen
-db/                   SQLite-Schema und Queries
+db/                   SQLite-Schema, Queries und lokale Einstellungen
 store/                App-State und Mutationen
 types/                TypeScript-Datenmodelle
 utils/                Formatierung und Insights
-widgets/              Expo WidgetKit-Layouts
 .github/workflows/     SideStore IPA Build und Auto-Update
 ```
 

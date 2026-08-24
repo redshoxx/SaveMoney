@@ -1,6 +1,6 @@
 {
   "name": "sparflow",
-  "version": "2.0.3",
+  "version": "2.1.0",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
@@ -10,11 +10,9 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "generate:icon": "node scripts/generate-icon.mjs",
-    "patch:widget-native": "node scripts/patch-widget-container-background.mjs",
     "postinstall": "npm run generate:icon"
   },
   "dependencies": {
-    "@expo/ui": "~57.0.11",
     "expo": "~57.0.9",
     "expo-constants": "~57.0.8",
     "expo-haptics": "~57.0.1",
@@ -25,7 +23,6 @@
     "expo-sqlite": "~57.0.1",
     "expo-status-bar": "~57.0.1",
     "expo-system-ui": "~57.0.2",
-    "expo-widgets": "~57.0.8",
     "react": "19.2.3",
     "react-native": "0.86.2",
     "react-native-reanimated": "4.5.1",
