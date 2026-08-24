@@ -7,6 +7,8 @@ on:
       - main
     tags:
       - 'v*'
+    paths-ignore:
+      - 'sidestore-source.json'
   pull_request:
     branches:
       - main
@@ -28,6 +30,23 @@ jobs:
         with:
           node-version: '22'
           package-manager-cache: false
+
+      - name: Prepare SideStore build metadata
+        id: metadata
+        shell: bash
+        run: |
+          VERSION=$(node -p "require('./app.json').expo.version")
+          BUILD_NUMBER="${GITHUB_RUN_NUMBER}"
+          node - <<'NODE'
+          const fs = require('fs');
+          const app = JSON.parse(fs.readFileSync('app.json', 'utf8'));
+          app.expo.ios = app.expo.ios || {};
+          app.expo.ios.buildNumber = process.env.GITHUB_RUN_NUMBER;
+          fs.writeFileSync('app.json', JSON.stringify(app, null, 2) + '\n');
+          NODE
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
+          echo "SparFlow $VERSION ($BUILD_NUMBER)"
 
       - name: Install dependencies
         id: install
@@ -125,7 +144,7 @@ jobs:
           path: SparFlow.ipa
           if-no-files-found: error
 
-      - name: Publish tagged build to GitHub Release
+      - name: Publish stable tagged build
         if: steps.package.outcome == 'success' && startsWith(github.ref, 'refs/tags/')
         env:
           GH_TOKEN: ${{ github.token }}
@@ -134,6 +153,51 @@ jobs:
           gh release view "$TAG" >/dev/null 2>&1 || \
             gh release create "$TAG" --title "SparFlow $TAG" --notes "Unsigned iPhone IPA for SideStore sideloading."
           gh release upload "$TAG" SparFlow.ipa --clobber
+
+      - name: Publish automatic SideStore update
+        if: steps.package.outcome == 'success' && github.event_name == 'push' && github.ref == 'refs/heads/main'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.metadata.outputs.version }}
+          BUILD_NUMBER: ${{ steps.metadata.outputs.build_number }}
+        run: |
+          AUTO_TAG="sidestore-latest"
+          gh release view "$AUTO_TAG" >/dev/null 2>&1 || \
+            gh release create "$AUTO_TAG" --title "SparFlow SideStore Auto Update" --notes "Latest automatic SideStore build."
+          gh release upload "$AUTO_TAG" SparFlow.ipa --clobber
+
+          IPA_SIZE=$(stat -f%z SparFlow.ipa)
+          RELEASE_DATE=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+          DOWNLOAD_URL="https://github.com/${GITHUB_REPOSITORY}/releases/download/${AUTO_TAG}/SparFlow.ipa"
+
+          node - <<'NODE'
+          const fs = require('fs');
+          const source = JSON.parse(fs.readFileSync('sidestore-source.json', 'utf8'));
+          const app = source.apps[0];
+          const next = {
+            version: process.env.VERSION,
+            buildVersion: process.env.BUILD_NUMBER,
+            date: process.env.RELEASE_DATE,
+            localizedDescription: 'Automatischer SparFlow-Build aus dem aktuellen main-Stand.',
+            downloadURL: process.env.DOWNLOAD_URL,
+            size: Number(process.env.IPA_SIZE),
+            minOSVersion: '16.4'
+          };
+          app.versions = [next, ...(app.versions || []).filter(v => v.buildVersion !== next.buildVersion)].slice(0, 12);
+          fs.writeFileSync('sidestore-source.json', JSON.stringify(source, null, 2) + '\n');
+          NODE
+
+          SOURCE_SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/sidestore-source.json?ref=main" --jq .sha)
+          SOURCE_B64=$(base64 < sidestore-source.json | tr -d '\n')
+          gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/sidestore-source.json" \
+            -f message="chore: publish SideStore build ${VERSION} (${BUILD_NUMBER}) [skip ci]" \
+            -f content="$SOURCE_B64" \
+            -f sha="$SOURCE_SHA" \
+            -f branch="main" >/dev/null
+        env:
+          RELEASE_DATE: ${{ github.event.repository.updated_at }}
+          DOWNLOAD_URL: https://github.com/${{ github.repository }}/releases/download/sidestore-latest/SparFlow.ipa
+          IPA_SIZE: '0'
 
       - name: Publish diagnostic report
         if: always()
@@ -144,6 +208,8 @@ jobs:
             echo "SparFlow iOS CI diagnostic"
             echo "commit: ${GITHUB_SHA}"
             echo "run: ${GITHUB_RUN_NUMBER}"
+            echo "version: ${{ steps.metadata.outputs.version }}"
+            echo "build: ${{ steps.metadata.outputs.build_number }}"
             echo
             echo "install:   ${{ steps.install.outcome }} (exit ${{ steps.install.outputs.exit_code }})"
             echo "typecheck: ${{ steps.typecheck.outcome }} (exit ${{ steps.typecheck.outputs.exit_code }})"
