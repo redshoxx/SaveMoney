@@ -1,0 +1,463 @@
+SparFlow iOS CI diagnostic
+commit: 4b2829ce9f33aab3badea33e0df46eb1e645113a
+run: 53
+version: 2.0.1
+build: 53
+
+install:      success (exit 0)
+typecheck:    success (exit 0)
+prebuild:     success (exit 0)
+widget patch: success (exit 0)
+pods:         success (exit 0)
+xcode:        failure (exit 65)
+package:      skipped (exit )
+
+===== NATIVE VERSION GRAPH =====
+sparflow@2.0.1 /Users/runner/work/SaveMoney/SaveMoney
+├─┬ @expo/ui@57.0.13
+│ └── react-native-worklets@0.10.1 deduped
+├─┬ expo-router@57.0.16
+│ ├─┬ react-native-drawer-layout@4.2.10
+│ │ └── react-native-reanimated@4.5.1 deduped
+│ └── react-native-reanimated@4.5.1 deduped
+├─┬ expo@57.0.16
+│ └─┬ expo-modules-core@57.0.13
+│   └── react-native-worklets@0.10.1 deduped
+├─┬ react-native-reanimated@4.5.1
+│ └── react-native-worklets@0.10.1 deduped
+└── react-native-worklets@0.10.1
+
+
+===== XCODE ERROR SUMMARY =====
+27282-    /bin/sh -c /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Script-46EB2E00017D20.sh
+27283-
+27284-ExtractAppIntentsMetadata (in target 'ExpoRouter' from project 'Pods')
+27285-    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
+27286-    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/appintentsmetadataprocessor --toolchain-dir /var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.CL0m4P/Metal.xctoolchain --module-name ExpoRouter --sdk-root /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk --xcode-version 17F113 --platform-family iOS --deployment-target 16.4 --bundle-identifier org.cocoapods.ExpoRouter --output /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoRouter/ExpoRouter.appintents --target-triple arm64-apple-ios16.4 --binary-file /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoRouter/libExpoRouter.a --dependency-file /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Objects-normal/arm64/ExpoRouter_libtool_dependency_info.dat --stringsdata-file /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Objects-normal/arm64/ExtractedAppShortcutsMetadata.stringsdata --source-file-list /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Objects-normal/arm64/ExpoRouter.SwiftFileList --metadata-file-list /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/ExpoRouter.DependencyMetadataFileList --static-metadata-file-list /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/ExpoRouter.DependencyStaticMetadataFileList --swift-const-vals-list /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoRouter.build/Objects-normal/arm64/ExpoRouter.SwiftConstValuesFileList --force --compile-time-extraction --deployment-aware-processing --validate-assistant-intents --no-app-shortcuts-localization
+27287-2026-08-24 10:40:41.371 appintentsmetadataprocessor[15440:43391] Starting appintentsmetadataprocessor export
+27288-2026-08-24 10:40:41.383 appintentsmetadataprocessor[15440:43391] Extracted no relevant App Intents symbols, skipping writing output
+27289-
+27290:CompileC /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoWorkletsBridgeProvider.o /Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-modules-core/ios/WorkletsAdapter/ExpoWorkletsBridgeProvider.mm normal arm64 objective-c++ com.apple.compilers.llvm.clang.1_0.compiler (in target 'ExpoModulesWorkletsAdapter' from project 'Pods')
+27291-    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
+27292-    
+27293-    Using response file: /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/af3fcb34312c57c0f52879cdce924b91-common-args.resp
+27294-    
+27295:    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c++ -ivfsstatcache /Users/runner/work/SaveMoney/SaveMoney/ios/build/SDKStatCaches.noindex/iphoneos26.5-23F81a-688ef53f1462e2c8f657fdc38a81448fee66e23052a0157c865c76b268046726.sdkstatcache -target arm64-apple-ios16.4 -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Wno-implicit-atomic-properties -Werror\=deprecated-objc-isa-usage -Wno-objc-interface-ivars -Werror\=objc-root-class -Wno-arc-repeated-use-of-weak -Wimplicit-retain-self -Wno-non-virtual-dtor -Wno-overloaded-virtual -Wno-exit-time-destructors -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wdeprecated-implementations -Wno-c++11-extensions -Wno-implicit-fallthrough -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -Winvalid-offsetof -Wno-sign-conversion -Winfinite-recursion -Wmove -Wcomma -Wblock-capture-autoreleasing -Wstrict-prototypes -Wrange-loop-analysis -Wno-semicolon-before-method-body -Wunguarded-availability @/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/af3fcb34312c57c0f52879cdce924b91-common-args.resp -include /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/ExpoModulesWorkletsAdapter/ExpoModulesWorkletsAdapter-prefix.pch -MMD -MT dependencies -MF /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoWorkletsBridgeProvider.d --serialize-diagnostics /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoWorkletsBridgeProvider.dia -c /Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-modules-core/ios/WorkletsAdapter/ExpoWorkletsBridgeProvider.mm -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/ExpoModulesWorkletsAdapter.build/Objects-normal/arm64/ExpoWorkletsBridgeProvider.o
+27296:In file included from /Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-modules-core/ios/WorkletsAdapter/ExpoWorkletsBridgeProvider.mm:12:
+27297-/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNWorklets/worklets/WorkletRuntime/WorkletRuntime.h:181:8: warning: declaration is marked with '@deprecated' command but does not have a deprecation attribute [-Wdocumentation-deprecated-sync]
+27298-  181 |   /** @deprecated Use `schedule` instead. */
+27299-      |       ~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+27300-/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNWorklets/worklets/WorkletRuntime/WorkletRuntime.h:182:3: note: add a deprecation attribute to the declaration to silence this warning
+27301-  182 |   void runAsyncGuarded(const std::shared_ptr<SerializableWorklet> &worklet);
+27302-      |   ^
+27303-      |   CA_DEPRECATED 
+27304-/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNWorklets/worklets/WorkletRuntime/WorkletRuntime.h:184:8: warning: declaration is marked with '@deprecated' command but does not have a deprecation attribute [-Wdocumentation-deprecated-sync]
+--
+41022-#import "Headers/ExpoModulesCore_umbrella.h"
+41023-        ^
+41024-/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore/ExpoModulesCore.framework/Headers/ExpoModulesCore_umbrella.h:31:9: note: in file included from /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore/ExpoModulesCore.framework/Headers/ExpoModulesCore_umbrella.h:31:
+41025-#import "EXFilePermissionModuleInterface.h"
+41026-        ^
+41027-/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore/ExpoModulesCore.framework/Headers/EXFilePermissionModuleInterface.h:3:9: note: in file included from /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore/ExpoModulesCore.framework/Headers/EXFilePermissionModuleInterface.h:3:
+41028-#import <ExpoModulesCore/EXFileSystemInterface.h>
+41029-        ^
+41030:/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:11:10: error: 'containerBackground(_:for:)' is only available in iOS 17.0 or newer
+41031-        .containerBackground(
+41032-         ^
+41033-/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:11:10: note: add 'if #available' version check
+41034-        .containerBackground(
+41035-         ^
+41036-/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:8:7: note: add '@available' attribute to enclosing property
+41037-  var body: some WidgetConfiguration {
+41038-      ^
+41039-/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:5:8: note: add '@available' attribute to enclosing struct
+41040-struct SparFlowSavings: Widget {
+41041-       ^
+41042:/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:13:17: error: 'widget' is only available in iOS 17.0 or newer
+41043-          for: .widget
+41044-                ^
+41045-/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:13:17: note: add 'if #available' version check
+41046-          for: .widget
+41047-                ^
+41048-/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:8:7: note: add '@available' attribute to enclosing property
+41049-  var body: some WidgetConfiguration {
+41050-      ^
+--
+41150-note: Run script build phase '[CP-User] [Expo] Switch ExpoImage XCFramework for build configuration' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoImage' from project 'Pods')
+41151-note: Run script build phase '[CP-User] [Expo] Switch ExpoFont XCFramework for build configuration' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoFont' from project 'Pods')
+41152-note: Run script build phase '[CP-User] [Expo] Switch ExpoFileSystem XCFramework for build configuration' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoFileSystem' from project 'Pods')
+41153-note: Run script build phase '[Expo] Configure project' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'SparFlow' from project 'SparFlow')
+41154-note: Run script build phase 'Bundle React Native code and images' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'SparFlow' from project 'SparFlow')
+41155-note: Run script build phase '[Expo] Configure project' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+41156-note: Run script build phase '[CP-User] Prepare ExpoWidgets Resources' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoWidgets' from project 'Pods')
+41157-note: Run script build phase '[CP-User] Generate app.config for prebuilt Constants.manifest' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'EXConstants' from project 'Pods')
+41158:** BUILD FAILED **
+41159-
+41160-
+41161:The following build commands failed:
+41162-	SwiftCompile normal arm64 /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+41163-	SwiftCompile normal arm64 Compiling\ SparFlowSavings.swift /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+41164-	Building workspace SparFlow with scheme SparFlow and configuration Release
+41165-(3 failures)
+
+===== ci-logs/install.log (last 160 lines) =====
+npm warn ERESOLVE overriding peer dependency
+npm warn deprecated uuid@7.0.3: uuid@10 and below is no longer supported.  For ESM codebases, update to uuid@latest.  For CommonJS codebases, use uuid@11 (but be aware this version will likely be deprecated in 2028).
+
+> sparflow@2.0.1 postinstall
+> npm run generate:icon
+
+
+> sparflow@2.0.1 generate:icon
+> node scripts/generate-icon.mjs
+
+Generated SparFlow icon (7939 bytes)
+
+added 559 packages in 25s
+
+===== ci-logs/typecheck.log (last 160 lines) =====
+
+> sparflow@2.0.1 typecheck
+> tsc --noEmit
+
+
+===== ci-logs/prebuild.log (last 160 lines) =====
+- Creating native directory (./ios)
+✔ Created native directory
+- Updating package.json
+✔ Updated package.json
+- Running prebuild
+✔ Finished prebuild
+
+===== ci-logs/widget-patch.log (last 160 lines) =====
+
+> sparflow@2.0.1 patch:widget-native
+> node scripts/patch-widget-container-background.mjs
+
+Patched WidgetKit root: ios/ExpoWidgetsTarget/SparFlowSavings.swift
+Native WidgetKit containerBackground patch applied to 1 file(s).
+
+===== ci-logs/pods.log (last 160 lines) =====
+Installing ExpoModulesCore (57.0.13)
+Installing ExpoModulesJSI (57.0.5)
+Installing ExpoModulesWorklets (57.0.13)
+Installing ExpoModulesWorkletsAdapter (57.0.13)
+Installing ExpoRouter (57.0.16)
+Installing ExpoSQLite (57.0.1)
+Installing ExpoSplashScreen (57.0.8)
+Installing ExpoSymbols (57.0.2)
+Installing ExpoSystemUI (57.0.2)
+Installing ExpoUI (57.0.13)
+Installing ExpoWidgets (57.0.12)
+Installing FBLazyVector (0.86.2)
+Installing RCTDeprecation (0.86.2)
+Installing RCTRequired (0.86.2)
+Installing RCTSwiftUI (0.86.2)
+Installing RCTSwiftUIWrapper (0.86.2)
+Installing RCTTypeSafety (0.86.2)
+Installing RNCMaskedView (0.3.2)
+Installing RNGestureHandler (3.2.1)
+Installing RNReanimated (4.5.1)
+Installing RNScreens (4.26.0)
+Installing RNWorklets (0.10.1)
+Installing React (0.86.2)
+Installing React-Core (0.86.2)
+Installing React-Core-prebuilt (0.86.2)
+Installing React-CoreModules (0.86.2)
+Installing React-Fabric (0.86.2)
+Installing React-FabricComponents (0.86.2)
+Installing React-FabricImage (0.86.2)
+Installing React-ImageManager (0.86.2)
+Installing React-Mapbuffer (0.86.2)
+Installing React-NativeModulesApple (0.86.2)
+Installing React-RCTActionSheet (0.86.2)
+Installing React-RCTAnimation (0.86.2)
+Installing React-RCTAppDelegate (0.86.2)
+Installing React-RCTBlob (0.86.2)
+Installing React-RCTFBReactNativeSpec (0.86.2)
+Installing React-RCTFabric (0.86.2)
+Installing React-RCTImage (0.86.2)
+Installing React-RCTLinking (0.86.2)
+Installing React-RCTNetwork (0.86.2)
+Installing React-RCTRuntime (0.86.2)
+Installing React-RCTSettings (0.86.2)
+Installing React-RCTText (0.86.2)
+Installing React-RCTVibration (0.86.2)
+Installing React-RuntimeApple (0.86.2)
+Installing React-RuntimeCore (0.86.2)
+Installing React-RuntimeHermes (0.86.2)
+Installing React-callinvoker (0.86.2)
+Installing React-cxxreact (0.86.2)
+Installing React-debug (0.86.2)
+Installing React-defaultsnativemodule (0.86.2)
+Installing React-domnativemodule (0.86.2)
+Installing React-featureflags (0.86.2)
+Installing React-featureflagsnativemodule (0.86.2)
+Installing React-graphics (0.86.2)
+Installing React-hermes (0.86.2)
+Installing React-idlecallbacksnativemodule (0.86.2)
+Installing React-intersectionobservernativemodule (0.86.2)
+Installing React-jserrorhandler (0.86.2)
+Installing React-jsi (0.86.2)
+Installing React-jsiexecutor (0.86.2)
+Installing React-jsinspector (0.86.2)
+Installing React-jsinspectorcdp (0.86.2)
+Installing React-jsinspectornetwork (0.86.2)
+Installing React-jsinspectortracing (0.86.2)
+Installing React-jsitooling (0.86.2)
+Installing React-jsitracing (0.86.2)
+Installing React-logger (0.86.2)
+Installing React-microtasksnativemodule (0.86.2)
+Installing React-mutationobservernativemodule (0.86.2)
+Installing React-networking (0.86.2)
+Installing React-oscompat (0.86.2)
+Installing React-perflogger (0.86.2)
+Installing React-performancecdpmetrics (0.86.2)
+Installing React-performancetimeline (0.86.2)
+Installing React-rendererconsistency (0.86.2)
+Installing React-renderercss (0.86.2)
+Installing React-rendererdebug (0.86.2)
+Installing React-runtimeexecutor (0.86.2)
+Installing React-runtimescheduler (0.86.2)
+Installing React-timing (0.86.2)
+Installing React-utils (0.86.2)
+Installing React-viewtransitionnativemodule (0.86.2)
+Installing React-webperformancenativemodule (0.86.2)
+Installing ReactAppDependencyProvider (0.86.2)
+Installing ReactCodegen (0.86.2)
+Installing ReactCommon (0.86.2)
+Installing ReactNativeDependencies (0.86.2)
+Installing Yoga (0.0.0)
+Installing hermes-engine (250829098.0.16)
+Installing react-native-safe-area-context (5.7.0)
+[Expo] Ensuring required slices in ExpoModulesJSI.xcframework
+[Expo] Staged 5/5 shared SPM xcframework(s) (debug)
+Generating Pods project
+Setting USE_HERMES build settings
+Setting REACT_NATIVE_PATH build settings
+Setting SWIFT_ACTIVE_COMPILATION_CONDITIONS build settings
+[Ccache]: Removing Ccache from CC, LD, CXX & LDPLUSPLUS build settings
+Setting SWIFT_ENABLE_EXPLICIT_MODULES build settings
+[ReactNativeCore] Processing VFS overlay file...
+[ReactNativeCore]   Created VFS overlay at /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/React-Core-prebuilt/React-VFS.yaml
+[ReactNativeCore] VFS overlay setup complete
+[ReactNativeCore] Configuring xcconfig for prebuilt React Native Core...
+[ReactNativeCore] Prebuilt xcconfig configuration complete
+[SPM] Cleaning old SPM dependencies from Pods project
+[SPM] Adding SPM dependencies to Pods project
+[Privacy Manifest Aggregation] No existing PrivacyInfo.xcprivacy file found, creating a new one.
+[Privacy Manifest Aggregation] Reading .xcprivacy files to aggregate all used Required Reason APIs.
+file_root: SparFlow
+Setting CLANG_CXX_LANGUAGE_STANDARD to c++20 on /Users/runner/work/SaveMoney/SaveMoney/ios/SparFlow.xcodeproj
+
+==================== DEPRECATION NOTICE =====================
+Calling `pod install` directly is deprecated in React Native
+because we are moving away from Cocoapods toward alternative
+solutions to build the project.
+* If you are using Expo, please run:
+`npx expo run:ios`
+* If you are using the Community CLI, please run:
+`yarn ios`
+=============================================================
+
+Pod install took 40 [s] to run
+Integrating client project
+
+[!] Please close any current Xcode sessions and use `SparFlow.xcworkspace` for this project from now on.
+[Expo] Installing the build script for target ExpoWidgetsTarget
+[Expo] Installing the build script for target SparFlow
+Pod installation complete! There are 105 dependencies from the Podfile and 104 total pods installed.
+[Expo-precompiled] Precompiled modules:
+[Expo-precompiled]   📦 ExpoFileSystem (57.0.5)
+[Expo-precompiled]   📦 ExpoFont (57.0.1)
+[Expo-precompiled]   📦 ExpoImage (57.0.3)
+[Expo-precompiled]       ∟ SDWebImage.xcframework (5.21.6)
+[Expo-precompiled]       ∟ SDWebImageAVIFCoder.xcframework (0.12.0)
+[Expo-precompiled]       ∟ SDWebImageSVGCoder.xcframework (1.8.0)
+[Expo-precompiled]       ∟ SDWebImageWebPCoder.xcframework (0.15.0)
+[Expo-precompiled]       ∟ libavif.xcframework (1.0.0)
+[Expo-precompiled]   📦 ExpoModulesCore (57.0.13)
+[Expo-precompiled]   📦 ExpoModulesWorklets (57.0.13)
+[Expo] Disabling SWIFT_EMIT_MODULE_INTERFACE for pod targets (prebuilt React compatibility)
+[Expo-precompiled] Looking for ExpoModulesCore.xcframework at: /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesCore/ExpoModulesCore.xcframework
+[Expo-precompiled] Adding ExpoModulesJSI header search paths to all targets
+[Expo] Adding '[Expo] Remove duplicate codegen output' build phase to ReactCodegen
+
+[!] ExpoFileSystem has added 2 script phases. Please inspect before executing a build. See `https://guides.cocoapods.org/syntax/podspec.html#script_phases` for more information.
+
+[!] ExpoFont has added 2 script phases. Please inspect before executing a build. See `https://guides.cocoapods.org/syntax/podspec.html#script_phases` for more information.
+
+[!] ExpoImage has added 2 script phases. Please inspect before executing a build. See `https://guides.cocoapods.org/syntax/podspec.html#script_phases` for more information.
+
+[!] ExpoModulesCore has added 2 script phases. Please inspect before executing a build. See `https://guides.cocoapods.org/syntax/podspec.html#script_phases` for more information.
+
+[!] ExpoModulesWorklets has added 2 script phases. Please inspect before executing a build. See `https://guides.cocoapods.org/syntax/podspec.html#script_phases` for more information.
+
+[!] React-Core-prebuilt has added 1 script phase. Please inspect before executing a build. See `https://guides.cocoapods.org/syntax/podspec.html#script_phases` for more information.
+
+[!] ReactNativeDependencies has added 1 script phase. Please inspect before executing a build. See `https://guides.cocoapods.org/syntax/podspec.html#script_phases` for more information.
+
+[!] hermes-engine has added 1 script phase. Please inspect before executing a build. See `https://guides.cocoapods.org/syntax/podspec.html#script_phases` for more information.
+
+===== ci-logs/xcodebuild.log (last 160 lines) =====
+Ld /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.appex/__preview.dylib normal (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -Xlinker -reproducible -target arm64-apple-ios16.4 -dynamiclib -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -Os -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos -L/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk/usr/lib/swift -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/Expo -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoUI -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgets -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ReactAppDependencyProvider -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ReactCodegen -L/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.CL0m4P/Metal.xctoolchain/usr/lib/swift/iphoneos -L/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk/usr/lib/swift -F/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos -F/Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-modules-jsi/apple/Products -F/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesCore -F/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesWorklets -F/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/React-Core-prebuilt -F/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ReactNativeDependencies/framework/packages/react-native -F/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/hermes-engine/destroot/Library/Frameworks/universal -F/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore -F/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesJSI -F/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesWorklets -F/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/React-Core-prebuilt -F/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ReactNativeDependencies -F/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/hermes-engine/Pre-built -install_name @rpath/ExpoWidgetsTarget.debug.dylib -Xlinker -dead_strip -Xlinker -dependency_info -Xlinker /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget_dependency_info.dat -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.appex/__preview.dylib
+/Users/runner/work/SaveMoney/SaveMoney/ios/SparFlow.xcodeproj: ExpoWidgetsTarget: ld: warning: search path '/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.CL0m4P/Metal.xctoolchain/usr/lib/swift/iphoneos' not found
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ ExpoWidgetsTarget (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+
+EmitSwiftModule normal arm64 (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    
+
+SwiftCompile normal arm64 Compiling\ SparFlowSavings.swift /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+SwiftCompile normal arm64 /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    
+<module-includes>:1:9: note: in file included from <module-includes>:1:
+#import "Headers/ExpoModulesCore_umbrella.h"
+        ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore/ExpoModulesCore.framework/Headers/ExpoModulesCore_umbrella.h:31:9: note: in file included from /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore/ExpoModulesCore.framework/Headers/ExpoModulesCore_umbrella.h:31:
+#import "EXFilePermissionModuleInterface.h"
+        ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore/ExpoModulesCore.framework/Headers/EXFilePermissionModuleInterface.h:3:9: note: in file included from /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore/ExpoModulesCore.framework/Headers/EXFilePermissionModuleInterface.h:3:
+#import <ExpoModulesCore/EXFileSystemInterface.h>
+        ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:11:10: error: 'containerBackground(_:for:)' is only available in iOS 17.0 or newer
+        .containerBackground(
+         ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:11:10: note: add 'if #available' version check
+        .containerBackground(
+         ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:8:7: note: add '@available' attribute to enclosing property
+  var body: some WidgetConfiguration {
+      ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:5:8: note: add '@available' attribute to enclosing struct
+struct SparFlowSavings: Widget {
+       ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:13:17: error: 'widget' is only available in iOS 17.0 or newer
+          for: .widget
+                ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:13:17: note: add 'if #available' version check
+          for: .widget
+                ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:8:7: note: add '@available' attribute to enclosing property
+  var body: some WidgetConfiguration {
+      ^
+/Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift:5:8: note: add '@available' attribute to enclosing struct
+struct SparFlowSavings: Widget {
+       ^
+
+Failed frontend command:
+/Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/index.swift -primary-file /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/Pods-ExpoWidgetsTarget/ExpoModulesProvider.swift -emit-dependencies-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/SparFlowSavings.d -emit-const-values-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/SparFlowSavings.swiftconstvalues -emit-reference-dependencies-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/SparFlowSavings.swiftdeps -serialize-diagnostics-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/SparFlowSavings.dia -target arm64-apple-ios16.4 -Xllvm -aarch64-use-tbi -enable-objc-interop -stack-check -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/Expo -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesCore -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesJSI -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesWorklets -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoUI -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgets -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-modules-jsi/apple/Products -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesCore -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesWorklets -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/React-Core-prebuilt -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ReactNativeDependencies/framework/packages/react-native -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/hermes-engine/destroot/Library/Frameworks/universal -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesJSI -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesWorklets -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/React-Core-prebuilt -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ReactNativeDependencies -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/hermes-engine/Pre-built -no-color-diagnostics -Xcc -fno-color-diagnostics -application-extension -g -debug-info-format\=dwarf -dwarf-version\=4 -module-cache-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex -swift-version 5 -Onone -D COCOAPODS -D EXPO_CONFIGURATION_RELEASE -serialize-debugging-options -const-gather-protocols-file /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget_const_extract_protocols.json -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios -enable-anonymous-context-mangled-names -file-compilation-dir /Users/runner/work/SaveMoney/SaveMoney/ios -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/Expo/Expo.modulemap -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoUI/ExpoUI.modulemap -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgets/ExpoWidgets.modulemap -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactAppDependencyProvider/ReactAppDependencyProvider.modulemap -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactCodegen/ReactCodegen.modulemap -Xcc -ivfsoverlay -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/React-Core-prebuilt/React-VFS.yaml -Xcc -Wno-incomplete-umbrella -Xcc -ivfsstatcache -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/build/SDKStatCaches.noindex/iphoneos26.5-23F81a-688ef53f1462e2c8f657fdc38a81448fee66e23052a0157c865c76b268046726.sdkstatcache -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/ExpoWidgetsTarget-generated-files.hmap -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/ExpoWidgetsTarget-own-target-headers.hmap -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/ExpoWidgetsTarget-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/SparFlow-1aa4cba3a8e8621925b09cd60ddfecd4-VFS-iphoneos/all-product-headers.yaml -Xcc -iquote -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/ExpoWidgetsTarget-project-headers.hmap -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/EXConstants -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/Expo -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ExpoModulesWorkletsAdapter -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ExpoSQLite -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ExpoUI -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/FBLazyVector -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RCTDeprecation -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RCTRequired -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RCTSwiftUIWrapper -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RCTTypeSafety -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNCMaskedView -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNGestureHandler -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNReanimated -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNScreens -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNWorklets -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-Core -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-Core-prebuilt -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-CoreModules -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-Fabric -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-FabricComponents -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-FabricImage -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-ImageManager -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-Mapbuffer -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-NativeModulesApple -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTAnimation -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTAppDelegate -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTBlob -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTFBReactNativeSpec -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTFabric -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTImage -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTRuntime -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTSettings -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTText -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTVibration -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RuntimeApple -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RuntimeCore -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RuntimeHermes -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-callinvoker -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-cxxreact -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-debug -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-defaultsnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-domnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-featureflags -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-featureflagsnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-graphics -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-hermes -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-idlecallbacksnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-intersectionobservernativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jserrorhandler -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsi -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsiexecutor -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsinspector -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsinspectorcdp -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsinspectornetwork -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsinspectortracing -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsitooling -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-logger -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-microtasksnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-mutationobservernativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-networking -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-oscompat -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-perflogger -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-performancecdpmetrics -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-performancetimeline -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-rendererconsistency -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-renderercss -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-rendererdebug -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-runtimeexecutor -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-runtimescheduler -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-timing -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-utils -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-viewtransitionnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-webperformancenativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactAppDependencyProvider -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactCodegen -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactCommon -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactNativeDependencies -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/Yoga -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/hermes-engine -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/react-native-safe-area-context -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/Expo/Swift\ Compatibility\ Header -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/Yoga -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesCore/Swift\ Compatibility\ Header -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/Yoga -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/React-Core -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/React-Core -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/Yoga -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesCore/ExpoModulesCore.xcframework/ios-arm64_x86_64-simulator/ExpoModulesCore.framework/Headers -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesCore/ExpoModulesCore.xcframework/ios-arm64/ExpoModulesCore.framework/Headers -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/DerivedSources -Xcc -DCOCOAPODS\=1 -no-auto-bridging-header-chaining -module-name ExpoWidgetsTarget -frontend-parseable-output -disable-clang-spi -target-sdk-version 26.5 -target-sdk-name iphoneos26.5 -external-plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins\#/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -external-plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/local/lib/swift/host/plugins\#/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server -in-process-plugin-server-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/plugins -plugin-path /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/local/lib/swift/host/plugins -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/SparFlowSavings.o -index-unit-output-path /SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/SparFlowSavings.o -index-store-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/Index.noindex/DataStore -index-system-modules
+PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ObjectiveC-A92O7FPIIAEKKF91TK79IMT3N.scan
+    cd /
+    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/ObjectiveC-A92O7FPIIAEKKF91TK79IMT3N.scan
+
+SwiftCompile normal arm64 Compiling\ index.swift /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/index.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+SwiftCompile normal arm64 /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/index.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    
+
+PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/os_object-BZO3FCQPOI9K6VBY9D13HA1GM.scan
+    cd /
+    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/os_object-BZO3FCQPOI9K6VBY9D13HA1GM.scan
+
+SwiftDriverJobDiscovery normal arm64 Emitting module for ExpoWidgetsTarget (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+
+SwiftDriver\ Compilation\ Requirements ExpoWidgetsTarget normal arm64 com.apple.xcode.tools.swift.compiler (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    builtin-Swift-Compilation-Requirements -- /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name ExpoWidgetsTarget -Onone @/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.SwiftFileList -D COCOAPODS -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/Expo/Expo.modulemap -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoUI/ExpoUI.modulemap -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgets/ExpoWidgets.modulemap -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactAppDependencyProvider/ReactAppDependencyProvider.modulemap -Xcc -fmodule-map-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactCodegen/ReactCodegen.modulemap -Xcc -ivfsoverlay -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/React-Core-prebuilt/React-VFS.yaml -Xcc -Wno-incomplete-umbrella -D EXPO_CONFIGURATION_RELEASE -enable-bare-slash-regex -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -target arm64-apple-ios16.4 -g -module-cache-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex -Xfrontend -serialize-debugging-options -application-extension -index-store-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/Index.noindex/DataStore -swift-version 5 -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/Expo -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesCore -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesJSI -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesWorklets -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoUI -I /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgets -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos -F /Users/runner/work/SaveMoney/SaveMoney/node_modules/expo-modules-jsi/apple/Products -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesCore -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesWorklets -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/React-Core-prebuilt -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ReactNativeDependencies/framework/packages/react-native -F /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/hermes-engine/destroot/Library/Frameworks/universal -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesCore -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesJSI -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ExpoModulesWorklets -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/React-Core-prebuilt -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/ReactNativeDependencies -F /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/XCFrameworkIntermediates/hermes-engine/Pre-built -c -j3 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/build/SDKStatCaches.noindex/iphoneos26.5-23F81a-688ef53f1462e2c8f657fdc38a81448fee66e23052a0157c865c76b268046726.sdkstatcache -output-file-map /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget_const_extract_protocols.json -Xcc -iquote -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/ExpoWidgetsTarget-generated-files.hmap -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/ExpoWidgetsTarget-own-target-headers.hmap -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/ExpoWidgetsTarget-all-non-framework-target-headers.hmap -Xcc -ivfsoverlay -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/SparFlow-1aa4cba3a8e8621925b09cd60ddfecd4-VFS-iphoneos/all-product-headers.yaml -Xcc -iquote -Xcc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/ExpoWidgetsTarget-project-headers.hmap -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/include -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/EXConstants -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/Expo -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ExpoModulesWorkletsAdapter -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ExpoSQLite -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ExpoUI -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/FBLazyVector -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RCTDeprecation -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RCTRequired -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RCTSwiftUIWrapper -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RCTTypeSafety -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNCMaskedView -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNGestureHandler -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNReanimated -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNScreens -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/RNWorklets -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-Core -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-Core-prebuilt -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-CoreModules -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-Fabric -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-FabricComponents -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-FabricImage -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-ImageManager -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-Mapbuffer -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-NativeModulesApple -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTAnimation -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTAppDelegate -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTBlob -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTFBReactNativeSpec -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTFabric -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTImage -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTRuntime -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTSettings -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTText -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RCTVibration -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RuntimeApple -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RuntimeCore -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-RuntimeHermes -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-callinvoker -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-cxxreact -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-debug -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-defaultsnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-domnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-featureflags -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-featureflagsnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-graphics -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-hermes -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-idlecallbacksnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-intersectionobservernativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jserrorhandler -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsi -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsiexecutor -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsinspector -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsinspectorcdp -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsinspectornetwork -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsinspectortracing -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-jsitooling -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-logger -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-microtasksnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-mutationobservernativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-networking -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-oscompat -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-perflogger -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-performancecdpmetrics -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-performancetimeline -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-rendererconsistency -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-renderercss -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-rendererdebug -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-runtimeexecutor -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-runtimescheduler -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-timing -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-utils -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-viewtransitionnativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/React-webperformancenativemodule -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactAppDependencyProvider -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactCodegen -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactCommon -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/ReactNativeDependencies -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/Yoga -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/hermes-engine -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Public/react-native-safe-area-context -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/Expo/Swift\ Compatibility\ Header -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/Yoga -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesCore/Swift\ Compatibility\ Header -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/Yoga -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/React-Core -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/React-Core -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Headers/Private/Yoga -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesCore/ExpoModulesCore.xcframework/ios-arm64_x86_64-simulator/ExpoModulesCore.framework/Headers -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/Pods/ExpoModulesCore/ExpoModulesCore.xcframework/ios-arm64/ExpoModulesCore.framework/Headers -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/DerivedSources-normal/arm64 -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/DerivedSources/arm64 -Xcc -I/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/DerivedSources -Xcc -DCOCOAPODS\=1 -emit-objc-header -emit-objc-header-path /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget-Swift.h -working-directory /Users/runner/work/SaveMoney/SaveMoney/ios -experimental-emit-module-separately -disable-cmo
+
+PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/os_workgroup-37NEGF6HCYC5HXP00JFRH0N9T.scan
+    cd /
+    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/os_workgroup-37NEGF6HCYC5HXP00JFRH0N9T.scan
+
+SwiftMergeGeneratedHeaders /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/DerivedSources/ExpoWidgetsTarget-Swift.h /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget-Swift.h (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    builtin-swiftHeaderTool -arch arm64 /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget-Swift.h -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/DerivedSources/ExpoWidgetsTarget-Swift.h
+
+Copy /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.swiftmodule/arm64-apple-ios.swiftmodule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.swiftmodule (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-unsigned-binaries -strip-deterministic -strip-tool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks -rename /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.swiftmodule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.swiftmodule/arm64-apple-ios.swiftmodule
+
+Copy /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.swiftmodule/arm64-apple-ios.swiftdoc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.swiftdoc (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-unsigned-binaries -strip-deterministic -strip-tool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks -rename /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.swiftdoc /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.swiftmodule/arm64-apple-ios.swiftdoc
+
+Copy /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.swiftmodule/arm64-apple-ios.abi.json /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.abi.json (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-unsigned-binaries -strip-deterministic -strip-tool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks -rename /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.abi.json /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.swiftmodule/arm64-apple-ios.abi.json
+
+Copy /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.swiftsourceinfo (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    builtin-copy -exclude .DS_Store -exclude CVS -exclude .svn -exclude .git -exclude .hg -strip-unsigned-binaries -strip-deterministic -strip-tool /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/strip -resolve-src-symlinks -rename /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/SparFlow.build/Release-iphoneos/ExpoWidgetsTarget.build/Objects-normal/arm64/ExpoWidgetsTarget.swiftsourceinfo /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgetsTarget.swiftmodule/Project/arm64-apple-ios.swiftsourceinfo
+
+PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Dispatch-DG4TUQ8H30PFQFD6ICDX20CZW.scan
+    cd /
+    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Dispatch-DG4TUQ8H30PFQFD6ICDX20CZW.scan
+
+SwiftCompile normal arm64 Compiling\ ExpoModulesProvider.swift /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/Pods-ExpoWidgetsTarget/ExpoModulesProvider.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+
+SwiftCompile normal arm64 /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/Pods-ExpoWidgetsTarget/ExpoModulesProvider.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios
+    
+
+PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/XPC-9T0OS6ZK4YLIVEA3M20D8BLBF.scan
+    cd /
+    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/XPC-9T0OS6ZK4YLIVEA3M20D8BLBF.scan
+
+SwiftDriverJobDiscovery normal arm64 Compiling ExpoModulesProvider.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+
+PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/CoreFoundation-451LHT65LHUXSM25W6YP5BEF2.scan
+    cd /
+    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/CoreFoundation-451LHT65LHUXSM25W6YP5BEF2.scan
+
+PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Security-EUX7BG8GVDVV94WFEEBCBE0LP.scan
+    cd /
+    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Security-EUX7BG8GVDVV94WFEEBCBE0LP.scan
+
+PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/CFNetwork-2DLGNS9GXWOUP5Z6VTQOGRCEZ.scan
+    cd /
+    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/CFNetwork-2DLGNS9GXWOUP5Z6VTQOGRCEZ.scan
+
+PrecompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Foundation-6XCXTTAE1NRCCE7QD4L96TLBH.scan
+    cd /
+    builtin-precompileModule /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/ExplicitPrecompiledModules/Foundation-6XCXTTAE1NRCCE7QD4L96TLBH.scan
+
+CompileC /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/Pods-SparFlow.build/Objects-normal/arm64/Pods-SparFlow-dummy.o /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/Pods-SparFlow/Pods-SparFlow-dummy.m normal arm64 objective-c com.apple.compilers.llvm.clang.1_0.compiler (in target 'Pods-SparFlow' from project 'Pods')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
+    
+    Using response file: /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/Pods-SparFlow.build/Objects-normal/arm64/e6072d4f65d7061329687fe24e3d63a7-common-args.resp
+    
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -x objective-c -ivfsstatcache /Users/runner/work/SaveMoney/SaveMoney/ios/build/SDKStatCaches.noindex/iphoneos26.5-23F81a-688ef53f1462e2c8f657fdc38a81448fee66e23052a0157c865c76b268046726.sdkstatcache -target arm64-apple-ios16.4 -fmessage-length\=0 -fdiagnostics-show-note-include-stack -fmacro-backtrace-limit\=0 -fno-color-diagnostics -fmodules-prune-interval\=86400 -fmodules-prune-after\=345600 -fbuild-session-file\=/Users/runner/work/SaveMoney/SaveMoney/ios/build/ModuleCache.noindex/Session.modulevalidation -fmodules-validate-once-per-build-session -Wnon-modular-include-in-framework-module -Werror\=non-modular-include-in-framework-module -Wno-trigraphs -Wno-missing-field-initializers -Wno-missing-prototypes -Werror\=return-type -Wdocumentation -Wunreachable-code -Wno-implicit-atomic-properties -Werror\=deprecated-objc-isa-usage -Wno-objc-interface-ivars -Werror\=objc-root-class -Wno-arc-repeated-use-of-weak -Wimplicit-retain-self -Wduplicate-method-match -Wno-missing-braces -Wparentheses -Wswitch -Wunused-function -Wno-unused-label -Wno-unused-parameter -Wunused-variable -Wunused-value -Wempty-body -Wuninitialized -Wconditional-uninitialized -Wno-unknown-pragmas -Wno-shadow -Wno-four-char-constants -Wno-conversion -Wconstant-conversion -Wint-conversion -Wbool-conversion -Wenum-conversion -Wno-float-conversion -Wnon-literal-null-conversion -Wobjc-literal-conversion -Wshorten-64-to-32 -Wpointer-sign -Wno-newline-eof -Wno-selector -Wno-strict-selector-match -Wundeclared-selector -Wdeprecated-implementations -Wno-implicit-fallthrough -isysroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -fstrict-aliasing -Wprotocol -Wdeprecated-declarations -Wno-sign-conversion -Winfinite-recursion -Wcomma -Wblock-capture-autoreleasing -Wstrict-prototypes -Wno-semicolon-before-method-body -Wunguarded-availability -Wno-comma -Wno-shorten-64-to-32 @/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/Pods-SparFlow.build/Objects-normal/arm64/e6072d4f65d7061329687fe24e3d63a7-common-args.resp -MMD -MT dependencies -MF /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/Pods-SparFlow.build/Objects-normal/arm64/Pods-SparFlow-dummy.d --serialize-diagnostics /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/Pods-SparFlow.build/Objects-normal/arm64/Pods-SparFlow-dummy.dia -c /Users/runner/work/SaveMoney/SaveMoney/ios/Pods/Target\ Support\ Files/Pods-SparFlow/Pods-SparFlow-dummy.m -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/Pods-SparFlow.build/Objects-normal/arm64/Pods-SparFlow-dummy.o
+
+Libtool /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/libPods-SparFlow.a normal (in target 'Pods-SparFlow' from project 'Pods')
+    cd /Users/runner/work/SaveMoney/SaveMoney/ios/Pods
+    /Applications/Xcode_26.6.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/libtool -static -arch_only arm64 -D -syslibroot /Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/EXConstants -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/Expo -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoAsset -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoDomWebView -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoGlassEffect -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoHaptics -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoKeepAwake -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoLinking -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoLogBox -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoModulesWorkletsAdapter -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoRouter -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSQLite -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSplashScreen -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSymbols -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoSystemUI -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoUI -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ExpoWidgets -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/RNCMaskedView -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/RNGestureHandler -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/RNReanimated -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/RNScreens -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/RNWorklets -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ReactAppDependencyProvider -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/ReactCodegen -L/Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/react-native-safe-area-context -L/var/run/com.apple.security.cryptexd/mnt/com.apple.MobileAsset.MetalToolchain-v17.6.109.0.CL0m4P/Metal.xctoolchain/usr/lib/swift/iphoneos -L/Applications/Xcode_26.6.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS26.5.sdk/usr/lib/swift -filelist /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/Pods-SparFlow.build/Objects-normal/arm64/Pods-SparFlow.LinkFileList -dependency_info /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Intermediates.noindex/Pods.build/Release-iphoneos/Pods-SparFlow.build/Objects-normal/arm64/Pods-SparFlow_libtool_dependency_info.dat -o /Users/runner/work/SaveMoney/SaveMoney/ios/build/Build/Products/Release-iphoneos/libPods-SparFlow.a
+
+warning: Run script build phase '[CP-User] [Hermes] Replace Hermes for the right configuration, if needed' will be run during every build because it does not specify any outputs. To address this issue, either add output dependencies to the script phase, or configure it to run in every build by unchecking "Based on dependency analysis" in the script phase. (in target 'hermes-engine' from project 'Pods')
+note: Run script build phase '[CP-User] [RNDeps] Replace React Native Dependencies for the right configuration, if needed' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ReactNativeDependencies' from project 'Pods')
+note: Run script build phase '[CP-User] [RN]Check FBReactNativeSpec' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'React-RCTFBReactNativeSpec' from project 'Pods')
+note: Run script build phase '[CP-User] [RNCore] Replace React Native Core for the right configuration, if needed' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'React-Core-prebuilt' from project 'Pods')
+note: Run script build phase '[CP-User] [Expo] Switch ExpoModulesWorklets XCFramework for build configuration' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoModulesWorklets' from project 'Pods')
+note: Run script build phase '[CP-User] Build ExpoModulesJSI xcframework' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoModulesJSI' from project 'Pods')
+note: Run script build phase '[CP-User] [Expo] Switch ExpoModulesCore XCFramework for build configuration' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoModulesCore' from project 'Pods')
+note: Run script build phase '[CP-User] [Expo] Switch ExpoImage XCFramework for build configuration' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoImage' from project 'Pods')
+note: Run script build phase '[CP-User] [Expo] Switch ExpoFont XCFramework for build configuration' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoFont' from project 'Pods')
+note: Run script build phase '[CP-User] [Expo] Switch ExpoFileSystem XCFramework for build configuration' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoFileSystem' from project 'Pods')
+note: Run script build phase '[Expo] Configure project' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'SparFlow' from project 'SparFlow')
+note: Run script build phase 'Bundle React Native code and images' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'SparFlow' from project 'SparFlow')
+note: Run script build phase '[Expo] Configure project' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+note: Run script build phase '[CP-User] Prepare ExpoWidgets Resources' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'ExpoWidgets' from project 'Pods')
+note: Run script build phase '[CP-User] Generate app.config for prebuilt Constants.manifest' will be run during every build because the option to run the script phase "Based on dependency analysis" is unchecked. (in target 'EXConstants' from project 'Pods')
+** BUILD FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+	SwiftCompile normal arm64 Compiling\ SparFlowSavings.swift /Users/runner/work/SaveMoney/SaveMoney/ios/ExpoWidgetsTarget/SparFlowSavings.swift (in target 'ExpoWidgetsTarget' from project 'SparFlow')
+	Building workspace SparFlow with scheme SparFlow and configuration Release
+(3 failures)
+
