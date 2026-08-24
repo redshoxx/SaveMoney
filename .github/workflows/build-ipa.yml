@@ -83,9 +83,21 @@ jobs:
           echo "exit_code=$status" >> "$GITHUB_OUTPUT"
           exit "$status"
 
+      - name: Patch WidgetKit container background
+        id: widget_patch
+        if: always() && steps.prebuild.outcome == 'success'
+        continue-on-error: true
+        run: |
+          mkdir -p ci-logs
+          set +e
+          npm run patch:widget-native 2>&1 | tee ci-logs/widget-patch.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit "$status"
+
       - name: Install CocoaPods
         id: pods
-        if: always() && steps.prebuild.outcome == 'success'
+        if: always() && steps.widget_patch.outcome == 'success'
         continue-on-error: true
         working-directory: ios
         run: |
@@ -209,12 +221,13 @@ jobs:
             echo "version: ${{ steps.metadata.outputs.version }}"
             echo "build: ${{ steps.metadata.outputs.build_number }}"
             echo
-            echo "install:   ${{ steps.install.outcome }} (exit ${{ steps.install.outputs.exit_code }})"
-            echo "typecheck: ${{ steps.typecheck.outcome }} (exit ${{ steps.typecheck.outputs.exit_code }})"
-            echo "prebuild:  ${{ steps.prebuild.outcome }} (exit ${{ steps.prebuild.outputs.exit_code }})"
-            echo "pods:      ${{ steps.pods.outcome }} (exit ${{ steps.pods.outputs.exit_code }})"
-            echo "xcode:     ${{ steps.xcode.outcome }} (exit ${{ steps.xcode.outputs.exit_code }})"
-            echo "package:   ${{ steps.package.outcome }} (exit ${{ steps.package.outputs.exit_code }})"
+            echo "install:      ${{ steps.install.outcome }} (exit ${{ steps.install.outputs.exit_code }})"
+            echo "typecheck:    ${{ steps.typecheck.outcome }} (exit ${{ steps.typecheck.outputs.exit_code }})"
+            echo "prebuild:     ${{ steps.prebuild.outcome }} (exit ${{ steps.prebuild.outputs.exit_code }})"
+            echo "widget patch: ${{ steps.widget_patch.outcome }} (exit ${{ steps.widget_patch.outputs.exit_code }})"
+            echo "pods:         ${{ steps.pods.outcome }} (exit ${{ steps.pods.outputs.exit_code }})"
+            echo "xcode:        ${{ steps.xcode.outcome }} (exit ${{ steps.xcode.outputs.exit_code }})"
+            echo "package:      ${{ steps.package.outcome }} (exit ${{ steps.package.outputs.exit_code }})"
             echo
             echo "===== NATIVE VERSION GRAPH ====="
             npm ls react-native-reanimated react-native-worklets --all || true
@@ -224,7 +237,7 @@ jobs:
               grep -n -C 8 -E '(^|[[:space:]])(fatal )?error:|BUILD FAILED|The following build commands failed|ExpoWorkletsBridgeProvider' ci-logs/xcodebuild.log | tail -n 240 || true
               echo
             fi
-            for file in ci-logs/install.log ci-logs/typecheck.log ci-logs/prebuild.log ci-logs/pods.log ci-logs/xcodebuild.log ci-logs/package.log; do
+            for file in ci-logs/install.log ci-logs/typecheck.log ci-logs/prebuild.log ci-logs/widget-patch.log ci-logs/pods.log ci-logs/xcodebuild.log ci-logs/package.log; do
               if [ -f "$file" ]; then
                 echo "===== $file (last 160 lines) ====="
                 tail -n 160 "$file"
@@ -246,6 +259,7 @@ jobs:
           test "${{ steps.install.outcome }}" = "success"
           test "${{ steps.typecheck.outcome }}" = "success"
           test "${{ steps.prebuild.outcome }}" = "success"
+          test "${{ steps.widget_patch.outcome }}" = "success"
           test "${{ steps.pods.outcome }}" = "success"
           test "${{ steps.xcode.outcome }}" = "success"
           test "${{ steps.package.outcome }}" = "success"
