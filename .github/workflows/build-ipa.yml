@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - sparflow-v2
     tags:
       - 'v*'
 
