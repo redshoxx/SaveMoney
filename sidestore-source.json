@@ -8,7 +8,7 @@
       "bundleIdentifier": "com.redshoxx.sparflow",
       "developerName": "redshoxx",
       "localizedDescription": "Lokale Spar-App mit Zielen, Challenges, Streaks, XP, Statistiken, Sparregeln und spielerischem Sparen.",
-      "iconURL": "https://raw.githubusercontent.com/redshoxx/SaveMoney/main/assets/icon.png",
+      "iconURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow-icon.png",
       "versions": []
     }
   ]
