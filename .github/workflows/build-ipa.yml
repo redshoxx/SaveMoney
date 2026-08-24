@@ -61,9 +61,6 @@ jobs:
       - name: Generate native iOS project
         run: npx expo prebuild --platform ios --clean --no-install
 
-      - name: Patch WidgetKit container background
-        run: npm run patch:widget-native
-
       - name: Install CocoaPods
         working-directory: ios
         run: pod install --repo-update
@@ -107,7 +104,6 @@ jobs:
           VERSION: ${{ steps.metadata.outputs.version }}
           BUILD_NUMBER: ${{ steps.metadata.outputs.build_number }}
         run: |
-          # Do not let an older concurrent build overwrite a newer main version.
           CURRENT_VERSION=$(gh api "repos/${GITHUB_REPOSITORY}/contents/app.json?ref=main" --jq .content | base64 --decode | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).expo.version))")
           if [ "$CURRENT_VERSION" != "$VERSION" ]; then
             echo "Skipping stale release $VERSION; main is already $CURRENT_VERSION"
@@ -133,7 +129,7 @@ jobs:
           const next = {
             version: process.env.VERSION,
             date: process.env.RELEASE_DATE,
-            localizedDescription: 'Minimalistisches SparFlow mit verbessertem iPhone-Widget.',
+            localizedDescription: 'Minimalistisches SparFlow mit schnellerem Sparen, neuer Navigation und erweiterten Einstellungen.',
             downloadURL: process.env.DOWNLOAD_URL,
             size: Number(process.env.IPA_SIZE),
             minOSVersion: '16.4'
@@ -158,7 +154,6 @@ jobs:
           fs.writeFileSync('sidestore-source.json', JSON.stringify(source, null, 2) + '\n');
           NODE
 
-          # Check main once more after the upload in case a newer app commit arrived.
           CURRENT_VERSION=$(gh api "repos/${GITHUB_REPOSITORY}/contents/app.json?ref=main" --jq .content | base64 --decode | node -e "let s='';process.stdin.on('data',d=>s+=d).on('end',()=>console.log(JSON.parse(s).expo.version))")
           if [ "$CURRENT_VERSION" != "$VERSION" ]; then
             echo "Main changed to $CURRENT_VERSION during publish; source update skipped."
