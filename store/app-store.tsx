@@ -18,6 +18,13 @@ import {
   removeSavingRule,
   toggleSavingRule as toggleSavingRuleDb,
 } from '@/db/database';
+import {
+  DEFAULT_PREFERENCES,
+  loadPreferences,
+  resetPreferences as resetPreferencesDb,
+  savePreference,
+  type AppPreferences,
+} from '@/db/preferences';
 import type {
   AppSnapshot,
   ChallengeMode,
@@ -34,7 +41,6 @@ import {
   monthlyBuckets,
   weeklyBuckets,
 } from '@/utils/insights';
-import { syncSavingsWidget } from '@/utils/widget-sync';
 
 const EMPTY: AppSnapshot = { goals: [], challenges: [], contributions: [], savingRules: [], noSpendDays: [] };
 
@@ -82,6 +88,7 @@ function ruleIsDue(rule: AppSnapshot['savingRules'][number]) {
 type StoreValue = AppSnapshot & {
   loading: boolean;
   error: string | null;
+  preferences: AppPreferences;
   totalSaved: number;
   level: number;
   levelName: string;
@@ -97,6 +104,8 @@ type StoreValue = AppSnapshot & {
   dueRules: AppSnapshot['savingRules'];
   todayIsNoSpend: boolean;
   reload: () => Promise<void>;
+  setPreference: <K extends keyof AppPreferences>(key: K, value: AppPreferences[K]) => Promise<void>;
+  restorePreferenceDefaults: () => Promise<void>;
   createGoal: (input: CreateGoalInput) => Promise<void>;
   saveToGoal: (goalId: string, amount: number, note?: string) => Promise<void>;
   startTemplate: (template: ChallengeTemplate) => Promise<void>;
@@ -116,13 +125,16 @@ const AppStoreContext = createContext<StoreValue | null>(null);
 
 export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   const [snapshot, setSnapshot] = useState<AppSnapshot>(EMPTY);
+  const [preferences, setPreferences] = useState<AppPreferences>(DEFAULT_PREFERENCES);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
     try {
       setError(null);
-      setSnapshot(await loadSnapshot());
+      const [nextSnapshot, nextPreferences] = await Promise.all([loadSnapshot(), loadPreferences()]);
+      setSnapshot(nextSnapshot);
+      setPreferences(nextPreferences);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Lokale Daten konnten nicht geladen werden.');
     } finally {
@@ -132,20 +144,11 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => { void reload(); }, [reload]);
 
-  useEffect(() => {
-    if (loading) return;
-    try {
-      syncSavingsWidget(snapshot);
-    } catch {
-      // The main app remains fully usable even if WidgetKit cannot refresh.
-    }
-  }, [loading, snapshot]);
-
   const runMutation = useCallback(async (mutation: () => Promise<unknown>, feedback: 'light' | 'success' = 'light') => {
     try {
       setError(null);
       await mutation();
-      if (process.env.EXPO_OS === 'ios') {
+      if (preferences.haptics && process.env.EXPO_OS === 'ios') {
         if (feedback === 'success') await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
         else await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
       }
@@ -154,7 +157,20 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       setError(cause instanceof Error ? cause.message : 'Aktion konnte nicht gespeichert werden.');
       throw cause;
     }
-  }, [reload]);
+  }, [preferences.haptics, reload]);
+
+  const updatePreference = useCallback(async <K extends keyof AppPreferences>(key: K, value: AppPreferences[K]) => {
+    await savePreference(key, value);
+    setPreferences((current) => ({ ...current, [key]: value }));
+    if (preferences.haptics && process.env.EXPO_OS === 'ios') {
+      await Haptics.selectionAsync();
+    }
+  }, [preferences.haptics]);
+
+  const restorePreferenceDefaults = useCallback(async () => {
+    await resetPreferencesDb();
+    setPreferences(DEFAULT_PREFERENCES);
+  }, []);
 
   const value = useMemo<StoreValue>(() => {
     const totalSaved = snapshot.contributions.reduce((sum, item) => sum + item.amount, 0);
@@ -168,6 +184,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       ...snapshot,
       loading,
       error,
+      preferences,
       totalSaved,
       level: level.level,
       levelName: level.name,
@@ -183,6 +200,8 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       dueRules: snapshot.savingRules.filter(ruleIsDue),
       todayIsNoSpend: snapshot.noSpendDays.some((item) => item.date === localDayKey()),
       reload,
+      setPreference: updatePreference,
+      restorePreferenceDefaults,
       createGoal: (input) => runMutation(() => insertGoal({
         title: input.title,
         targetAmount: input.targetAmount,
@@ -228,7 +247,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       deleteChallenge: (challengeId) => runMutation(() => removeChallenge(challengeId)),
       resetAll: () => runMutation(clearAllData, 'success'),
     };
-  }, [error, loading, reload, runMutation, snapshot]);
+  }, [error, loading, preferences, reload, restorePreferenceDefaults, runMutation, snapshot, updatePreference]);
 
   return <AppStoreContext.Provider value={value}>{children}</AppStoreContext.Provider>;
 }
