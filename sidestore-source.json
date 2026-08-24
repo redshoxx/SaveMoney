@@ -12,10 +12,10 @@
       "versions": [
         {
           "version": "2.0.1",
-          "date": "2026-08-24T11:19:49Z",
+          "date": "2026-08-24T20:22:47Z",
           "localizedDescription": "Widget-Fix und aktueller automatischer SparFlow-Build.",
           "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-          "size": 15304380,
+          "size": 15304375,
           "minOSVersion": "16.4"
         },
         {
@@ -28,10 +28,10 @@
         }
       ],
       "version": "2.0.1",
-      "versionDate": "2026-08-24T11:19:49Z",
+      "versionDate": "2026-08-24T20:22:47Z",
       "versionDescription": "Widget-Fix und aktueller automatischer SparFlow-Build.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 15304380
+      "size": 15304375
     }
   ]
 }
