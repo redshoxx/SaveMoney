@@ -21,4 +21,5 @@ export function syncSavingsWidget(snapshot: AppSnapshot) {
     streak,
     level: level.level,
   });
+  SparFlowWidget.reload();
 }
