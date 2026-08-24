@@ -198,11 +198,17 @@ jobs:
             minOSVersion: '16.4'
           };
 
-          // SideStores aktuelles Source-Schema erkennt Updates ueber die sichtbare
-          // CFBundleShortVersionString. Alte buildVersion-Felder werden entfernt.
+          // SideStore requires every visible version string to be unique.
+          // Also strip legacy buildVersion fields while preserving the newest
+          // historical entry for each distinct version.
+          const seenVersions = new Set([next.version]);
           const previous = (app.versions || [])
             .map(({ buildVersion, ...version }) => version)
-            .filter((version) => version.version !== next.version);
+            .filter((version) => {
+              if (!version.version || seenVersions.has(version.version)) return false;
+              seenVersions.add(version.version);
+              return true;
+            });
           app.versions = [next, ...previous].slice(0, 12);
 
           // Rueckwaertskompatible AltSource-Felder fuer SideStore-Versionen,
