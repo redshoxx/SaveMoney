@@ -1,16 +1,30 @@
 import * as SQLite from 'expo-sqlite';
 
-import type { AppSnapshot, Challenge, Contribution, Goal } from '@/types/models';
+import type {
+  AppSnapshot,
+  Challenge,
+  ChallengeMode,
+  Contribution,
+  Goal,
+  NoSpendDay,
+  SavingRule,
+  SavingRuleFrequency,
+} from '@/types/models';
 import { makeId } from '@/utils/money';
 
 let databasePromise: Promise<SQLite.SQLiteDatabase> | null = null;
 
-async function getDatabase() {
-  if (!databasePromise) {
-    databasePromise = SQLite.openDatabaseAsync('sparflow.db');
+async function ensureColumn(db: SQLite.SQLiteDatabase, table: string, column: string, definition: string) {
+  const rows = await db.getAllAsync<{ name: string }>(`PRAGMA table_info(${table})`);
+  if (!rows.some((row) => row.name === column)) {
+    await db.execAsync(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
   }
+}
 
+async function getDatabase() {
+  if (!databasePromise) databasePromise = SQLite.openDatabaseAsync('sparflow.db');
   const db = await databasePromise;
+
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
     PRAGMA foreign_keys = ON;
@@ -50,9 +64,34 @@ async function getDatabase() {
       created_at TEXT NOT NULL
     );
 
-    CREATE INDEX IF NOT EXISTS idx_contributions_created_at
-      ON contributions(created_at DESC);
+    CREATE TABLE IF NOT EXISTS saving_rules (
+      id TEXT PRIMARY KEY NOT NULL,
+      title TEXT NOT NULL,
+      goal_id TEXT NOT NULL,
+      amount REAL NOT NULL CHECK(amount > 0),
+      frequency TEXT NOT NULL CHECK(frequency IN ('daily', 'weekly', 'monthly')),
+      weekday INTEGER,
+      day_of_month INTEGER,
+      enabled INTEGER NOT NULL DEFAULT 1,
+      last_applied_at TEXT,
+      created_at TEXT NOT NULL,
+      FOREIGN KEY(goal_id) REFERENCES goals(id) ON DELETE CASCADE
+    );
+
+    CREATE TABLE IF NOT EXISTS no_spend_days (
+      id TEXT PRIMARY KEY NOT NULL,
+      date TEXT NOT NULL UNIQUE,
+      saved_amount REAL NOT NULL DEFAULT 0,
+      created_at TEXT NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_contributions_created_at ON contributions(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_rules_goal ON saving_rules(goal_id);
   `);
+
+  await ensureColumn(db, 'goals', 'target_date', 'TEXT');
+  await ensureColumn(db, 'challenges', 'mode', "TEXT NOT NULL DEFAULT 'fixed'");
+  await ensureColumn(db, 'challenges', 'duration_days', 'INTEGER');
 
   return db;
 }
@@ -65,6 +104,7 @@ function mapGoal(row: Record<string, unknown>): Goal {
     savedAmount: Number(row.saved_amount),
     icon: String(row.icon),
     color: String(row.color),
+    targetDate: row.target_date ? String(row.target_date) : null,
     createdAt: String(row.created_at),
   };
 }
@@ -80,6 +120,8 @@ function mapChallenge(row: Record<string, unknown>): Challenge {
     stepAmount: Number(row.step_amount),
     totalSteps: Number(row.total_steps),
     completedSteps: Number(row.completed_steps),
+    mode: (row.mode ? String(row.mode) : 'fixed') as ChallengeMode,
+    durationDays: row.duration_days == null ? null : Number(row.duration_days),
     icon: String(row.icon),
     color: String(row.color),
     createdAt: String(row.created_at),
@@ -98,18 +140,46 @@ function mapContribution(row: Record<string, unknown>): Contribution {
   };
 }
 
+function mapRule(row: Record<string, unknown>): SavingRule {
+  return {
+    id: String(row.id),
+    title: String(row.title),
+    goalId: String(row.goal_id),
+    amount: Number(row.amount),
+    frequency: String(row.frequency) as SavingRuleFrequency,
+    weekday: row.weekday == null ? null : Number(row.weekday),
+    dayOfMonth: row.day_of_month == null ? null : Number(row.day_of_month),
+    enabled: Number(row.enabled) === 1,
+    lastAppliedAt: row.last_applied_at ? String(row.last_applied_at) : null,
+    createdAt: String(row.created_at),
+  };
+}
+
+function mapNoSpendDay(row: Record<string, unknown>): NoSpendDay {
+  return {
+    id: String(row.id),
+    date: String(row.date),
+    savedAmount: Number(row.saved_amount),
+    createdAt: String(row.created_at),
+  };
+}
+
 export async function loadSnapshot(): Promise<AppSnapshot> {
   const db = await getDatabase();
-  const [goalRows, challengeRows, contributionRows] = await Promise.all([
+  const [goalRows, challengeRows, contributionRows, ruleRows, noSpendRows] = await Promise.all([
     db.getAllAsync<Record<string, unknown>>('SELECT * FROM goals ORDER BY created_at DESC'),
     db.getAllAsync<Record<string, unknown>>('SELECT * FROM challenges ORDER BY completed_at IS NOT NULL, created_at DESC'),
-    db.getAllAsync<Record<string, unknown>>('SELECT * FROM contributions ORDER BY created_at DESC LIMIT 100'),
+    db.getAllAsync<Record<string, unknown>>('SELECT * FROM contributions ORDER BY created_at DESC LIMIT 500'),
+    db.getAllAsync<Record<string, unknown>>('SELECT * FROM saving_rules ORDER BY created_at DESC'),
+    db.getAllAsync<Record<string, unknown>>('SELECT * FROM no_spend_days ORDER BY date DESC LIMIT 365'),
   ]);
 
   return {
     goals: goalRows.map(mapGoal),
     challenges: challengeRows.map(mapChallenge),
     contributions: contributionRows.map(mapContribution),
+    savingRules: ruleRows.map(mapRule),
+    noSpendDays: noSpendRows.map(mapNoSpendDay),
   };
 }
 
@@ -118,51 +188,45 @@ export async function insertGoal(input: {
   targetAmount: number;
   icon: string;
   color: string;
+  targetDate?: string | null;
 }) {
   const db = await getDatabase();
   const id = makeId('goal');
   await db.runAsync(
-    `INSERT INTO goals (id, title, target_amount, saved_amount, icon, color, created_at)
-     VALUES (?, ?, ?, 0, ?, ?, ?)`,
+    `INSERT INTO goals (id, title, target_amount, saved_amount, icon, color, target_date, created_at)
+     VALUES (?, ?, ?, 0, ?, ?, ?, ?)`,
     id,
     input.title.trim(),
     input.targetAmount,
     input.icon,
     input.color,
+    input.targetDate ?? null,
     new Date().toISOString(),
   );
   return id;
 }
 
-export async function addGoalContribution(goalId: string, amount: number) {
+export async function addGoalContribution(goalId: string, amount: number, note?: string | null) {
   const db = await getDatabase();
   const goal = await db.getFirstAsync<{ target_amount: number; saved_amount: number; title: string }>(
-    'SELECT target_amount, saved_amount, title FROM goals WHERE id = ?',
-    goalId,
+    'SELECT target_amount, saved_amount, title FROM goals WHERE id = ?', goalId,
   );
   if (!goal) throw new Error('Sparziel wurde nicht gefunden.');
+  if (!Number.isFinite(amount) || amount <= 0) throw new Error('Bitte gib einen gültigen Sparbetrag ein.');
 
   const remaining = Math.max(0, Number(goal.target_amount) - Number(goal.saved_amount));
-  if (remaining <= 0) return;
+  if (remaining <= 0) throw new Error('Dieses Sparziel ist bereits erreicht.');
   const applied = Math.min(amount, remaining);
-  if (applied <= 0) return;
 
   await db.withTransactionAsync(async () => {
-    await db.runAsync(
-      'UPDATE goals SET saved_amount = MIN(target_amount, saved_amount + ?) WHERE id = ?',
-      applied,
-      goalId,
-    );
+    await db.runAsync('UPDATE goals SET saved_amount = MIN(target_amount, saved_amount + ?) WHERE id = ?', applied, goalId);
     await db.runAsync(
       `INSERT INTO contributions (id, source_type, source_id, amount, note, created_at)
        VALUES (?, 'goal', ?, ?, ?, ?)`,
-      makeId('save'),
-      goalId,
-      applied,
-      goal.title,
-      new Date().toISOString(),
+      makeId('save'), goalId, applied, note?.trim() || goal.title, new Date().toISOString(),
     );
   });
+  return applied;
 }
 
 export async function insertChallenge(input: {
@@ -172,6 +236,8 @@ export async function insertChallenge(input: {
   targetAmount: number;
   stepAmount: number;
   totalSteps: number;
+  mode?: ChallengeMode;
+  durationDays?: number | null;
   icon: string;
   color: string;
 }) {
@@ -180,66 +246,99 @@ export async function insertChallenge(input: {
   await db.runAsync(
     `INSERT INTO challenges (
       id, template_id, title, subtitle, target_amount, saved_amount, step_amount,
-      total_steps, completed_steps, icon, color, created_at, completed_at
-    ) VALUES (?, ?, ?, ?, ?, 0, ?, ?, 0, ?, ?, ?, NULL)`,
-    id,
-    input.templateId ?? null,
-    input.title.trim(),
-    input.subtitle.trim(),
-    input.targetAmount,
-    input.stepAmount,
-    input.totalSteps,
-    input.icon,
-    input.color,
-    new Date().toISOString(),
+      total_steps, completed_steps, mode, duration_days, icon, color, created_at, completed_at
+    ) VALUES (?, ?, ?, ?, ?, 0, ?, ?, 0, ?, ?, ?, ?, ?, NULL)`,
+    id, input.templateId ?? null, input.title.trim(), input.subtitle.trim(), input.targetAmount,
+    input.stepAmount, input.totalSteps, input.mode ?? 'fixed', input.durationDays ?? null,
+    input.icon, input.color, new Date().toISOString(),
   );
   return id;
 }
 
-export async function completeChallengeStep(challengeId: string) {
+export async function completeChallengeStep(challengeId: string, overrideAmount?: number) {
   const db = await getDatabase();
   const challenge = await db.getFirstAsync<{
-    target_amount: number;
-    saved_amount: number;
-    step_amount: number;
-    completed_steps: number;
-    title: string;
-  }>('SELECT target_amount, saved_amount, step_amount, completed_steps, title FROM challenges WHERE id = ?', challengeId);
-
+    target_amount: number; saved_amount: number; step_amount: number; title: string;
+  }>('SELECT target_amount, saved_amount, step_amount, title FROM challenges WHERE id = ?', challengeId);
   if (!challenge) throw new Error('Challenge wurde nicht gefunden.');
-  const remaining = Number(challenge.target_amount) - Number(challenge.saved_amount);
-  if (remaining <= 0) return;
 
-  const applied = Math.min(Number(challenge.step_amount), remaining);
+  const remaining = Number(challenge.target_amount) - Number(challenge.saved_amount);
+  if (remaining <= 0) throw new Error('Diese Challenge ist bereits abgeschlossen.');
+  const requested = overrideAmount && overrideAmount > 0 ? overrideAmount : Number(challenge.step_amount);
+  const applied = Math.min(requested, remaining);
   const nextSaved = Number(challenge.saved_amount) + applied;
   const completedAt = nextSaved >= Number(challenge.target_amount) ? new Date().toISOString() : null;
 
   await db.withTransactionAsync(async () => {
     await db.runAsync(
-      `UPDATE challenges
-       SET saved_amount = MIN(target_amount, saved_amount + ?),
-           completed_steps = completed_steps + 1,
-           completed_at = COALESCE(?, completed_at)
-       WHERE id = ?`,
-      applied,
-      completedAt,
-      challengeId,
+      `UPDATE challenges SET saved_amount = MIN(target_amount, saved_amount + ?), completed_steps = completed_steps + 1,
+       completed_at = COALESCE(?, completed_at) WHERE id = ?`,
+      applied, completedAt, challengeId,
     );
     await db.runAsync(
       `INSERT INTO contributions (id, source_type, source_id, amount, note, created_at)
        VALUES (?, 'challenge', ?, ?, ?, ?)`,
-      makeId('save'),
-      challengeId,
-      applied,
-      challenge.title,
-      new Date().toISOString(),
+      makeId('save'), challengeId, applied, challenge.title, new Date().toISOString(),
     );
   });
+  return applied;
+}
+
+export async function insertSavingRule(input: {
+  title: string;
+  goalId: string;
+  amount: number;
+  frequency: SavingRuleFrequency;
+  weekday?: number | null;
+  dayOfMonth?: number | null;
+}) {
+  const db = await getDatabase();
+  await db.runAsync(
+    `INSERT INTO saving_rules (id, title, goal_id, amount, frequency, weekday, day_of_month, enabled, last_applied_at, created_at)
+     VALUES (?, ?, ?, ?, ?, ?, ?, 1, NULL, ?)`,
+    makeId('rule'), input.title.trim(), input.goalId, input.amount, input.frequency,
+    input.weekday ?? null, input.dayOfMonth ?? null, new Date().toISOString(),
+  );
+}
+
+export async function toggleSavingRule(ruleId: string, enabled: boolean) {
+  const db = await getDatabase();
+  await db.runAsync('UPDATE saving_rules SET enabled = ? WHERE id = ?', enabled ? 1 : 0, ruleId);
+}
+
+export async function applySavingRule(ruleId: string) {
+  const db = await getDatabase();
+  const rule = await db.getFirstAsync<{ goal_id: string; amount: number; title: string }>(
+    'SELECT goal_id, amount, title FROM saving_rules WHERE id = ?', ruleId,
+  );
+  if (!rule) throw new Error('Sparregel wurde nicht gefunden.');
+  const applied = await addGoalContribution(rule.goal_id, Number(rule.amount), `Sparregel: ${rule.title}`);
+  await db.runAsync('UPDATE saving_rules SET last_applied_at = ? WHERE id = ?', new Date().toISOString(), ruleId);
+  return applied;
+}
+
+export async function removeSavingRule(ruleId: string) {
+  const db = await getDatabase();
+  await db.runAsync('DELETE FROM saving_rules WHERE id = ?', ruleId);
+}
+
+export async function markNoSpendDay(date: string, goalId?: string | null, amount = 0) {
+  const db = await getDatabase();
+  const existing = await db.getFirstAsync<{ id: string }>('SELECT id FROM no_spend_days WHERE date = ?', date);
+  if (existing) throw new Error('Dieser Tag ist bereits als No-Spend-Day markiert.');
+
+  let applied = 0;
+  if (goalId && amount > 0) applied = await addGoalContribution(goalId, amount, 'No-Spend-Day');
+  await db.runAsync(
+    'INSERT INTO no_spend_days (id, date, saved_amount, created_at) VALUES (?, ?, ?, ?)',
+    makeId('nospend'), date, applied, new Date().toISOString(),
+  );
 }
 
 export async function removeGoal(goalId: string) {
   const db = await getDatabase();
   await db.withTransactionAsync(async () => {
+    await db.runAsync('DELETE FROM saving_rules WHERE goal_id = ?', goalId);
     await db.runAsync("DELETE FROM contributions WHERE source_type = 'goal' AND source_id = ?", goalId);
     await db.runAsync('DELETE FROM goals WHERE id = ?', goalId);
   });
@@ -256,6 +355,8 @@ export async function removeChallenge(challengeId: string) {
 export async function clearAllData() {
   const db = await getDatabase();
   await db.withTransactionAsync(async () => {
+    await db.runAsync('DELETE FROM saving_rules');
+    await db.runAsync('DELETE FROM no_spend_days');
     await db.runAsync('DELETE FROM contributions');
     await db.runAsync('DELETE FROM goals');
     await db.runAsync('DELETE FROM challenges');
