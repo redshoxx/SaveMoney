@@ -2,7 +2,7 @@
   "expo": {
     "name": "SparFlow",
     "slug": "sparflow",
-    "version": "2.0.3",
+    "version": "2.1.0",
     "orientation": "portrait",
     "scheme": "sparflow",
     "userInterfaceStyle": "light",
@@ -25,29 +25,7 @@
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite",
-      [
-        "expo-widgets",
-        {
-          "bundleIdentifier": "com.redshoxx.sparflow.widgets",
-          "groupIdentifier": "group.com.redshoxx.sparflow",
-          "widgets": [
-            {
-              "name": "SparFlowSavings",
-              "displayName": "SparFlow",
-              "description": "Dein Sparfortschritt direkt auf dem Home-Bildschirm.",
-              "ios": {
-                "contentMarginsDisabled": true,
-                "supportedFamilies": [
-                  "systemSmall",
-                  "systemMedium"
-                ],
-                "initialLayout": "widgets/sparflow-widget.tsx"
-              }
-            }
-          ]
-        }
-      ]
+      "expo-sqlite"
     ],
     "experiments": {
       "typedRoutes": true
