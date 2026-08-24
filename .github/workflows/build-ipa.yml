@@ -149,6 +149,11 @@ jobs:
             echo "xcode:     ${{ steps.xcode.outcome }} (exit ${{ steps.xcode.outputs.exit_code }})"
             echo "package:   ${{ steps.package.outcome }} (exit ${{ steps.package.outputs.exit_code }})"
             echo
+            if [ -f ci-logs/xcodebuild.log ]; then
+              echo "===== XCODE ERROR SUMMARY ====="
+              grep -n -C 8 -E '(^|[[:space:]])(fatal )?error:|BUILD FAILED|The following build commands failed|ExpoWorkletsBridgeProvider' ci-logs/xcodebuild.log | tail -n 240 || true
+              echo
+            fi
             for file in ci-logs/install.log ci-logs/typecheck.log ci-logs/prebuild.log ci-logs/pods.log ci-logs/xcodebuild.log ci-logs/package.log; do
               if [ -f "$file" ]; then
                 echo "===== $file (last 160 lines) ====="
