@@ -188,23 +188,38 @@ jobs:
           const fs = require('fs');
           const source = JSON.parse(fs.readFileSync('sidestore-source.json', 'utf8'));
           const app = source.apps[0];
+          const description = 'Widget-Fix und aktueller automatischer SparFlow-Build.';
           const next = {
             version: process.env.VERSION,
-            buildVersion: process.env.BUILD_NUMBER,
             date: process.env.RELEASE_DATE,
-            localizedDescription: 'Automatischer SparFlow-Build aus dem aktuellen main-Stand.',
+            localizedDescription: description,
             downloadURL: process.env.DOWNLOAD_URL,
             size: Number(process.env.IPA_SIZE),
             minOSVersion: '16.4'
           };
-          app.versions = [next, ...(app.versions || []).filter(v => v.buildVersion !== next.buildVersion)].slice(0, 12);
+
+          // SideStores aktuelles Source-Schema erkennt Updates ueber die sichtbare
+          // CFBundleShortVersionString. Alte buildVersion-Felder werden entfernt.
+          const previous = (app.versions || [])
+            .map(({ buildVersion, ...version }) => version)
+            .filter((version) => version.version !== next.version);
+          app.versions = [next, ...previous].slice(0, 12);
+
+          // Rueckwaertskompatible AltSource-Felder fuer SideStore-Versionen,
+          // die bei reinen versions[]-Feeds Update-Probleme haben.
+          app.version = next.version;
+          app.versionDate = next.date;
+          app.versionDescription = next.localizedDescription;
+          app.downloadURL = next.downloadURL;
+          app.size = next.size;
+
           fs.writeFileSync('sidestore-source.json', JSON.stringify(source, null, 2) + '\n');
           NODE
 
           SOURCE_SHA=$(gh api "repos/${GITHUB_REPOSITORY}/contents/sidestore-source.json?ref=main" --jq .sha)
           SOURCE_B64=$(base64 < sidestore-source.json | tr -d '\n')
           gh api --method PUT "repos/${GITHUB_REPOSITORY}/contents/sidestore-source.json" \
-            -f message="chore: publish SideStore build ${VERSION} (${BUILD_NUMBER}) [skip ci]" \
+            -f message="chore: publish SideStore ${VERSION} (${BUILD_NUMBER}) [skip ci]" \
             -f content="$SOURCE_B64" \
             -f sha="$SOURCE_SHA" \
             -f branch="main" >/dev/null
