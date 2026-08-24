@@ -2,20 +2,26 @@
   "expo": {
     "name": "SparFlow",
     "slug": "sparflow",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "scheme": "sparflow",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.redshoxx.sparflow",
-      "buildNumber": "1",
+      "buildNumber": "2",
+      "icon": "./assets/icon.png",
       "infoPlist": {
         "UIFileSharingEnabled": false
       }
     },
     "android": {
-      "package": "com.redshoxx.sparflow"
+      "package": "com.redshoxx.sparflow",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#173E2B"
+      }
     },
     "plugins": [
       "expo-router",

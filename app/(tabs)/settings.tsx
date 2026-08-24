@@ -1,6 +1,8 @@
+import { router } from 'expo-router';
 import { Alert, ScrollView, Text, View } from 'react-native';
 
-import { Card, Pill, PrimaryButton, SectionHeading, Symbol } from '@/components/ui';
+import { MenuRow } from '@/components/savings-ui';
+import { Card, SectionHeading, Symbol } from '@/components/ui';
 import { colors } from '@/constants/theme';
 import { useAppStore } from '@/store/app-store';
 import { formatMoney } from '@/utils/money';
@@ -11,80 +13,43 @@ export default function SettingsScreen() {
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ padding: 16, paddingBottom: 120, gap: 20 }}>
       <Card style={{ backgroundColor: colors.primaryDark, borderColor: colors.primaryDark }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-          <View style={{ width: 50, height: 50, borderRadius: 17, backgroundColor: '#FFFFFF18', alignItems: 'center', justifyContent: 'center' }}>
-            <Symbol name="lock.shield.fill" size={24} color="#FFFFFF" />
-          </View>
-          <View style={{ flex: 1, gap: 3 }}>
-            <Text selectable style={{ color: '#FFFFFF', fontSize: 18, fontWeight: '900' }}>Lokal & privat</Text>
-            <Text selectable style={{ color: '#C8E3D1', lineHeight: 19 }}>
-              Deine Spar-Daten bleiben in der SQLite-Datenbank auf diesem iPhone.
-            </Text>
-          </View>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 13 }}>
+          <View style={{ width: 52, height: 52, borderRadius: 18, backgroundColor: '#FFFFFF18', alignItems: 'center', justifyContent: 'center' }}><Symbol name="person.crop.circle.fill" size={27} color="#FFFFFF" /></View>
+          <View style={{ flex: 1, gap: 3 }}><Text selectable style={{ color: '#FFFFFF', fontSize: 19, fontWeight: '900' }}>Level {store.level} · {store.levelName}</Text><Text selectable style={{ color: '#CFE4D6', fontSize: 13 }}>{formatMoney(store.totalSaved)} gespart · {store.streak} Tage Serie</Text></View>
         </View>
       </Card>
 
-      <View style={{ gap: 12 }}>
-        <SectionHeading title="Übersicht" />
+      <View style={{ gap: 9 }}>
+        <SectionHeading title="Fortschritt" />
         <Card style={{ gap: 0 }}>
-          {[
-            ['Gesamt gespart', formatMoney(store.totalSaved)],
-            ['Sparziele', String(store.goals.length)],
-            ['Challenges', String(store.challenges.length)],
-            ['Level', String(store.level)],
-          ].map(([label, value], index) => (
-            <View
-              key={label}
-              style={{
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'space-between',
-                paddingVertical: 13,
-                borderBottomWidth: index === 3 ? 0 : 1,
-                borderBottomColor: colors.border,
-              }}
-            >
-              <Text selectable style={{ color: colors.textMuted, fontWeight: '700' }}>{label}</Text>
-              <Text selectable style={{ color: colors.text, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{value}</Text>
-            </View>
-          ))}
+          <MenuRow icon="trophy.fill" title="Erfolge" subtitle={`${store.achievements.filter((item) => item.unlocked).length} Badges freigeschaltet`} onPress={() => router.push('/achievements')} />
+          <View style={{ height: 1, backgroundColor: colors.border }} />
+          <MenuRow icon="chart.bar.fill" title="Statistiken" subtitle="Wochenrückblick, Monate und Prognosen" onPress={() => router.push('/statistics')} />
+          <View style={{ height: 1, backgroundColor: colors.border }} />
+          <MenuRow icon="clock.arrow.circlepath" title="Sparverlauf" subtitle={`${store.contributions.length} lokale Buchungen`} onPress={() => router.push('/history')} />
         </Card>
       </View>
 
-      <View style={{ gap: 12 }}>
-        <SectionHeading title="Installation" />
+      <View style={{ gap: 9 }}>
+        <SectionHeading title="Sparen automatisieren" />
+        <Card style={{ gap: 0 }}>
+          <MenuRow icon="clock.badge.checkmark.fill" title="Sparregeln" subtitle="Täglich, freitags oder monatlich erinnern" onPress={() => router.push('/rules')} />
+          <View style={{ height: 1, backgroundColor: colors.border }} />
+          <MenuRow icon="function" title="Was wäre wenn?" subtitle="Kleine Beträge auf Monat und Jahr hochrechnen" onPress={() => router.push('/what-if')} />
+          <View style={{ height: 1, backgroundColor: colors.border }} />
+          <MenuRow icon="rectangle.3.group.fill" title="Widget-Vorschau" subtitle="Kompakte Ziel- und Serienansicht für den Homescreen" onPress={() => router.push('/widget-preview')} />
+        </Card>
+      </View>
+
+      <View style={{ gap: 9 }}>
+        <SectionHeading title="Datenschutz & Daten" />
         <Card>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <Symbol name="iphone" size={25} color={colors.primary} />
-            <View style={{ flex: 1, gap: 3 }}>
-              <Text selectable style={{ color: colors.text, fontWeight: '900' }}>SideStore-ready</Text>
-              <Text selectable style={{ color: colors.textMuted, lineHeight: 19 }}>
-                Das Repository enthält einen GitHub-Workflow für eine unsigned iOS-IPA, die SideStore beim Installieren neu signieren kann.
-              </Text>
-            </View>
-            <Pill>iPhone</Pill>
-          </View>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}><View style={{ width: 46, height: 46, borderRadius: 16, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}><Symbol name="lock.shield.fill" size={22} color={colors.primary} /></View><View style={{ flex: 1, gap: 3 }}><Text selectable style={{ color: colors.text, fontWeight: '900' }}>Lokal & privat</Text><Text selectable style={{ color: colors.textMuted, fontSize: 12.5, lineHeight: 18 }}>Sparziele, Challenges, Regeln und Verlauf bleiben in SQLite auf dem Gerät. Keine Cloud-Anmeldung erforderlich.</Text></View></View>
+          <MenuRow icon="trash.fill" title="Alle lokalen Daten löschen" subtitle="SparFlow vollständig zurücksetzen" destructive onPress={() => Alert.alert('Alles zurücksetzen?', 'Sparziele, Challenges, Sparregeln und Verlauf werden dauerhaft gelöscht.', [{ text: 'Abbrechen', style: 'cancel' }, { text: 'Alles löschen', style: 'destructive', onPress: () => void store.resetAll() }])} />
         </Card>
       </View>
 
-      <View style={{ gap: 12 }}>
-        <SectionHeading title="Daten" />
-        <PrimaryButton
-          title="Alle lokalen Daten löschen"
-          tone="danger"
-          icon="trash.fill"
-          onPress={() =>
-            Alert.alert('Alles zurücksetzen?', 'Sparziele, Challenges und alle Einzahlungen werden dauerhaft von diesem Gerät gelöscht.', [
-              { text: 'Abbrechen', style: 'cancel' },
-              { text: 'Alles löschen', style: 'destructive', onPress: () => void store.resetAll() },
-            ])
-          }
-        />
-      </View>
-
-      <Text selectable style={{ color: colors.textMuted, fontSize: 12, textAlign: 'center', lineHeight: 18 }}>
-        SparFlow 1.0 · Local-first · Keine Cloud-Anmeldung erforderlich
-      </Text>
+      <Text selectable style={{ color: colors.textMuted, fontSize: 12, textAlign: 'center', lineHeight: 18 }}>SparFlow V2 · Local-first · SideStore-ready</Text>
     </ScrollView>
   );
 }
