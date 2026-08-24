@@ -11,6 +11,7 @@ Eine lokal-first Spar-App für iPhone. Schnell sparen, klare Ziele verfolgen, Ch
 - **Gamification** mit Level, XP, Erfolgen und Spar-Serie
 - **Wochen-/Monatsstatistiken**, Verlauf und Was-wäre-wenn-Rechner
 - **Lokale Sparregeln** für wiederkehrende Sparroutinen
+- **iOS-Homescreen-Widget** in Small und Medium mit Gesamtbetrag, Hauptziel, Fortschritt, Level und Sparserie
 - **Lokale SQLite-Datenbank** über `expo-sqlite`
 - **Keine Registrierung**, kein Tracking, kein Backend für die Grundfunktionen
 - **SideStore-Workflow** mit automatischem Update-Feed
@@ -30,6 +31,21 @@ Voraussetzungen:
 npm install
 npx expo start
 ```
+
+Das echte Widget benötigt einen nativen iOS-Build und läuft nicht in Expo Go.
+
+## iPhone-Widget
+
+SparFlow registriert über `expo-widgets` eine WidgetKit-Extension mit zwei Größen:
+
+- **Klein:** Gesamtbetrag, Hauptziel, Fortschritt und Sparserie
+- **Mittel:** Gesamtbetrag, Hauptziel, Restbetrag, Fortschritt, Level und Sparserie
+
+Die App schreibt nach jedem Daten-Reload einen neuen Widget-Snapshot. Dadurch werden Sparaktionen, Challenge-Schritte, Zieländerungen und andere Buchungen an WidgetKit weitergegeben.
+
+Auf dem iPhone: Homescreen lange gedrückt halten → **Bearbeiten / +** → **Widgets** → **SparFlow** → Größe wählen → **Widget hinzufügen**.
+
+Hinweis für SideStore: Das Widget ist eine zusätzliche App-Extension und benötigt beim Sideloading einen zusätzlichen App-ID/Extension-Slot. Die gemeinsame Datenübertragung zwischen App und Widget verwendet eine iOS App Group.
 
 ## SideStore installieren und Updates erhalten
 
@@ -86,6 +102,7 @@ db/                   SQLite-Schema und Queries
 store/                App-State und Mutationen
 types/                TypeScript-Datenmodelle
 utils/                Formatierung und Insights
+widgets/              Expo WidgetKit-Layouts
 .github/workflows/     SideStore IPA Build und Auto-Update
 ```
 
