@@ -37,7 +37,7 @@ export function StatTile({ icon, label, value, caption }: { icon: string; label:
 export function QuickAmount({ amount, selected, onPress }: { amount: number; selected?: boolean; onPress: () => void }) {
   return (
     <Pressable onPress={onPress} style={({ pressed }) => ({ minHeight: 46, paddingHorizontal: 15, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: selected ? colors.primary : colors.surfaceMuted, opacity: pressed ? 0.75 : 1 })}>
-      <Text style={{ fontWeight: '850', fontSize: 15, color: selected ? '#FFFFFF' : colors.text }}>{formatMoney(amount)}</Text>
+      <Text style={{ fontWeight: '800', fontSize: 15, color: selected ? '#FFFFFF' : colors.text }}>{formatMoney(amount)}</Text>
     </Pressable>
   );
 }
@@ -77,7 +77,7 @@ export function ComparisonBadge({ value }: { value: number }) {
   const positive = value >= 0;
   return (
     <View style={{ alignSelf: 'flex-start', borderRadius: 999, backgroundColor: positive ? colors.primarySoft : '#FDE8E8', paddingHorizontal: 10, paddingVertical: 6 }}>
-      <Text style={{ fontSize: 12, fontWeight: '850', color: positive ? colors.primaryDark : colors.danger }}>{positive ? '+' : ''}{Math.round(value)} %</Text>
+      <Text style={{ fontSize: 12, fontWeight: '800', color: positive ? colors.primaryDark : colors.danger }}>{positive ? '+' : ''}{Math.round(value)} %</Text>
     </View>
   );
 }
