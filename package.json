@@ -10,6 +10,7 @@
     "web": "expo start --web",
     "typecheck": "tsc --noEmit",
     "generate:icon": "node scripts/generate-icon.mjs",
+    "patch:widget-native": "node scripts/patch-widget-container-background.mjs",
     "postinstall": "npm run generate:icon"
   },
   "dependencies": {
