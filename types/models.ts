@@ -5,8 +5,11 @@ export type Goal = {
   savedAmount: number;
   icon: string;
   color: string;
+  targetDate: string | null;
   createdAt: string;
 };
+
+export type ChallengeMode = 'fixed' | 'daily' | 'weekly' | 'action' | 'random';
 
 export type Challenge = {
   id: string;
@@ -18,6 +21,8 @@ export type Challenge = {
   stepAmount: number;
   totalSteps: number;
   completedSteps: number;
+  mode: ChallengeMode;
+  durationDays: number | null;
   icon: string;
   color: string;
   createdAt: string;
@@ -37,16 +42,61 @@ export type ChallengeTemplate = {
   id: string;
   title: string;
   subtitle: string;
+  category: 'Einfach' | 'Verzicht' | 'Gamification' | 'Zufall';
   targetAmount: number;
   stepAmount: number;
   totalSteps: number;
+  mode: ChallengeMode;
+  durationDays?: number;
   icon: string;
   color: string;
   difficulty: 'Leicht' | 'Mittel' | 'Intensiv';
+};
+
+export type SavingAction = {
+  id: string;
+  title: string;
+  subtitle: string;
+  amount: number;
+  icon: string;
+  color: string;
+};
+
+export type SavingRuleFrequency = 'daily' | 'weekly' | 'monthly';
+
+export type SavingRule = {
+  id: string;
+  title: string;
+  goalId: string;
+  amount: number;
+  frequency: SavingRuleFrequency;
+  weekday: number | null;
+  dayOfMonth: number | null;
+  enabled: boolean;
+  lastAppliedAt: string | null;
+  createdAt: string;
+};
+
+export type NoSpendDay = {
+  id: string;
+  date: string;
+  savedAmount: number;
+  createdAt: string;
+};
+
+export type Achievement = {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: string;
+  unlocked: boolean;
+  progress: number;
 };
 
 export type AppSnapshot = {
   goals: Goal[];
   challenges: Challenge[];
   contributions: Contribution[];
+  savingRules: SavingRule[];
+  noSpendDays: NoSpendDay[];
 };
