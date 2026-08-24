@@ -1,108 +1,185 @@
 import { router } from 'expo-router';
-import { useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
-import { BarChart, HeroCard, IconBubble, StatTile } from '@/components/savings-ui';
+import { HeroCard, IconBubble } from '@/components/savings-ui';
 import { Card, ProgressBar, SectionHeading, Symbol } from '@/components/ui';
 import { colors } from '@/constants/theme';
-import { savingActions, useAppStore } from '@/store/app-store';
+import { useAppStore } from '@/store/app-store';
 import { formatMoney, progress } from '@/utils/money';
 
-const rouletteValues = [1, 2, 3, 5, 7, 10, 15, 20];
+const quickAmounts = [5, 10, 20, 50];
 
 export default function HomeScreen() {
   const store = useAppStore();
-  const [roulette, setRoulette] = useState(7);
-  const activeChallenges = store.challenges.filter((challenge) => !challenge.completedAt).slice(0, 3);
   const primaryGoal = store.primaryGoal;
+  const activeChallenge = store.challenges.find((challenge) => !challenge.completedAt);
+  const dueRule = store.dueRules[0];
 
   const run = async (action: () => Promise<void>) => {
-    try { await action(); } catch (error) { Alert.alert('SparFlow', error instanceof Error ? error.message : 'Aktion fehlgeschlagen.'); }
+    try {
+      await action();
+    } catch (error) {
+      Alert.alert('SparFlow', error instanceof Error ? error.message : 'Aktion fehlgeschlagen.');
+    }
   };
 
   if (store.loading) {
-    return <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}><ActivityIndicator color={colors.primary} /></View>;
+    return (
+      <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.background }}>
+        <ActivityIndicator color={colors.primary} />
+      </View>
+    );
   }
 
-  const monthDelta = store.periodMetrics.previousMonth > 0
-    ? ((store.periodMetrics.month - store.periodMetrics.previousMonth) / store.periodMetrics.previousMonth) * 100
-    : store.periodMetrics.month > 0 ? 100 : 0;
-
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ padding: 16, paddingBottom: 120, gap: 20 }}>
-      {store.error ? <View style={{ backgroundColor: '#FDECEC', borderRadius: 16, padding: 12 }}><Text selectable style={{ color: colors.danger, fontWeight: '700' }}>{store.error}</Text></View> : null}
+    <ScrollView
+      contentInsetAdjustmentBehavior="automatic"
+      contentContainerStyle={{ padding: 16, paddingBottom: 110, gap: 18 }}>
+      {store.error ? (
+        <View style={{ backgroundColor: '#FDECEC', borderRadius: 16, padding: 12 }}>
+          <Text selectable style={{ color: colors.danger, fontWeight: '700' }}>{store.error}</Text>
+        </View>
+      ) : null}
 
       <HeroCard>
         <View style={{ gap: 5 }}>
-          <Text style={{ color: '#BFD7C8', fontSize: 13, fontWeight: '700' }}>INSGESAMT GESPART</Text>
-          <Text selectable style={{ color: '#FFFFFF', fontSize: 38, fontWeight: '900', letterSpacing: -1.2, fontVariant: ['tabular-nums'] }}>{formatMoney(store.totalSaved)}</Text>
-          <Text selectable style={{ color: '#D7E7DC', fontSize: 13 }}>{monthDelta >= 0 ? '+' : ''}{Math.round(monthDelta)} % gegenüber letztem Monat</Text>
+          <Text style={{ color: '#BFD7C8', fontSize: 12, fontWeight: '800' }}>GESPART</Text>
+          <Text selectable style={{ color: '#FFFFFF', fontSize: 40, fontWeight: '900', letterSpacing: -1.3, fontVariant: ['tabular-nums'] }}>
+            {formatMoney(store.totalSaved)}
+          </Text>
+          <Text selectable style={{ color: '#D7E7DC', fontSize: 13 }}>
+            {formatMoney(store.periodMetrics.month)} diesen Monat
+          </Text>
         </View>
-        <Pressable onPress={() => router.push('/save')} style={({ pressed }) => ({ minHeight: 54, borderRadius: 17, backgroundColor: '#FFFFFF', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 9, opacity: pressed ? 0.82 : 1 })}>
-          <Symbol name="plus.circle.fill" size={20} color={colors.primaryDark} />
+
+        <Pressable
+          onPress={() => router.push('/save')}
+          style={({ pressed }) => ({
+            minHeight: 52,
+            borderRadius: 16,
+            backgroundColor: '#FFFFFF',
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 8,
+            opacity: pressed ? 0.82 : 1,
+          })}>
+          <Symbol name="plus" size={18} color={colors.primaryDark} />
           <Text style={{ color: colors.primaryDark, fontWeight: '900', fontSize: 16 }}>Geld sparen</Text>
         </Pressable>
       </HeroCard>
 
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 10 }}>
-        <StatTile icon="flame.fill" label="SPARSERIE" value={`${store.streak} Tage`} caption={store.streak >= 7 ? 'Starke Routine' : 'Heute weitermachen'} />
-        <StatTile icon="trophy.fill" label={`LEVEL ${store.level}`} value={store.levelName} caption={`${store.xpInLevel} / ${store.xpTarget} XP`} />
-      </View>
-
-      <Card>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
-          <View style={{ gap: 4 }}><Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '800' }}>LEVEL-FORTSCHRITT</Text><Text selectable style={{ color: colors.text, fontSize: 17, fontWeight: '800' }}>Noch {store.xpTarget - store.xpInLevel} XP bis Level {store.level + 1}</Text></View>
-          <IconBubble icon="star.fill" size={40} />
-        </View>
-        <ProgressBar value={store.xpInLevel / store.xpTarget} height={10} />
-      </Card>
-
       {primaryGoal ? (
-        <View style={{ gap: 10 }}>
-          <SectionHeading title="Dein nächstes Ziel" />
-          <Card>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-              <IconBubble icon={primaryGoal.icon} color={primaryGoal.color} background={`${primaryGoal.color}18`} size={48} />
-              <View style={{ flex: 1, gap: 3 }}><Text selectable style={{ fontSize: 19, fontWeight: '900', color: colors.text }}>{primaryGoal.title}</Text><Text selectable style={{ fontSize: 13, color: colors.textMuted }}>{formatMoney(primaryGoal.savedAmount)} von {formatMoney(primaryGoal.targetAmount)}</Text></View>
-              <Text selectable style={{ fontSize: 18, fontWeight: '900', color: primaryGoal.color }}>{Math.round(progress(primaryGoal.savedAmount, primaryGoal.targetAmount) * 100)} %</Text>
+        <Card>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <IconBubble icon={primaryGoal.icon} color={primaryGoal.color} background={`${primaryGoal.color}18`} size={46} />
+            <View style={{ flex: 1, gap: 3 }}>
+              <Text selectable style={{ fontSize: 18, fontWeight: '900', color: colors.text }}>{primaryGoal.title}</Text>
+              <Text selectable style={{ color: colors.textMuted, fontSize: 13 }}>
+                {formatMoney(primaryGoal.savedAmount)} von {formatMoney(primaryGoal.targetAmount)}
+              </Text>
             </View>
-            <ProgressBar value={progress(primaryGoal.savedAmount, primaryGoal.targetAmount)} color={primaryGoal.color} height={11} />
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}><Text selectable style={{ color: colors.textMuted, fontSize: 13 }}>Noch {formatMoney(Math.max(0, primaryGoal.targetAmount - primaryGoal.savedAmount))}</Text>{store.forecast ? <Text selectable style={{ color: colors.primaryDark, fontSize: 13, fontWeight: '800' }}>ca. {store.forecast.date.toLocaleDateString('de-AT', { day: '2-digit', month: 'short' })}</Text> : null}</View>
-          </Card>
-        </View>
+            <Text selectable style={{ fontSize: 16, fontWeight: '900', color: primaryGoal.color }}>
+              {Math.round(progress(primaryGoal.savedAmount, primaryGoal.targetAmount) * 100)} %
+            </Text>
+          </View>
+          <ProgressBar value={progress(primaryGoal.savedAmount, primaryGoal.targetAmount)} color={primaryGoal.color} height={9} />
+          <Text selectable style={{ color: colors.textMuted, fontSize: 13 }}>
+            Noch {formatMoney(Math.max(0, primaryGoal.targetAmount - primaryGoal.savedAmount))}
+          </Text>
+        </Card>
       ) : (
-        <Card><Text selectable style={{ color: colors.text, fontWeight: '800' }}>Lege zuerst ein Sparziel an, damit Schnell-Sparen, Aktionen und Roulette verwendet werden können.</Text><Pressable onPress={() => router.push('/add-goal')}><Text style={{ color: colors.primary, fontWeight: '900' }}>Sparziel erstellen</Text></Pressable></Card>
+        <Card>
+          <Text selectable style={{ color: colors.text, fontSize: 16, fontWeight: '800' }}>Dein erstes Sparziel</Text>
+          <Text selectable style={{ color: colors.textMuted, lineHeight: 19 }}>Lege ein Ziel an und starte direkt mit dem Sparen.</Text>
+          <Pressable onPress={() => router.push('/add-goal')}>
+            <Text style={{ color: colors.primary, fontWeight: '900' }}>Ziel erstellen</Text>
+          </Pressable>
+        </Card>
       )}
 
-      {store.dueRules.length > 0 ? (
-        <View style={{ gap: 10 }}><SectionHeading title="Heute fällig" />{store.dueRules.map((rule) => <Card key={rule.id} style={{ flexDirection: 'row', alignItems: 'center' }}><IconBubble icon="clock.badge.checkmark.fill" /><View style={{ flex: 1, gap: 3 }}><Text selectable style={{ fontWeight: '800', fontSize: 16, color: colors.text }}>{rule.title}</Text><Text selectable style={{ color: colors.textMuted, fontSize: 13 }}>{formatMoney(rule.amount)} · {rule.frequency === 'daily' ? 'täglich' : rule.frequency === 'weekly' ? 'wöchentlich' : 'monatlich'}</Text></View><Pressable onPress={() => void run(() => store.applyRule(rule.id))} style={({ pressed }) => ({ backgroundColor: colors.primarySoft, paddingHorizontal: 13, paddingVertical: 10, borderRadius: 13, opacity: pressed ? 0.7 : 1 })}><Text style={{ color: colors.primaryDark, fontWeight: '900' }}>Sparen</Text></Pressable></Card>)}</View>
-      ) : null}
-
-      {activeChallenges.length > 0 ? (
-        <View style={{ gap: 10 }}>
-          <SectionHeading title="Heute" action={<Pressable onPress={() => router.push('/(tabs)/challenges')}><Text style={{ color: colors.primary, fontWeight: '800' }}>Alle Challenges</Text></Pressable>} />
-          {activeChallenges.map((challenge) => <Card key={challenge.id} style={{ flexDirection: 'row', alignItems: 'center' }}><IconBubble icon={challenge.icon} color={challenge.color} background={`${challenge.color}18`} /><View style={{ flex: 1, gap: 3 }}><Text selectable style={{ color: colors.text, fontWeight: '800' }}>{challenge.title}</Text><Text selectable style={{ color: colors.textMuted, fontSize: 12 }}>Noch {formatMoney(Math.max(0, challenge.targetAmount - challenge.savedAmount))}</Text></View><Pressable onPress={() => void run(() => store.completeChallengeStep(challenge.id, challenge.mode === 'random' ? rouletteValues[Math.floor(Math.random() * rouletteValues.length)] : undefined))} style={({ pressed }) => ({ minWidth: 54, minHeight: 42, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: `${challenge.color}18`, opacity: pressed ? 0.7 : 1 })}><Text style={{ color: challenge.color, fontWeight: '900' }}>+{challenge.mode === 'random' ? '?' : formatMoney(challenge.stepAmount)}</Text></Pressable></Card>)}
+      {primaryGoal ? (
+        <View style={{ gap: 9 }}>
+          <SectionHeading title="Schnell sparen" />
+          <View style={{ flexDirection: 'row', gap: 8 }}>
+            {quickAmounts.map((amount) => (
+              <Pressable
+                key={amount}
+                onPress={() => void run(() => store.saveToGoal(primaryGoal.id, amount, 'Schnell sparen'))}
+                style={({ pressed }) => ({
+                  flex: 1,
+                  minHeight: 46,
+                  borderRadius: 14,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  backgroundColor: colors.surface,
+                  borderWidth: 1,
+                  borderColor: colors.border,
+                  opacity: pressed ? 0.7 : 1,
+                })}>
+                <Text style={{ color: colors.primaryDark, fontWeight: '900' }}>+{amount} €</Text>
+              </Pressable>
+            ))}
+          </View>
         </View>
       ) : null}
 
-      <View style={{ gap: 10 }}>
-        <SectionHeading title="Spar-Aktionen" action={<Pressable onPress={() => router.push('/save')}><Text style={{ color: colors.primary, fontWeight: '800' }}>Eigener Betrag</Text></Pressable>} />
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 10 }}>
-          {savingActions.map((action) => <Pressable key={action.id} disabled={!primaryGoal} onPress={() => primaryGoal ? void run(() => store.saveToGoal(primaryGoal.id, action.amount, action.title)) : undefined} style={({ pressed }) => ({ width: 150, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 20, borderCurve: 'continuous', padding: 15, gap: 10, opacity: pressed ? 0.7 : primaryGoal ? 1 : 0.45 })}><IconBubble icon={action.icon} color={action.color} background={`${action.color}18`} /><View style={{ gap: 3 }}><Text selectable style={{ color: colors.text, fontWeight: '800', fontSize: 15 }}>{action.title}</Text><Text selectable style={{ color: colors.textMuted, fontSize: 11.5, lineHeight: 16 }}>{action.subtitle}</Text></View><Text selectable style={{ color: action.color, fontWeight: '900', fontSize: 18 }}>+{formatMoney(action.amount)}</Text></Pressable>)}
-        </ScrollView>
-      </View>
-
-      <View style={{ gap: 10 }}><SectionHeading title="Spar-Roulette" /><Card><View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}><IconBubble icon="die.face.5.fill" color={colors.purple} background="#EEE8FA" size={52} /><View style={{ flex: 1, gap: 2 }}><Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '800' }}>HEUTIGER BETRAG</Text><Text selectable style={{ color: colors.text, fontSize: 30, fontWeight: '900' }}>{formatMoney(roulette)}</Text></View></View><View style={{ flexDirection: 'row', gap: 10 }}><Pressable onPress={() => setRoulette(rouletteValues[Math.floor(Math.random() * rouletteValues.length)])} style={({ pressed }) => ({ flex: 1, minHeight: 48, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: '#EEE8FA', opacity: pressed ? 0.7 : 1 })}><Text style={{ color: colors.purple, fontWeight: '900' }}>Neu drehen</Text></Pressable><Pressable disabled={!primaryGoal} onPress={() => primaryGoal ? void run(() => store.saveToGoal(primaryGoal.id, roulette, 'Spar-Roulette')) : undefined} style={({ pressed }) => ({ flex: 1, minHeight: 48, borderRadius: 15, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.purple, opacity: !primaryGoal ? 0.4 : pressed ? 0.75 : 1 })}><Text style={{ color: '#FFFFFF', fontWeight: '900' }}>Sparen</Text></Pressable></View></Card></View>
-
-      <View style={{ gap: 10 }}>
-        <SectionHeading title="No-Spend-Day" />
-        <Card>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 13 }}><IconBubble icon={store.todayIsNoSpend ? 'checkmark.seal.fill' : 'hand.thumbsup.fill'} /><View style={{ flex: 1, gap: 3 }}><Text selectable style={{ fontSize: 17, fontWeight: '800', color: colors.text }}>{store.todayIsNoSpend ? 'Heute geschafft' : 'Heute nichts Unnötiges gekauft?'}</Text><Text selectable style={{ color: colors.textMuted, fontSize: 13, lineHeight: 18 }}>{store.todayIsNoSpend ? 'Der Tag zählt für deine No-Spend-Erfolge.' : 'Markiere den Tag oder spare zusätzlich 5 € in dein Hauptziel.'}</Text></View></View>
-          {!store.todayIsNoSpend ? <View style={{ flexDirection: 'row', gap: 9 }}><Pressable onPress={() => void run(() => store.markNoSpend())} style={({ pressed }) => ({ flex: 1, minHeight: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceMuted, opacity: pressed ? 0.7 : 1 })}><Text style={{ color: colors.text, fontWeight: '800' }}>Nur markieren</Text></Pressable><Pressable disabled={!primaryGoal} onPress={() => primaryGoal ? void run(() => store.markNoSpend(primaryGoal.id, 5)) : undefined} style={({ pressed }) => ({ flex: 1, minHeight: 46, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySoft, opacity: !primaryGoal ? 0.45 : pressed ? 0.7 : 1 })}><Text style={{ color: colors.primaryDark, fontWeight: '900' }}>+5 € & markieren</Text></Pressable></View> : null}
+      <View style={{ flexDirection: 'row', gap: 10 }}>
+        <Card style={{ flex: 1, gap: 4 }}>
+          <Text style={{ color: colors.textMuted, fontSize: 11, fontWeight: '800' }}>SERIE</Text>
+          <Text selectable style={{ color: colors.text, fontSize: 18, fontWeight: '900' }}>🔥 {store.streak} Tage</Text>
+        </Card>
+        <Card style={{ flex: 1, gap: 4 }}>
+          <Text style={{ color: colors.textMuted, fontSize: 11, fontWeight: '800' }}>LEVEL</Text>
+          <Text selectable style={{ color: colors.text, fontSize: 18, fontWeight: '900' }}>{store.level}</Text>
         </Card>
       </View>
 
-      <View style={{ gap: 10 }}><SectionHeading title="Diese Woche" action={<Pressable onPress={() => router.push('/statistics')}><Text style={{ color: colors.primary, fontWeight: '800' }}>Details</Text></Pressable>} /><Card><View style={{ flexDirection: 'row', justifyContent: 'space-between', gap: 12 }}><View><Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '800' }}>GESPART</Text><Text selectable style={{ color: colors.text, fontSize: 26, fontWeight: '900' }}>{formatMoney(store.periodMetrics.week)}</Text></View><View style={{ alignItems: 'flex-end' }}><Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '800' }}>AKTIONEN</Text><Text selectable style={{ color: colors.text, fontSize: 26, fontWeight: '900' }}>{store.contributions.filter((item) => new Date(item.createdAt).getTime() >= Date.now() - 7 * 86_400_000).length}</Text></View></View><BarChart data={store.weeklyData} height={90} /></Card></View>
+      {dueRule || activeChallenge ? (
+        <View style={{ gap: 9 }}>
+          <SectionHeading title="Heute" />
+          {dueRule ? (
+            <Card style={{ flexDirection: 'row', alignItems: 'center' }}>
+              <IconBubble icon="clock.fill" size={42} />
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text selectable style={{ color: colors.text, fontWeight: '800' }}>{dueRule.title}</Text>
+                <Text selectable style={{ color: colors.textMuted, fontSize: 12 }}>{formatMoney(dueRule.amount)}</Text>
+              </View>
+              <Pressable
+                onPress={() => void run(() => store.applyRule(dueRule.id))}
+                style={({ pressed }) => ({ paddingHorizontal: 13, paddingVertical: 9, borderRadius: 12, backgroundColor: colors.primarySoft, opacity: pressed ? 0.7 : 1 })}>
+                <Text style={{ color: colors.primaryDark, fontWeight: '900' }}>Sparen</Text>
+              </Pressable>
+            </Card>
+          ) : null}
+
+          {activeChallenge ? (
+            <Pressable onPress={() => router.push('/(tabs)/challenges')}>
+              <Card style={{ flexDirection: 'row', alignItems: 'center' }}>
+                <IconBubble icon={activeChallenge.icon} color={activeChallenge.color} background={`${activeChallenge.color}18`} size={42} />
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text selectable style={{ color: colors.text, fontWeight: '800' }}>{activeChallenge.title}</Text>
+                  <Text selectable style={{ color: colors.textMuted, fontSize: 12 }}>
+                    {formatMoney(activeChallenge.savedAmount)} von {formatMoney(activeChallenge.targetAmount)}
+                  </Text>
+                </View>
+                <Symbol name="chevron.right" size={14} color={colors.textMuted} />
+              </Card>
+            </Pressable>
+          ) : null}
+        </View>
+      ) : null}
+
+      <Pressable onPress={() => router.push('/play')} style={({ pressed }) => ({ opacity: pressed ? 0.65 : 1 })}>
+        <Card style={{ flexDirection: 'row', alignItems: 'center' }}>
+          <IconBubble icon="sparkles" size={42} />
+          <View style={{ flex: 1, gap: 2 }}>
+            <Text selectable style={{ color: colors.text, fontWeight: '800' }}>Mehr Sparideen</Text>
+            <Text selectable style={{ color: colors.textMuted, fontSize: 12 }}>Aktionen, Roulette und No-Spend</Text>
+          </View>
+          <Symbol name="chevron.right" size={14} color={colors.textMuted} />
+        </Card>
+      </Pressable>
     </ScrollView>
   );
 }
