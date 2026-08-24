@@ -8,7 +8,9 @@
     "ios": "expo start --ios",
     "android": "expo start --android",
     "web": "expo start --web",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "generate:icon": "node scripts/generate-icon.mjs",
+    "postinstall": "npm run generate:icon"
   },
   "dependencies": {
     "expo": "~57.0.9",
