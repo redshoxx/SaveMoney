@@ -2,20 +2,21 @@
   "expo": {
     "name": "SparFlow",
     "slug": "sparflow",
-    "version": "1.0.0",
+    "version": "2.0.0",
     "orientation": "portrait",
     "scheme": "sparflow",
     "userInterfaceStyle": "light",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.redshoxx.sparflow",
-      "buildNumber": "1",
+      "buildNumber": "2",
       "infoPlist": {
         "UIFileSharingEnabled": false
       }
     },
     "android": {
-      "package": "com.redshoxx.sparflow"
+      "package": "com.redshoxx.sparflow",
+      "versionCode": 2
     },
     "plugins": [
       "expo-router",
