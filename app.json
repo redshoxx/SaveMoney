@@ -6,17 +6,22 @@
     "orientation": "portrait",
     "scheme": "sparflow",
     "userInterfaceStyle": "light",
+    "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.redshoxx.sparflow",
       "buildNumber": "2",
+      "icon": "./assets/icon.png",
       "infoPlist": {
         "UIFileSharingEnabled": false
       }
     },
     "android": {
       "package": "com.redshoxx.sparflow",
-      "versionCode": 2
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#173E2B"
+      }
     },
     "plugins": [
       "expo-router",
