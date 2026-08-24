@@ -34,6 +34,7 @@ import {
   monthlyBuckets,
   weeklyBuckets,
 } from '@/utils/insights';
+import { syncSavingsWidget } from '@/utils/widget-sync';
 
 const EMPTY: AppSnapshot = { goals: [], challenges: [], contributions: [], savingRules: [], noSpendDays: [] };
 
@@ -130,6 +131,15 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => { void reload(); }, [reload]);
+
+  useEffect(() => {
+    if (loading) return;
+    try {
+      syncSavingsWidget(snapshot);
+    } catch {
+      // The main app remains fully usable even if WidgetKit cannot refresh.
+    }
+  }, [loading, snapshot]);
 
   const runMutation = useCallback(async (mutation: () => Promise<unknown>, feedback: 'light' | 'success' = 'light') => {
     try {
