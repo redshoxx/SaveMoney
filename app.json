@@ -36,11 +36,14 @@
               "name": "SparFlowSavings",
               "displayName": "SparFlow",
               "description": "Dein Sparfortschritt direkt auf dem Home-Bildschirm.",
-              "contentMarginsDisabled": true,
-              "supportedFamilies": [
-                "systemSmall",
-                "systemMedium"
-              ]
+              "ios": {
+                "contentMarginsDisabled": true,
+                "supportedFamilies": [
+                  "systemSmall",
+                  "systemMedium"
+                ],
+                "initialLayout": "widgets/sparflow-widget.tsx"
+              }
             }
           ]
         }
