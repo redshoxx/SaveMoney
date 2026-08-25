@@ -29,6 +29,7 @@ import type {
   AppSnapshot,
   ChallengeMode,
   ChallengeTemplate,
+  GoalMode,
   SavingRuleFrequency,
 } from '@/types/models';
 import {
@@ -46,7 +47,10 @@ const EMPTY: AppSnapshot = { goals: [], challenges: [], contributions: [], savin
 
 type CreateGoalInput = {
   title: string;
+  mode?: GoalMode;
   targetAmount: number;
+  recurringAmount?: number | null;
+  recurringDay?: number | null;
   icon?: string;
   color?: string;
   targetDate?: string | null;
@@ -81,7 +85,7 @@ function ruleIsDue(rule: AppSnapshot['savingRules'][number]) {
     const diff = Math.floor((new Date(today).getTime() - new Date(localDayKey(last)).getTime()) / 86_400_000);
     return diff >= 7;
   }
-  if (rule.dayOfMonth != null && now.getDate() !== rule.dayOfMonth) return false;
+  if (rule.dayOfMonth != null && now.getDate() < rule.dayOfMonth) return false;
   return !last || last.getMonth() !== now.getMonth() || last.getFullYear() !== now.getFullYear();
 }
 
@@ -176,7 +180,9 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     const totalSaved = snapshot.contributions.reduce((sum, item) => sum + item.amount, 0);
     const streak = calculateStreak(snapshot.contributions);
     const level = levelInfo(Math.floor(totalSaved));
-    const primaryGoal = snapshot.goals.find((goal) => goal.savedAmount < goal.targetAmount) ?? snapshot.goals[0];
+    const primaryGoal = snapshot.goals.find((goal) => goal.mode === 'target' && goal.savedAmount < goal.targetAmount)
+      ?? snapshot.goals.find((goal) => goal.mode === 'recurring')
+      ?? snapshot.goals[0];
     const periodMetrics = getPeriodMetrics(snapshot.contributions);
     const achievements = buildAchievements({ totalSaved, streak, goals: snapshot.goals, challenges: snapshot.challenges, noSpendDays: snapshot.noSpendDays });
 
@@ -195,20 +201,36 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       periodMetrics,
       weeklyData: weeklyBuckets(snapshot.contributions),
       monthlyData: monthlyBuckets(snapshot.contributions),
-      forecast: forecastGoal(primaryGoal, snapshot.contributions),
+      forecast: forecastGoal(primaryGoal?.mode === 'target' ? primaryGoal : undefined, snapshot.contributions),
       achievements,
       dueRules: snapshot.savingRules.filter(ruleIsDue),
       todayIsNoSpend: snapshot.noSpendDays.some((item) => item.date === localDayKey()),
       reload,
       setPreference: updatePreference,
       restorePreferenceDefaults,
-      createGoal: (input) => runMutation(() => insertGoal({
-        title: input.title,
-        targetAmount: input.targetAmount,
-        icon: input.icon ?? 'target',
-        color: input.color ?? '#1D7A46',
-        targetDate: input.targetDate ?? null,
-      }), 'success'),
+      createGoal: (input) => runMutation(async () => {
+        const mode = input.mode ?? 'target';
+        const goalId = await insertGoal({
+          title: input.title,
+          mode,
+          targetAmount: input.targetAmount,
+          recurringAmount: input.recurringAmount ?? null,
+          recurringDay: input.recurringDay ?? null,
+          icon: input.icon ?? (mode === 'recurring' ? 'arrow.triangle.2.circlepath' : 'target'),
+          color: input.color ?? '#1D7A46',
+          targetDate: input.targetDate ?? null,
+        });
+        if (mode === 'recurring') {
+          const recurringAmount = input.recurringAmount ?? input.targetAmount;
+          await insertSavingRule({
+            title: `${input.title.trim()} · monatlich`,
+            goalId,
+            amount: recurringAmount,
+            frequency: 'monthly',
+            dayOfMonth: input.recurringDay ?? 1,
+          });
+        }
+      }, 'success'),
       saveToGoal: (goalId, amount, note) => runMutation(() => addGoalContribution(goalId, amount, note), 'success'),
       startTemplate: (template) => runMutation(async () => {
         const alreadyActive = snapshot.challenges.some((item) => item.templateId === template.id && !item.completedAt);

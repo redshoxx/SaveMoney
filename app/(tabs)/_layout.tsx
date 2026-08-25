@@ -62,7 +62,7 @@ export default function TabsLayout() {
         name="goals"
         options={{
           title: '',
-          headerTitle: 'Sparziele',
+          headerTitle: 'Sparbereiche',
           tabBarLabel: () => null,
           tabBarButton: () => <ActionButton />,
         }}

@@ -69,18 +69,7 @@ export default function ActionsScreen() {
           {store.preferences.showQuickAmounts ? (
             <View style={{ flexDirection: 'row', gap: 7 }}>
               {QUICK.map((amount) => (
-                <Pressable
-                  key={amount}
-                  onPress={() => quickSave(amount)}
-                  style={({ pressed }) => ({
-                    flex: 1,
-                    minHeight: 44,
-                    borderRadius: 13,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: colors.primary,
-                    opacity: pressed ? 0.75 : 1,
-                  })}>
+                <Pressable key={amount} onPress={() => quickSave(amount)} style={({ pressed }) => ({ flex: 1, minHeight: 44, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary, opacity: pressed ? 0.75 : 1 })}>
                   <Text style={{ color: '#FFFFFF', fontSize: 14, fontWeight: '900' }}>+{amount}</Text>
                 </Pressable>
               ))}
@@ -91,8 +80,9 @@ export default function ActionsScreen() {
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 8 }}>
         <Tool icon="banknote.fill" title="Betrag sparen" onPress={() => router.replace('/save')} />
-        <Tool icon="target" title="Sparziele" onPress={() => router.replace('/(tabs)/goals')} />
-        <Tool icon="plus" title="Neues Ziel" onPress={() => router.replace('/add-goal')} />
+        <Tool icon="target" title="Zielbetrag anlegen" onPress={() => router.replace('/add-goal?mode=target')} />
+        <Tool icon="arrow.triangle.2.circlepath" title="Monatliche Rücklage" onPress={() => router.replace('/add-goal?mode=recurring')} />
+        <Tool icon="tray.full.fill" title="Sparbereiche" onPress={() => router.replace('/(tabs)/goals')} />
         <Tool icon="flag.fill" title="Challenges" onPress={() => router.replace('/(tabs)/challenges')} />
         <Tool icon="clock.badge.checkmark.fill" title="Sparregeln" onPress={() => router.replace('/rules')} />
         <Tool icon="sparkles" title="Sparideen" onPress={() => router.replace('/play')} />

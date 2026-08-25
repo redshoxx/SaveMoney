@@ -6,6 +6,15 @@ import { colors } from '@/constants/theme';
 import { useAppStore } from '@/store/app-store';
 import { formatMoney, progress } from '@/utils/money';
 
+function savedThisMonth(contributions: ReturnType<typeof useAppStore>['contributions'], goalId: string) {
+  const now = new Date();
+  return contributions.reduce((sum, item) => {
+    if (item.sourceType !== 'goal' || item.sourceId !== goalId) return sum;
+    const date = new Date(item.createdAt);
+    return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() ? sum + item.amount : sum;
+  }, 0);
+}
+
 export default function HomeScreen() {
   const store = useAppStore();
   const goal = store.primaryGoal;
@@ -28,7 +37,10 @@ export default function HomeScreen() {
     );
   }
 
-  const goalProgress = goal ? progress(goal.savedAmount, goal.targetAmount) : 0;
+  const recurring = goal?.mode === 'recurring';
+  const recurringAmount = goal ? goal.recurringAmount ?? goal.targetAmount : 0;
+  const monthSaved = goal && recurring ? savedThisMonth(store.contributions, goal.id) : 0;
+  const goalProgress = goal ? (recurring ? progress(monthSaved, recurringAmount) : progress(goal.savedAmount, goal.targetAmount)) : 0;
   const meta: string[] = [];
   if (store.preferences.showMonthly) meta.push(`${formatMoney(store.periodMetrics.month)} im Monat`);
   if (store.preferences.showGamification) meta.push(`🔥 ${store.streak} · Level ${store.level}`);
@@ -71,7 +83,9 @@ export default function HomeScreen() {
             <View style={{ flex: 1, gap: 2 }}>
               <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 16, fontWeight: '900' }}>{goal.title}</Text>
               <Text selectable style={{ color: colors.textMuted, fontSize: 11 }}>
-                {formatMoney(goal.savedAmount)} / {formatMoney(goal.targetAmount)}
+                {recurring
+                  ? `${formatMoney(monthSaved)} / ${formatMoney(recurringAmount)} diesen Monat`
+                  : `${formatMoney(goal.savedAmount)} / ${formatMoney(goal.targetAmount)}`}
               </Text>
             </View>
             <Text selectable style={{ color: goal.color, fontSize: 14, fontWeight: '900' }}>{Math.round(goalProgress * 100)} %</Text>
@@ -95,7 +109,7 @@ export default function HomeScreen() {
             opacity: pressed ? 0.72 : 1,
           })}>
           <Symbol name="target" size={17} color={colors.primaryDark} />
-          <Text style={{ flex: 1, color: colors.text, fontWeight: '900' }}>Sparziel anlegen</Text>
+          <Text style={{ flex: 1, color: colors.text, fontWeight: '900' }}>Sparen einrichten</Text>
           <Symbol name="chevron.right" size={13} color={colors.textMuted} />
         </Pressable>
       )}

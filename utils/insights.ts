@@ -104,7 +104,7 @@ export function monthlyBuckets(contributions: Contribution[], count = 6) {
 }
 
 export function forecastGoal(goal: Goal | undefined, contributions: Contribution[]) {
-  if (!goal || goal.savedAmount >= goal.targetAmount) return null;
+  if (!goal || goal.mode !== 'target' || goal.savedAmount >= goal.targetAmount) return null;
   const thirtyDaysAgo = startOfDay(new Date());
   thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 29);
   const savedLast30 = sumSince(contributions, thirtyDaysAgo);
@@ -124,7 +124,7 @@ export function buildAchievements(input: {
   challenges: Challenge[];
   noSpendDays: NoSpendDay[];
 }) : Achievement[] {
-  const completedGoals = input.goals.filter((goal) => goal.savedAmount >= goal.targetAmount).length;
+  const completedGoals = input.goals.filter((goal) => goal.mode === 'target' && goal.savedAmount >= goal.targetAmount).length;
   const completedChallenges = input.challenges.filter((challenge) => Boolean(challenge.completedAt)).length;
   const thresholds = [
     { id: 'first10', title: 'Erste 10 €', subtitle: 'Die ersten 10 € sind geschafft.', icon: 'sparkles', value: 10 },

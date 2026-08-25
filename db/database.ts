@@ -6,6 +6,7 @@ import type {
   ChallengeMode,
   Contribution,
   Goal,
+  GoalMode,
   NoSpendDay,
   SavingRule,
   SavingRuleFrequency,
@@ -90,6 +91,9 @@ async function getDatabase() {
   `);
 
   await ensureColumn(db, 'goals', 'target_date', 'TEXT');
+  await ensureColumn(db, 'goals', 'mode', "TEXT NOT NULL DEFAULT 'target'");
+  await ensureColumn(db, 'goals', 'recurring_amount', 'REAL');
+  await ensureColumn(db, 'goals', 'recurring_day', 'INTEGER');
   await ensureColumn(db, 'challenges', 'mode', "TEXT NOT NULL DEFAULT 'fixed'");
   await ensureColumn(db, 'challenges', 'duration_days', 'INTEGER');
 
@@ -100,8 +104,11 @@ function mapGoal(row: Record<string, unknown>): Goal {
   return {
     id: String(row.id),
     title: String(row.title),
+    mode: (row.mode ? String(row.mode) : 'target') as GoalMode,
     targetAmount: Number(row.target_amount),
     savedAmount: Number(row.saved_amount),
+    recurringAmount: row.recurring_amount == null ? null : Number(row.recurring_amount),
+    recurringDay: row.recurring_day == null ? null : Number(row.recurring_day),
     icon: String(row.icon),
     color: String(row.color),
     targetDate: row.target_date ? String(row.target_date) : null,
@@ -185,19 +192,26 @@ export async function loadSnapshot(): Promise<AppSnapshot> {
 
 export async function insertGoal(input: {
   title: string;
+  mode?: GoalMode;
   targetAmount: number;
+  recurringAmount?: number | null;
+  recurringDay?: number | null;
   icon: string;
   color: string;
   targetDate?: string | null;
 }) {
   const db = await getDatabase();
   const id = makeId('goal');
+  const mode = input.mode ?? 'target';
   await db.runAsync(
-    `INSERT INTO goals (id, title, target_amount, saved_amount, icon, color, target_date, created_at)
-     VALUES (?, ?, ?, 0, ?, ?, ?, ?)`,
+    `INSERT INTO goals (id, title, mode, target_amount, saved_amount, recurring_amount, recurring_day, icon, color, target_date, created_at)
+     VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)`,
     id,
     input.title.trim(),
+    mode,
     input.targetAmount,
+    mode === 'recurring' ? input.recurringAmount ?? input.targetAmount : null,
+    mode === 'recurring' ? input.recurringDay ?? 1 : null,
     input.icon,
     input.color,
     input.targetDate ?? null,
@@ -208,18 +222,23 @@ export async function insertGoal(input: {
 
 export async function addGoalContribution(goalId: string, amount: number, note?: string | null) {
   const db = await getDatabase();
-  const goal = await db.getFirstAsync<{ target_amount: number; saved_amount: number; title: string }>(
-    'SELECT target_amount, saved_amount, title FROM goals WHERE id = ?', goalId,
+  const goal = await db.getFirstAsync<{ target_amount: number; saved_amount: number; title: string; mode: string }>(
+    'SELECT target_amount, saved_amount, title, mode FROM goals WHERE id = ?', goalId,
   );
-  if (!goal) throw new Error('Sparziel wurde nicht gefunden.');
+  if (!goal) throw new Error('Sparbereich wurde nicht gefunden.');
   if (!Number.isFinite(amount) || amount <= 0) throw new Error('Bitte gib einen gültigen Sparbetrag ein.');
 
+  const recurring = goal.mode === 'recurring';
   const remaining = Math.max(0, Number(goal.target_amount) - Number(goal.saved_amount));
-  if (remaining <= 0) throw new Error('Dieses Sparziel ist bereits erreicht.');
-  const applied = Math.min(amount, remaining);
+  if (!recurring && remaining <= 0) throw new Error('Dieses Sparziel ist bereits erreicht.');
+  const applied = recurring ? amount : Math.min(amount, remaining);
 
   await db.withTransactionAsync(async () => {
-    await db.runAsync('UPDATE goals SET saved_amount = MIN(target_amount, saved_amount + ?) WHERE id = ?', applied, goalId);
+    if (recurring) {
+      await db.runAsync('UPDATE goals SET saved_amount = saved_amount + ? WHERE id = ?', applied, goalId);
+    } else {
+      await db.runAsync('UPDATE goals SET saved_amount = MIN(target_amount, saved_amount + ?) WHERE id = ?', applied, goalId);
+    }
     await db.runAsync(
       `INSERT INTO contributions (id, source_type, source_id, amount, note, created_at)
        VALUES (?, 'goal', ?, ?, ?, ?)`,
