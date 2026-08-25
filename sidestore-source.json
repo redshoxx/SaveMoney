@@ -11,6 +11,14 @@
       "iconURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow-icon.png",
       "versions": [
         {
+          "version": "3.1.0",
+          "date": "2026-08-25T20:22:19Z",
+          "localizedDescription": "SparFlow 3 mit reduzierter iPhone-Oberfläche, adaptiver Spar-Empfehlung, verbessertem Dark Mode und Release-Sicherheitschecks.",
+          "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
+          "size": 13618513,
+          "minOSVersion": "16.4"
+        },
+        {
           "version": "3.0.0",
           "date": "2026-08-25T19:46:24Z",
           "localizedDescription": "SparFlow 3 mit reduzierter iPhone-Oberfläche, adaptiver Spar-Empfehlung, verbessertem Dark Mode und Release-Sicherheitschecks.",
@@ -83,11 +91,11 @@
           "minOSVersion": "16.4"
         }
       ],
-      "version": "3.0.0",
-      "versionDate": "2026-08-25T19:46:24Z",
+      "version": "3.1.0",
+      "versionDate": "2026-08-25T20:22:19Z",
       "versionDescription": "SparFlow 3 mit reduzierter iPhone-Oberfläche, adaptiver Spar-Empfehlung, verbessertem Dark Mode und Release-Sicherheitschecks.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 13618297
+      "size": 13618513
     }
   ]
 }
