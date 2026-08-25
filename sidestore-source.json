@@ -11,6 +11,14 @@
       "iconURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow-icon.png",
       "versions": [
         {
+          "version": "2.2.0",
+          "date": "2026-08-25T13:16:59Z",
+          "localizedDescription": "Minimalistisches SparFlow mit schnellerem Sparen, neuer Navigation und erweiterten Einstellungen.",
+          "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
+          "size": 13590574,
+          "minOSVersion": "16.4"
+        },
+        {
           "version": "2.1.0",
           "date": "2026-08-24T21:39:44Z",
           "localizedDescription": "Minimalistisches SparFlow mit schnellerem Sparen, neuer Navigation und erweiterten Einstellungen.",
@@ -43,11 +51,11 @@
           "minOSVersion": "16.4"
         }
       ],
-      "version": "2.1.0",
-      "versionDate": "2026-08-24T21:39:44Z",
+      "version": "2.2.0",
+      "versionDate": "2026-08-25T13:16:59Z",
       "versionDescription": "Minimalistisches SparFlow mit schnellerem Sparen, neuer Navigation und erweiterten Einstellungen.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 13590943
+      "size": 13590574
     }
   ]
 }
