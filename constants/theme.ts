@@ -1,4 +1,6 @@
-export const colors = {
+import { Appearance } from 'react-native';
+
+const light = {
   background: '#F4F6F2',
   surface: '#FFFFFF',
   surfaceMuted: '#EEF2EC',
@@ -11,8 +13,59 @@ export const colors = {
   success: '#1D7A46',
   warning: '#B66A15',
   danger: '#B43E3E',
+  dangerSoft: '#FDE8E8',
+  disabled: '#D9DEDA',
   purple: '#7652B7',
   blue: '#3976B8',
+};
+
+const dark = {
+  background: '#0D120F',
+  surface: '#161D18',
+  surfaceMuted: '#202922',
+  text: '#F2F6F3',
+  textMuted: '#98A49B',
+  primary: '#4CC17A',
+  primaryDark: '#8DE0AB',
+  primarySoft: '#203B29',
+  border: '#2A352D',
+  success: '#4CC17A',
+  warning: '#E2A050',
+  danger: '#EF7B7B',
+  dangerSoft: '#3A2224',
+  disabled: '#364039',
+  purple: '#A98BE3',
+  blue: '#76AAE4',
+};
+
+export type ResolvedColorScheme = 'light' | 'dark';
+let activeScheme: ResolvedColorScheme = Appearance.getColorScheme() === 'dark' ? 'dark' : 'light';
+
+export function setActiveColorScheme(scheme: ResolvedColorScheme) {
+  activeScheme = scheme;
+}
+
+function palette() {
+  return activeScheme === 'dark' ? dark : light;
+}
+
+export const colors = {
+  get background() { return palette().background; },
+  get surface() { return palette().surface; },
+  get surfaceMuted() { return palette().surfaceMuted; },
+  get text() { return palette().text; },
+  get textMuted() { return palette().textMuted; },
+  get primary() { return palette().primary; },
+  get primaryDark() { return palette().primaryDark; },
+  get primarySoft() { return palette().primarySoft; },
+  get border() { return palette().border; },
+  get success() { return palette().success; },
+  get warning() { return palette().warning; },
+  get danger() { return palette().danger; },
+  get dangerSoft() { return palette().dangerSoft; },
+  get disabled() { return palette().disabled; },
+  get purple() { return palette().purple; },
+  get blue() { return palette().blue; },
 };
 
 export const radius = {
@@ -22,4 +75,4 @@ export const radius = {
   xl: 30,
 };
 
-export const shadow = '0 10px 30px rgba(24, 42, 29, 0.08)';
+export const shadow = '0 10px 30px rgba(0, 0, 0, 0.10)';

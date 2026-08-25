@@ -2,10 +2,10 @@
   "expo": {
     "name": "SparFlow",
     "slug": "sparflow",
-    "version": "2.3.0",
+    "version": "2.4.0",
     "orientation": "portrait",
     "scheme": "sparflow",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
     "icon": "./assets/icon.png",
     "ios": {
       "supportsTablet": false,

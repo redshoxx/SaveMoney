@@ -1,5 +1,5 @@
 import { router, Tabs } from 'expo-router';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, useColorScheme, View } from 'react-native';
 
 import { Symbol } from '@/components/ui';
 import { colors } from '@/constants/theme';
@@ -19,10 +19,10 @@ function ActionButton() {
           justifyContent: 'center',
           backgroundColor: colors.primary,
           borderWidth: 4,
-          borderColor: '#FFFFFF',
+          borderColor: colors.surface,
           opacity: pressed ? 0.78 : 1,
           shadowColor: '#000000',
-          shadowOpacity: 0.14,
+          shadowOpacity: 0.18,
           shadowRadius: 8,
           shadowOffset: { width: 0, height: 4 },
         })}>
@@ -34,16 +34,19 @@ function ActionButton() {
 }
 
 export default function TabsLayout() {
+  useColorScheme();
+
   return (
     <Tabs
       screenOptions={{
         headerShadowVisible: false,
+        headerTintColor: colors.text,
         headerStyle: { backgroundColor: colors.background },
-        headerTitleStyle: { fontWeight: '900' },
+        headerTitleStyle: { fontWeight: '900', color: colors.text },
         tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: '#8B958C',
+        tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: {
-          backgroundColor: 'rgba(255,255,255,0.98)',
+          backgroundColor: colors.surface,
           borderTopColor: colors.border,
           height: 74,
           paddingTop: 5,

@@ -80,6 +80,7 @@ export default function ActionsScreen() {
 
       <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between', gap: 8 }}>
         <Tool icon="banknote.fill" title="Betrag sparen" onPress={() => router.replace('/save')} />
+        <Tool icon="minus.circle.fill" title="Betrag abziehen" onPress={() => router.replace({ pathname: '/save', params: { mode: 'withdraw' } })} />
         <Tool icon="target" title="Zielbetrag anlegen" onPress={() => router.replace({ pathname: '/add-goal', params: { mode: 'target' } })} />
         <Tool icon="arrow.triangle.2.circlepath" title="Monatliche Rücklage" onPress={() => router.replace({ pathname: '/add-goal', params: { mode: 'recurring' } })} />
         <Tool icon="tray.full.fill" title="Sparbereiche" onPress={() => router.replace('/(tabs)/goals')} />

@@ -18,11 +18,7 @@ export function Symbol({
     return <Text style={{ fontSize: size * 0.78, color, fontWeight: '800' }}>•</Text>;
   }
 
-  // expo-image currently types tintColor as string | null, while React Native
-  // navigation exposes ColorValue. Navigation tab colors are strings at runtime;
-  // dynamic native colors fall back to the app text color for the SF Symbol.
   const tintColor = typeof color === 'string' ? color : colors.text;
-
   return <Image source={`sf:${name}`} style={{ width: size, height: size }} tintColor={tintColor} />;
 }
 
@@ -72,7 +68,7 @@ export function PrimaryButton({
   loading?: boolean;
   tone?: 'primary' | 'soft' | 'danger';
 }) {
-  const background = tone === 'danger' ? '#FDE8E8' : tone === 'soft' ? colors.primarySoft : colors.primary;
+  const background = tone === 'danger' ? colors.dangerSoft : tone === 'soft' ? colors.primarySoft : colors.primary;
   const foreground = tone === 'danger' ? colors.danger : tone === 'soft' ? colors.primaryDark : '#FFFFFF';
   return (
     <Pressable
@@ -89,7 +85,7 @@ export function PrimaryButton({
         justifyContent: 'center',
         flexDirection: 'row',
         gap: 8,
-        backgroundColor: disabled ? '#D9DEDA' : background,
+        backgroundColor: disabled ? colors.disabled : background,
         opacity: pressed ? 0.78 : 1,
       })}
     >

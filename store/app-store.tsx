@@ -25,6 +25,7 @@ import {
   savePreference,
   type AppPreferences,
 } from '@/db/preferences';
+import { clearWithdrawals, loadWithdrawals, removeGoalWithdrawals, withdrawGoalAmount } from '@/db/withdrawals';
 import type {
   AppSnapshot,
   ChallengeMode,
@@ -112,6 +113,7 @@ type StoreValue = AppSnapshot & {
   restorePreferenceDefaults: () => Promise<void>;
   createGoal: (input: CreateGoalInput) => Promise<void>;
   saveToGoal: (goalId: string, amount: number, note?: string) => Promise<void>;
+  withdrawFromGoal: (goalId: string, amount: number, note?: string) => Promise<void>;
   startTemplate: (template: ChallengeTemplate) => Promise<void>;
   createCustomChallenge: (input: CustomChallengeInput) => Promise<void>;
   completeChallengeStep: (challengeId: string, amountOverride?: number) => Promise<void>;
@@ -136,8 +138,11 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   const reload = useCallback(async () => {
     try {
       setError(null);
-      const [nextSnapshot, nextPreferences] = await Promise.all([loadSnapshot(), loadPreferences()]);
-      setSnapshot(nextSnapshot);
+      const [nextSnapshot, withdrawals, nextPreferences] = await Promise.all([loadSnapshot(), loadWithdrawals(), loadPreferences()]);
+      const contributions = [...nextSnapshot.contributions, ...withdrawals]
+        .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        .slice(0, 500);
+      setSnapshot({ ...nextSnapshot, contributions });
       setPreferences(nextPreferences);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Lokale Daten konnten nicht geladen werden.');
@@ -178,8 +183,8 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
 
   const value = useMemo<StoreValue>(() => {
     const totalSaved = snapshot.contributions.reduce((sum, item) => sum + item.amount, 0);
-    const streak = calculateStreak(snapshot.contributions);
-    const level = levelInfo(Math.floor(totalSaved));
+    const streak = calculateStreak(snapshot.contributions.filter((item) => item.amount > 0));
+    const level = levelInfo(Math.max(0, Math.floor(totalSaved)));
     const primaryGoal = snapshot.goals.find((goal) => goal.mode === 'target' && goal.savedAmount < goal.targetAmount)
       ?? snapshot.goals.find((goal) => goal.mode === 'recurring')
       ?? snapshot.goals[0];
@@ -232,6 +237,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
         }
       }, 'success'),
       saveToGoal: (goalId, amount, note) => runMutation(() => addGoalContribution(goalId, amount, note), 'success'),
+      withdrawFromGoal: (goalId, amount, note) => runMutation(() => withdrawGoalAmount(goalId, amount, note), 'success'),
       startTemplate: (template) => runMutation(async () => {
         const alreadyActive = snapshot.challenges.some((item) => item.templateId === template.id && !item.completedAt);
         if (alreadyActive) throw new Error('Diese Challenge läuft bereits.');
@@ -265,9 +271,15 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       applyRule: (ruleId) => runMutation(() => applySavingRuleDb(ruleId), 'success'),
       deleteRule: (ruleId) => runMutation(() => removeSavingRule(ruleId)),
       markNoSpend: (goalId, amount = 0) => runMutation(() => markNoSpendDayDb(localDayKey(), goalId, amount), 'success'),
-      deleteGoal: (goalId) => runMutation(() => removeGoal(goalId)),
+      deleteGoal: (goalId) => runMutation(async () => {
+        await removeGoalWithdrawals(goalId);
+        await removeGoal(goalId);
+      }),
       deleteChallenge: (challengeId) => runMutation(() => removeChallenge(challengeId)),
-      resetAll: () => runMutation(clearAllData, 'success'),
+      resetAll: () => runMutation(async () => {
+        await clearWithdrawals();
+        await clearAllData();
+      }, 'success'),
     };
   }, [error, loading, preferences, reload, restorePreferenceDefaults, runMutation, snapshot, updatePreference]);
 
