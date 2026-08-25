@@ -1,46 +1,23 @@
 import { router } from 'expo-router';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
-import { Card, ProgressBar, Symbol } from '@/components/ui';
+import { ProgressBar, Symbol } from '@/components/ui';
 import { colors } from '@/constants/theme';
 import { useAppStore } from '@/store/app-store';
 import { formatMoney, progress } from '@/utils/money';
-
-const QUICK_AMOUNTS = [5, 10, 20, 50];
 
 export default function HomeScreen() {
   const store = useAppStore();
   const goal = store.primaryGoal;
   const dueRule = store.dueRules[0];
 
-  const run = async (action: () => Promise<void>) => {
+  const applyDueRule = async () => {
+    if (!dueRule) return;
     try {
-      await action();
+      await store.applyRule(dueRule.id);
     } catch (error) {
       Alert.alert('SparFlow', error instanceof Error ? error.message : 'Aktion fehlgeschlagen.');
     }
-  };
-
-  const quickSave = (amount: number) => {
-    if (!goal) {
-      router.push('/add-goal');
-      return;
-    }
-
-    const save = () => void run(() => store.saveToGoal(goal.id, amount, 'Schnell sparen'));
-    if (!store.preferences.confirmQuickSave) {
-      save();
-      return;
-    }
-
-    Alert.alert(
-      `${formatMoney(amount)} sparen?`,
-      `Der Betrag wird direkt zu „${goal.title}“ hinzugefügt.`,
-      [
-        { text: 'Abbrechen', style: 'cancel' },
-        { text: 'Sparen', onPress: save },
-      ],
-    );
   };
 
   if (store.loading) {
@@ -52,122 +29,94 @@ export default function HomeScreen() {
   }
 
   const goalProgress = goal ? progress(goal.savedAmount, goal.targetAmount) : 0;
+  const meta: string[] = [];
+  if (store.preferences.showMonthly) meta.push(`${formatMoney(store.periodMetrics.month)} im Monat`);
+  if (store.preferences.showGamification) meta.push(`🔥 ${store.streak} · Level ${store.level}`);
 
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
-      contentContainerStyle={{ padding: 16, paddingBottom: 110, gap: 14 }}>
+      contentContainerStyle={{ padding: 18, paddingBottom: 105, gap: 14 }}>
       {store.error ? (
-        <View style={{ backgroundColor: '#FDECEC', borderRadius: 14, padding: 12 }}>
-          <Text selectable style={{ color: colors.danger, fontWeight: '700' }}>{store.error}</Text>
-        </View>
+        <Pressable onPress={() => void store.reload()} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
+          <Text style={{ color: colors.danger, fontSize: 12, fontWeight: '700' }}>Daten konnten nicht geladen werden · erneut versuchen</Text>
+        </Pressable>
       ) : null}
 
-      <View style={{ paddingTop: 6, gap: 4 }}>
-        <Text style={{ color: colors.textMuted, fontSize: 13, fontWeight: '800' }}>GESAMT GESPART</Text>
+      <View style={{ paddingTop: 12, paddingBottom: 8, gap: 3 }}>
+        <Text style={{ color: colors.textMuted, fontSize: 11, fontWeight: '900', letterSpacing: 0.7 }}>GESPART</Text>
         <Text
           selectable
-          style={{ color: colors.text, fontSize: 44, fontWeight: '900', letterSpacing: -1.6, fontVariant: ['tabular-nums'] }}>
+          style={{ color: colors.text, fontSize: 48, fontWeight: '900', letterSpacing: -2, fontVariant: ['tabular-nums'] }}>
           {formatMoney(store.totalSaved)}
         </Text>
-        {store.preferences.showMonthly ? (
-          <Text selectable style={{ color: colors.textMuted, fontSize: 13 }}>
-            {formatMoney(store.periodMetrics.month)} diesen Monat
-          </Text>
+        {meta.length > 0 ? (
+          <Text selectable style={{ color: colors.textMuted, fontSize: 12 }}>{meta.join('  •  ')}</Text>
         ) : null}
       </View>
 
-      <Pressable
-        onPress={() => router.push('/save')}
-        style={({ pressed }) => ({
-          minHeight: 56,
-          borderRadius: 18,
-          backgroundColor: colors.primary,
-          flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'center',
-          gap: 8,
-          opacity: pressed ? 0.8 : 1,
-        })}>
-        <Symbol name="plus" size={18} color="#FFFFFF" />
-        <Text style={{ color: '#FFFFFF', fontSize: 16, fontWeight: '900' }}>Geld sparen</Text>
-      </Pressable>
-
       {goal ? (
-        <Card style={{ gap: 12 }}>
-          <Pressable onPress={() => router.push('/(tabs)/goals')} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-              <View style={{ flex: 1, gap: 3 }}>
-                <Text selectable style={{ color: colors.text, fontSize: 18, fontWeight: '900' }}>{goal.title}</Text>
-                <Text selectable style={{ color: colors.textMuted, fontSize: 13 }}>
-                  {formatMoney(goal.savedAmount)} von {formatMoney(goal.targetAmount)}
-                </Text>
-              </View>
-              <Text selectable style={{ color: goal.color, fontWeight: '900', fontSize: 16 }}>
-                {Math.round(goalProgress * 100)} %
+        <Pressable
+          onPress={() => router.push('/(tabs)/goals')}
+          style={({ pressed }) => ({
+            borderRadius: 16,
+            padding: 14,
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor: colors.border,
+            gap: 9,
+            opacity: pressed ? 0.72 : 1,
+          })}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+            <View style={{ flex: 1, gap: 2 }}>
+              <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 16, fontWeight: '900' }}>{goal.title}</Text>
+              <Text selectable style={{ color: colors.textMuted, fontSize: 11 }}>
+                {formatMoney(goal.savedAmount)} / {formatMoney(goal.targetAmount)}
               </Text>
             </View>
-            <View style={{ marginTop: 10 }}>
-              <ProgressBar value={goalProgress} color={goal.color} height={9} />
-            </View>
-          </Pressable>
-
-          {store.preferences.showQuickAmounts ? (
-            <View style={{ flexDirection: 'row', gap: 7 }}>
-              {QUICK_AMOUNTS.map((amount) => (
-                <Pressable
-                  key={amount}
-                  onPress={() => quickSave(amount)}
-                  style={({ pressed }) => ({
-                    flex: 1,
-                    minHeight: 42,
-                    borderRadius: 13,
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: colors.surfaceMuted,
-                    opacity: pressed ? 0.65 : 1,
-                  })}>
-                  <Text style={{ color: colors.primaryDark, fontWeight: '900' }}>+{amount}</Text>
-                </Pressable>
-              ))}
-            </View>
-          ) : null}
-        </Card>
+            <Text selectable style={{ color: goal.color, fontSize: 14, fontWeight: '900' }}>{Math.round(goalProgress * 100)} %</Text>
+            <Symbol name="chevron.right" size={13} color={colors.textMuted} />
+          </View>
+          <ProgressBar value={goalProgress} color={goal.color} height={6} />
+        </Pressable>
       ) : (
-        <Pressable onPress={() => router.push('/add-goal')} style={({ pressed }) => ({ opacity: pressed ? 0.7 : 1 })}>
-          <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-            <View style={{ width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySoft }}>
-              <Symbol name="target" size={18} color={colors.primaryDark} />
-            </View>
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={{ color: colors.text, fontWeight: '900' }}>Erstes Sparziel anlegen</Text>
-              <Text style={{ color: colors.textMuted, fontSize: 12 }}>Danach kannst du mit einem Tap sparen.</Text>
-            </View>
-            <Symbol name="chevron.right" size={14} color={colors.textMuted} />
-          </Card>
+        <Pressable
+          onPress={() => router.push('/add-goal')}
+          style={({ pressed }) => ({
+            minHeight: 52,
+            borderRadius: 15,
+            paddingHorizontal: 14,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 10,
+            backgroundColor: colors.surface,
+            borderWidth: 1,
+            borderColor: colors.border,
+            opacity: pressed ? 0.72 : 1,
+          })}>
+          <Symbol name="target" size={17} color={colors.primaryDark} />
+          <Text style={{ flex: 1, color: colors.text, fontWeight: '900' }}>Sparziel anlegen</Text>
+          <Symbol name="chevron.right" size={13} color={colors.textMuted} />
         </Pressable>
       )}
 
       {dueRule ? (
-        <Card style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <View style={{ flex: 1, gap: 2 }}>
-            <Text style={{ color: colors.text, fontWeight: '900' }}>{dueRule.title}</Text>
-            <Text style={{ color: colors.textMuted, fontSize: 12 }}>{formatMoney(dueRule.amount)} heute fällig</Text>
-          </View>
-          <Pressable
-            onPress={() => void run(() => store.applyRule(dueRule.id))}
-            style={({ pressed }) => ({ paddingHorizontal: 14, paddingVertical: 10, borderRadius: 12, backgroundColor: colors.primarySoft, opacity: pressed ? 0.7 : 1 })}>
-            <Text style={{ color: colors.primaryDark, fontWeight: '900' }}>Sparen</Text>
-          </Pressable>
-        </Card>
-      ) : null}
-
-      {store.preferences.showGamification ? (
-        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 14, paddingVertical: 2 }}>
-          <Text selectable style={{ color: colors.textMuted, fontSize: 12, fontWeight: '800' }}>🔥 {store.streak} Tage</Text>
-          <Text style={{ color: colors.border }}>•</Text>
-          <Text selectable style={{ color: colors.textMuted, fontSize: 12, fontWeight: '800' }}>Level {store.level}</Text>
-        </View>
+        <Pressable
+          onPress={() => void applyDueRule()}
+          style={({ pressed }) => ({
+            minHeight: 48,
+            borderRadius: 14,
+            paddingHorizontal: 13,
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 9,
+            backgroundColor: colors.primarySoft,
+            opacity: pressed ? 0.7 : 1,
+          })}>
+          <Symbol name="clock.badge.checkmark.fill" size={16} color={colors.primaryDark} />
+          <Text numberOfLines={1} style={{ flex: 1, color: colors.primaryDark, fontSize: 12, fontWeight: '800' }}>{dueRule.title}</Text>
+          <Text style={{ color: colors.primaryDark, fontSize: 12, fontWeight: '900' }}>{formatMoney(dueRule.amount)}</Text>
+        </Pressable>
       ) : null}
     </ScrollView>
   );
