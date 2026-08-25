@@ -8,11 +8,12 @@ import { formatMoney, progress } from '@/utils/money';
 
 function savedThisMonth(contributions: ReturnType<typeof useAppStore>['contributions'], goalId: string) {
   const now = new Date();
-  return contributions.reduce((sum, item) => {
+  const value = contributions.reduce((sum, item) => {
     if (item.sourceType !== 'goal' || item.sourceId !== goalId) return sum;
     const date = new Date(item.createdAt);
     return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() ? sum + item.amount : sum;
   }, 0);
+  return Math.max(0, value);
 }
 
 export default function GoalsScreen() {
