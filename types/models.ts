@@ -15,6 +15,7 @@ export type Goal = {
 };
 
 export type ChallengeMode = 'fixed' | 'daily' | 'weekly' | 'action' | 'random';
+export type ChallengeCellShape = 'rounded' | 'circle';
 
 export type Challenge = {
   id: string;
@@ -32,6 +33,18 @@ export type Challenge = {
   color: string;
   createdAt: string;
   completedAt: string | null;
+};
+
+export type ChallengeCell = {
+  id: string;
+  challengeId: string;
+  index: number;
+  amount: number;
+  completed: boolean;
+  completedAt: string | null;
+  contributionId: string | null;
+  gridColumns: number;
+  shape: ChallengeCellShape;
 };
 
 export type Contribution = {
@@ -56,6 +69,9 @@ export type ChallengeTemplate = {
   icon: string;
   color: string;
   difficulty: 'Leicht' | 'Mittel' | 'Intensiv';
+  cellValues?: number[];
+  gridColumns?: number;
+  cellShape?: ChallengeCellShape;
 };
 
 export type SavingAction = {

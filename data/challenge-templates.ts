@@ -1,6 +1,79 @@
 import type { ChallengeTemplate } from '@/types/models';
 
+function repeatValue(value: number, count: number) {
+  return Array.from({ length: count }, () => value);
+}
+
+function mixedValues(entries: { amount: number; count: number }[]) {
+  const remaining = entries.map((entry) => ({ ...entry }));
+  const result: number[] = [];
+  while (remaining.some((entry) => entry.count > 0)) {
+    for (const entry of remaining) {
+      if (entry.count <= 0) continue;
+      result.push(entry.amount);
+      entry.count -= 1;
+    }
+  }
+  return result;
+}
+
+const fiveEuro200 = repeatValue(5, 40);
+const coin120 = mixedValues([
+  { amount: 0.5, count: 10 },
+  { amount: 1, count: 25 },
+  { amount: 2, count: 45 },
+]);
+const tenEuro300 = repeatValue(10, 30);
+
 export const challengeTemplates: ChallengeTemplate[] = [
+  {
+    id: 'five-euro-200-grid',
+    title: '5 € Challenge',
+    subtitle: '40 Felder à 5 € – antippen, sparen, abhaken. Wie auf einem klassischen Sparblatt.',
+    category: 'Einfach',
+    targetAmount: 200,
+    stepAmount: 5,
+    totalSteps: 40,
+    mode: 'fixed',
+    icon: 'square.grid.3x3.fill',
+    color: '#C06A72',
+    difficulty: 'Leicht',
+    cellValues: fiveEuro200,
+    gridColumns: 5,
+    cellShape: 'rounded',
+  },
+  {
+    id: 'coin-120-grid',
+    title: 'Kleingeldchallenge',
+    subtitle: '80 Felder mit 0,50 €, 1 € und 2 €. Alle Felder zusammen ergeben genau 120 €.',
+    category: 'Einfach',
+    targetAmount: 120,
+    stepAmount: 1.5,
+    totalSteps: coin120.length,
+    mode: 'fixed',
+    icon: 'eurosign.circle.fill',
+    color: '#C98286',
+    difficulty: 'Leicht',
+    cellValues: coin120,
+    gridColumns: 5,
+    cellShape: 'circle',
+  },
+  {
+    id: 'ten-euro-300-grid',
+    title: '10 € Challenge',
+    subtitle: '30 klare 10-€-Felder für ein 300-€-Ziel.',
+    category: 'Einfach',
+    targetAmount: 300,
+    stepAmount: 10,
+    totalSteps: 30,
+    mode: 'fixed',
+    icon: 'rectangle.grid.3x2.fill',
+    color: '#3976B8',
+    difficulty: 'Leicht',
+    cellValues: tenEuro300,
+    gridColumns: 5,
+    cellShape: 'rounded',
+  },
   {
     id: 'daily-one',
     title: '1 € am Tag',

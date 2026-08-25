@@ -4,6 +4,14 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useS
 import { challengeTemplates } from '@/data/challenge-templates';
 import { savingActions } from '@/data/saving-actions';
 import {
+  clearChallengeCells,
+  completeChallengeCell as completeChallengeCellDb,
+  createChallengeCells,
+  loadChallengeCells,
+  removeChallengeCells,
+  undoChallengeCell as undoChallengeCellDb,
+} from '@/db/challenge-cells';
+import {
   addGoalContribution,
   applySavingRule as applySavingRuleDb,
   clearAllData,
@@ -28,6 +36,8 @@ import {
 import { clearWithdrawals, loadWithdrawals, removeGoalWithdrawals, withdrawGoalAmount } from '@/db/withdrawals';
 import type {
   AppSnapshot,
+  ChallengeCell,
+  ChallengeCellShape,
   ChallengeMode,
   ChallengeTemplate,
   GoalMode,
@@ -63,6 +73,9 @@ type CustomChallengeInput = {
   stepAmount: number;
   mode: ChallengeMode;
   durationDays?: number | null;
+  cellValues?: number[];
+  gridColumns?: number;
+  cellShape?: ChallengeCellShape;
 };
 
 type CreateRuleInput = {
@@ -94,6 +107,7 @@ type StoreValue = AppSnapshot & {
   loading: boolean;
   error: string | null;
   preferences: AppPreferences;
+  challengeCells: Record<string, ChallengeCell[]>;
   totalSaved: number;
   level: number;
   levelName: string;
@@ -117,6 +131,8 @@ type StoreValue = AppSnapshot & {
   startTemplate: (template: ChallengeTemplate) => Promise<void>;
   createCustomChallenge: (input: CustomChallengeInput) => Promise<void>;
   completeChallengeStep: (challengeId: string, amountOverride?: number) => Promise<void>;
+  completeChallengeCell: (challengeId: string, cellIndex: number) => Promise<void>;
+  undoChallengeCell: (challengeId: string, cellIndex: number) => Promise<void>;
   createRule: (input: CreateRuleInput) => Promise<void>;
   toggleRule: (ruleId: string, enabled: boolean) => Promise<void>;
   applyRule: (ruleId: string) => Promise<void>;
@@ -132,17 +148,28 @@ const AppStoreContext = createContext<StoreValue | null>(null);
 export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   const [snapshot, setSnapshot] = useState<AppSnapshot>(EMPTY);
   const [preferences, setPreferences] = useState<AppPreferences>(DEFAULT_PREFERENCES);
+  const [challengeCells, setChallengeCells] = useState<Record<string, ChallengeCell[]>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
     try {
       setError(null);
-      const [nextSnapshot, withdrawals, nextPreferences] = await Promise.all([loadSnapshot(), loadWithdrawals(), loadPreferences()]);
+      const [nextSnapshot, withdrawals, nextPreferences, cells] = await Promise.all([
+        loadSnapshot(),
+        loadWithdrawals(),
+        loadPreferences(),
+        loadChallengeCells(),
+      ]);
       const contributions = [...nextSnapshot.contributions, ...withdrawals]
         .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
         .slice(0, 500);
+      const groupedCells = cells.reduce<Record<string, ChallengeCell[]>>((result, cell) => {
+        (result[cell.challengeId] ??= []).push(cell);
+        return result;
+      }, {});
       setSnapshot({ ...nextSnapshot, contributions });
+      setChallengeCells(groupedCells);
       setPreferences(nextPreferences);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Lokale Daten konnten nicht geladen werden.');
@@ -196,6 +223,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       loading,
       error,
       preferences,
+      challengeCells,
       totalSaved,
       level: level.level,
       levelName: level.name,
@@ -241,7 +269,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       startTemplate: (template) => runMutation(async () => {
         const alreadyActive = snapshot.challenges.some((item) => item.templateId === template.id && !item.completedAt);
         if (alreadyActive) throw new Error('Diese Challenge läuft bereits.');
-        await insertChallenge({
+        const challengeId = await insertChallenge({
           templateId: template.id,
           title: template.title,
           subtitle: template.subtitle,
@@ -253,19 +281,33 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
           icon: template.icon,
           color: template.color,
         });
+        if (template.cellValues?.length) {
+          await createChallengeCells(challengeId, template.cellValues, template.gridColumns ?? 5, template.cellShape ?? 'rounded');
+        }
       }, 'success'),
-      createCustomChallenge: (input) => runMutation(() => insertChallenge({
-        title: input.title,
-        subtitle: input.mode === 'action' ? 'Sparen, wenn du die Aktion schaffst.' : 'Deine eigene Spar-Challenge',
-        targetAmount: input.targetAmount,
-        stepAmount: input.stepAmount,
-        totalSteps: Math.max(1, Math.ceil(input.targetAmount / input.stepAmount)),
-        mode: input.mode,
-        durationDays: input.durationDays ?? null,
-        icon: input.mode === 'random' ? 'die.face.5.fill' : 'wand.and.stars',
-        color: '#7652B7',
-      }), 'success'),
+      createCustomChallenge: (input) => runMutation(async () => {
+        const challengeId = await insertChallenge({
+          title: input.title,
+          subtitle: input.cellValues?.length
+            ? `${input.cellValues.length} Sparfelder · antippen und abhaken.`
+            : input.mode === 'action'
+              ? 'Sparen, wenn du die Aktion schaffst.'
+              : 'Deine eigene Spar-Challenge',
+          targetAmount: input.targetAmount,
+          stepAmount: input.stepAmount,
+          totalSteps: input.cellValues?.length ?? Math.max(1, Math.ceil(input.targetAmount / input.stepAmount)),
+          mode: input.mode,
+          durationDays: input.durationDays ?? null,
+          icon: input.cellValues?.length ? 'square.grid.3x3.fill' : input.mode === 'random' ? 'die.face.5.fill' : 'wand.and.stars',
+          color: input.cellShape === 'circle' ? '#C98286' : '#7652B7',
+        });
+        if (input.cellValues?.length) {
+          await createChallengeCells(challengeId, input.cellValues, input.gridColumns ?? 5, input.cellShape ?? 'rounded');
+        }
+      }, 'success'),
       completeChallengeStep: (challengeId, amountOverride) => runMutation(() => completeChallengeStepDb(challengeId, amountOverride), 'success'),
+      completeChallengeCell: (challengeId, cellIndex) => runMutation(() => completeChallengeCellDb(challengeId, cellIndex), 'success'),
+      undoChallengeCell: (challengeId, cellIndex) => runMutation(() => undoChallengeCellDb(challengeId, cellIndex)),
       createRule: (input) => runMutation(() => insertSavingRule(input), 'success'),
       toggleRule: (ruleId, enabled) => runMutation(() => toggleSavingRuleDb(ruleId, enabled)),
       applyRule: (ruleId) => runMutation(() => applySavingRuleDb(ruleId), 'success'),
@@ -275,13 +317,17 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
         await removeGoalWithdrawals(goalId);
         await removeGoal(goalId);
       }),
-      deleteChallenge: (challengeId) => runMutation(() => removeChallenge(challengeId)),
+      deleteChallenge: (challengeId) => runMutation(async () => {
+        await removeChallengeCells(challengeId);
+        await removeChallenge(challengeId);
+      }),
       resetAll: () => runMutation(async () => {
+        await clearChallengeCells();
         await clearWithdrawals();
         await clearAllData();
       }, 'success'),
     };
-  }, [error, loading, preferences, reload, restorePreferenceDefaults, runMutation, snapshot, updatePreference]);
+  }, [challengeCells, error, loading, preferences, reload, restorePreferenceDefaults, runMutation, snapshot, updatePreference]);
 
   return <AppStoreContext.Provider value={value}>{children}</AppStoreContext.Provider>;
 }
