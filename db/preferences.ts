@@ -1,6 +1,9 @@
 import * as SQLite from 'expo-sqlite';
 
+export type ThemeMode = 'system' | 'light' | 'dark';
+
 export type AppPreferences = {
+  themeMode: ThemeMode;
   haptics: boolean;
   confirmQuickSave: boolean;
   showMonthly: boolean;
@@ -10,6 +13,7 @@ export type AppPreferences = {
 };
 
 export const DEFAULT_PREFERENCES: AppPreferences = {
+  themeMode: 'system',
   haptics: true,
   confirmQuickSave: false,
   showMonthly: false,
@@ -38,12 +42,17 @@ function parseBoolean(value: string | undefined, fallback: boolean) {
   return fallback;
 }
 
+function parseThemeMode(value: string | undefined): ThemeMode {
+  return value === 'light' || value === 'dark' || value === 'system' ? value : DEFAULT_PREFERENCES.themeMode;
+}
+
 export async function loadPreferences(): Promise<AppPreferences> {
   const db = await getDb();
   const rows = await db.getAllAsync<{ key: string; value: string }>('SELECT key, value FROM app_settings');
   const map = Object.fromEntries(rows.map((row) => [row.key, row.value]));
 
   return {
+    themeMode: parseThemeMode(map.themeMode),
     haptics: parseBoolean(map.haptics, DEFAULT_PREFERENCES.haptics),
     confirmQuickSave: parseBoolean(map.confirmQuickSave, DEFAULT_PREFERENCES.confirmQuickSave),
     showMonthly: parseBoolean(map.showMonthly, DEFAULT_PREFERENCES.showMonthly),
@@ -55,11 +64,12 @@ export async function loadPreferences(): Promise<AppPreferences> {
 
 export async function savePreference<K extends keyof AppPreferences>(key: K, value: AppPreferences[K]) {
   const db = await getDb();
+  const serialized = typeof value === 'boolean' ? (value ? '1' : '0') : String(value);
   await db.runAsync(
     `INSERT INTO app_settings (key, value) VALUES (?, ?)
      ON CONFLICT(key) DO UPDATE SET value = excluded.value`,
     key,
-    value ? '1' : '0',
+    serialized,
   );
 }
 
