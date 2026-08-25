@@ -1,41 +1,41 @@
 import { Appearance } from 'react-native';
 
 const light = {
-  background: '#F5F7F4',
+  background: '#F5F6F7',
   surface: '#FFFFFF',
-  surfaceMuted: '#EDF1EC',
-  text: '#152018',
-  textMuted: '#6C776F',
-  primary: '#197447',
-  primaryDark: '#115A35',
-  primarySoft: '#DCEFE4',
-  border: '#E0E6E1',
-  success: '#197447',
-  warning: '#A96316',
-  danger: '#B43E3E',
-  dangerSoft: '#FBE8E8',
-  disabled: '#D7DDD8',
-  purple: '#7452B7',
-  blue: '#3574B8',
+  surfaceMuted: '#ECEFF2',
+  text: '#171A1F',
+  textMuted: '#69717D',
+  primary: '#59687C',
+  primaryDark: '#3F4B5C',
+  primarySoft: '#E4E8ED',
+  border: '#DEE2E7',
+  success: '#64776A',
+  warning: '#9A754A',
+  danger: '#A95858',
+  dangerSoft: '#F5E8E8',
+  disabled: '#D7DBE0',
+  purple: '#756D86',
+  blue: '#64758C',
 } as const;
 
 const dark = {
-  background: '#0B100D',
-  surface: '#151B17',
-  surfaceMuted: '#202821',
-  text: '#F2F6F3',
-  textMuted: '#9AA59D',
-  primary: '#58C884',
-  primaryDark: '#96E5B4',
-  primarySoft: '#1D3928',
-  border: '#2B352E',
-  success: '#58C884',
-  warning: '#E0A35C',
-  danger: '#EF8585',
-  dangerSoft: '#3A2325',
-  disabled: '#354039',
-  purple: '#AC91E2',
-  blue: '#7AADE4',
+  background: '#0D0F12',
+  surface: '#15181D',
+  surfaceMuted: '#1D2127',
+  text: '#F3F4F6',
+  textMuted: '#989EA8',
+  primary: '#718096',
+  primaryDark: '#C2CAD5',
+  primarySoft: '#252B34',
+  border: '#2A2F37',
+  success: '#93A49A',
+  warning: '#C29B68',
+  danger: '#DE8585',
+  dangerSoft: '#352326',
+  disabled: '#343941',
+  purple: '#9A91AA',
+  blue: '#8A9CB4',
 } as const;
 
 export type ResolvedColorScheme = 'light' | 'dark';
@@ -75,10 +75,10 @@ export const colors = {
 };
 
 export const radius = {
-  sm: 12,
-  md: 16,
-  lg: 20,
-  xl: 26,
+  sm: 10,
+  md: 14,
+  lg: 18,
+  xl: 22,
 };
 
-export const shadow = '0 8px 24px rgba(0, 0, 0, 0.08)';
+export const shadow = '0 6px 18px rgba(0, 0, 0, 0.08)';
