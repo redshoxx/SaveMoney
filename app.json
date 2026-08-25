@@ -2,7 +2,7 @@
   "expo": {
     "name": "SparFlow",
     "slug": "sparflow",
-    "version": "2.5.0",
+    "version": "3.0.0",
     "orientation": "portrait",
     "scheme": "sparflow",
     "userInterfaceStyle": "automatic",
@@ -13,7 +13,12 @@
       "buildNumber": "2",
       "icon": "./assets/icon.png",
       "infoPlist": {
-        "UIFileSharingEnabled": false
+        "UIFileSharingEnabled": false,
+        "LSSupportsOpeningDocumentsInPlace": false,
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSAppTransportSecurity": {
+          "NSAllowsArbitraryLoads": false
+        }
       }
     },
     "android": {

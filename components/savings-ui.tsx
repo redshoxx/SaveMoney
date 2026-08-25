@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, Text, View } from 'react-native';
+import { Pressable, Text, View, type ColorValue } from 'react-native';
 
 import { Symbol } from '@/components/ui';
 import { colors, radius, shadow } from '@/constants/theme';
@@ -7,13 +7,13 @@ import { formatMoney } from '@/utils/money';
 
 export function HeroCard({ children }: { children: ReactNode }) {
   return (
-    <View style={{ backgroundColor: '#173E2B', borderRadius: radius.xl, borderCurve: 'continuous', padding: 22, gap: 18, boxShadow: '0 14px 36px rgba(23,62,43,0.18)' }}>
+    <View style={{ backgroundColor: '#173E2B', borderRadius: radius.xl, borderCurve: 'continuous', padding: 20, gap: 16, boxShadow: '0 12px 32px rgba(23,62,43,0.16)' }}>
       {children}
     </View>
   );
 }
 
-export function IconBubble({ icon, color = colors.primary, background = colors.primarySoft, size = 42 }: { icon: string; color?: string; background?: string; size?: number }) {
+export function IconBubble({ icon, color = colors.primary, background = colors.primarySoft, size = 42 }: { icon: string; color?: ColorValue; background?: ColorValue; size?: number }) {
   return (
     <View style={{ width: size, height: size, borderRadius: Math.round(size * 0.34), borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', backgroundColor: background }}>
       <Symbol name={icon} size={Math.round(size * 0.48)} color={color} />
@@ -63,7 +63,7 @@ export function MenuRow({ icon, title, subtitle, onPress, destructive }: { icon:
   const foreground = destructive ? colors.danger : colors.text;
   return (
     <Pressable onPress={onPress} style={({ pressed }) => ({ flexDirection: 'row', alignItems: 'center', gap: 13, paddingVertical: 13, opacity: pressed ? 0.6 : 1 })}>
-      <IconBubble icon={icon} size={38} color={destructive ? colors.danger : colors.primary} background={destructive ? '#FDE8E8' : colors.primarySoft} />
+      <IconBubble icon={icon} size={38} color={destructive ? colors.danger : colors.primary} background={destructive ? colors.dangerSoft : colors.primarySoft} />
       <View style={{ flex: 1, gap: 2 }}>
         <Text selectable style={{ fontSize: 16, fontWeight: '800', color: foreground }}>{title}</Text>
         {subtitle ? <Text selectable style={{ fontSize: 12.5, lineHeight: 18, color: colors.textMuted }}>{subtitle}</Text> : null}
@@ -76,7 +76,7 @@ export function MenuRow({ icon, title, subtitle, onPress, destructive }: { icon:
 export function ComparisonBadge({ value }: { value: number }) {
   const positive = value >= 0;
   return (
-    <View style={{ alignSelf: 'flex-start', borderRadius: 999, backgroundColor: positive ? colors.primarySoft : '#FDE8E8', paddingHorizontal: 10, paddingVertical: 6 }}>
+    <View style={{ alignSelf: 'flex-start', borderRadius: 999, backgroundColor: positive ? colors.primarySoft : colors.dangerSoft, paddingHorizontal: 10, paddingVertical: 6 }}>
       <Text style={{ fontSize: 12, fontWeight: '800', color: positive ? colors.primaryDark : colors.danger }}>{positive ? '+' : ''}{Math.round(value)} %</Text>
     </View>
   );

@@ -1,78 +1,89 @@
-import { Appearance } from 'react-native';
+import { Appearance, DynamicColorIOS, Platform, type ColorValue } from 'react-native';
 
 const light = {
-  background: '#F4F6F2',
+  background: '#F5F7F4',
   surface: '#FFFFFF',
-  surfaceMuted: '#EEF2EC',
-  text: '#172018',
-  textMuted: '#6E796F',
-  primary: '#1D7A46',
-  primaryDark: '#145C34',
-  primarySoft: '#DDEFE4',
-  border: '#E3E8E1',
-  success: '#1D7A46',
-  warning: '#B66A15',
+  surfaceMuted: '#EDF1EC',
+  text: '#152018',
+  textMuted: '#6C776F',
+  primary: '#197447',
+  primaryDark: '#115A35',
+  primarySoft: '#DCEFE4',
+  border: '#E0E6E1',
+  success: '#197447',
+  warning: '#A96316',
   danger: '#B43E3E',
-  dangerSoft: '#FDE8E8',
-  disabled: '#D9DEDA',
-  purple: '#7652B7',
-  blue: '#3976B8',
-};
+  dangerSoft: '#FBE8E8',
+  disabled: '#D7DDD8',
+  purple: '#7452B7',
+  blue: '#3574B8',
+} as const;
 
 const dark = {
-  background: '#0D120F',
-  surface: '#161D18',
-  surfaceMuted: '#202922',
+  background: '#0B100D',
+  surface: '#151B17',
+  surfaceMuted: '#202821',
   text: '#F2F6F3',
-  textMuted: '#98A49B',
-  primary: '#4CC17A',
-  primaryDark: '#8DE0AB',
-  primarySoft: '#203B29',
-  border: '#2A352D',
-  success: '#4CC17A',
-  warning: '#E2A050',
-  danger: '#EF7B7B',
-  dangerSoft: '#3A2224',
-  disabled: '#364039',
-  purple: '#A98BE3',
-  blue: '#76AAE4',
-};
+  textMuted: '#9AA59D',
+  primary: '#58C884',
+  primaryDark: '#96E5B4',
+  primarySoft: '#1D3928',
+  border: '#2B352E',
+  success: '#58C884',
+  warning: '#E0A35C',
+  danger: '#EF8585',
+  dangerSoft: '#3A2325',
+  disabled: '#354039',
+  purple: '#AC91E2',
+  blue: '#7AADE4',
+} as const;
 
+type Palette = typeof light;
+type PaletteKey = keyof Palette;
 export type ResolvedColorScheme = 'light' | 'dark';
+export type AppThemeMode = 'system' | ResolvedColorScheme;
+
 let activeScheme: ResolvedColorScheme = Appearance.getColorScheme() === 'dark' ? 'dark' : 'light';
 
 export function setActiveColorScheme(scheme: ResolvedColorScheme) {
   activeScheme = scheme;
 }
 
-function palette() {
-  return activeScheme === 'dark' ? dark : light;
+export function applyNativeThemeMode(mode: AppThemeMode) {
+  Appearance.setColorScheme(mode === 'system' ? null : mode);
+}
+
+function resolveColor(key: PaletteKey): ColorValue {
+  if (Platform.OS === 'ios') {
+    return DynamicColorIOS({ light: light[key], dark: dark[key] });
+  }
+  return activeScheme === 'dark' ? dark[key] : light[key];
 }
 
 export const colors = {
-  get background() { return palette().background; },
-  get surface() { return palette().surface; },
-  get surfaceMuted() { return palette().surfaceMuted; },
-  get text() { return palette().text; },
-  get textMuted() { return palette().textMuted; },
-  get primary() { return palette().primary; },
-  get primaryDark() { return palette().primaryDark; },
-  get primarySoft() { return palette().primarySoft; },
-  get border() { return palette().border; },
-  get success() { return palette().success; },
-  get warning() { return palette().warning; },
-  get danger() { return palette().danger; },
-  get dangerSoft() { return palette().dangerSoft; },
-  get disabled() { return palette().disabled; },
-  get purple() { return palette().purple; },
-  get blue() { return palette().blue; },
+  get background(): ColorValue { return resolveColor('background'); },
+  get surface(): ColorValue { return resolveColor('surface'); },
+  get surfaceMuted(): ColorValue { return resolveColor('surfaceMuted'); },
+  get text(): ColorValue { return resolveColor('text'); },
+  get textMuted(): ColorValue { return resolveColor('textMuted'); },
+  get primary(): ColorValue { return resolveColor('primary'); },
+  get primaryDark(): ColorValue { return resolveColor('primaryDark'); },
+  get primarySoft(): ColorValue { return resolveColor('primarySoft'); },
+  get border(): ColorValue { return resolveColor('border'); },
+  get success(): ColorValue { return resolveColor('success'); },
+  get warning(): ColorValue { return resolveColor('warning'); },
+  get danger(): ColorValue { return resolveColor('danger'); },
+  get dangerSoft(): ColorValue { return resolveColor('dangerSoft'); },
+  get disabled(): ColorValue { return resolveColor('disabled'); },
+  get purple(): ColorValue { return resolveColor('purple'); },
+  get blue(): ColorValue { return resolveColor('blue'); },
 };
 
 export const radius = {
   sm: 12,
-  md: 18,
-  lg: 24,
-  xl: 30,
+  md: 16,
+  lg: 20,
+  xl: 26,
 };
 
-export const shadow = '0 10px 30px rgba(0, 0, 0, 0.10)';
+export const shadow = '0 8px 24px rgba(0, 0, 0, 0.08)';

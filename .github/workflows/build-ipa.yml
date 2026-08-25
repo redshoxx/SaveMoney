@@ -28,6 +28,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v5
+        with:
+          persist-credentials: false
 
       - name: Setup Node.js
         uses: actions/setup-node@v5
@@ -54,6 +56,15 @@ jobs:
 
       - name: Install dependencies
         run: npm install --no-audit --no-fund
+
+      - name: Check Expo dependency compatibility
+        run: npx expo install --check
+
+      - name: Security audit
+        run: npm audit --omit=dev --audit-level=high
+
+      - name: Expo project diagnostics
+        run: npx --yes expo-doctor@1.20.2
 
       - name: Typecheck
         run: npm run typecheck
@@ -129,7 +140,7 @@ jobs:
           const next = {
             version: process.env.VERSION,
             date: process.env.RELEASE_DATE,
-            localizedDescription: 'Minimalistisches SparFlow mit schnellerem Sparen, neuer Navigation und erweiterten Einstellungen.',
+            localizedDescription: 'SparFlow 3 mit reduzierter iPhone-Oberfläche, adaptiver Spar-Empfehlung, verbessertem Dark Mode und Release-Sicherheitschecks.',
             downloadURL: process.env.DOWNLOAD_URL,
             size: Number(process.env.IPA_SIZE),
             minOSVersion: '16.4'

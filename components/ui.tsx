@@ -1,7 +1,6 @@
 import { Image } from 'expo-image';
 import type { PropsWithChildren, ReactNode } from 'react';
-import { ActivityIndicator, Pressable, Text, View } from 'react-native';
-import type { ColorValue } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View, type ColorValue } from 'react-native';
 
 import { colors, radius, shadow } from '@/constants/theme';
 
@@ -18,8 +17,7 @@ export function Symbol({
     return <Text style={{ fontSize: size * 0.78, color, fontWeight: '800' }}>•</Text>;
   }
 
-  const tintColor = typeof color === 'string' ? color : colors.text;
-  return <Image source={`sf:${name}`} style={{ width: size, height: size }} tintColor={tintColor} />;
+  return <Image source={`sf:${name}`} style={{ width: size, height: size }} tintColor={color} />;
 }
 
 export function Card({ children, style }: PropsWithChildren<{ style?: object }>) {
@@ -32,8 +30,8 @@ export function Card({ children, style }: PropsWithChildren<{ style?: object }>)
           borderCurve: 'continuous',
           borderWidth: 1,
           borderColor: colors.border,
-          padding: 18,
-          gap: 14,
+          padding: 16,
+          gap: 12,
           boxShadow: shadow,
         },
         style,
@@ -44,7 +42,7 @@ export function Card({ children, style }: PropsWithChildren<{ style?: object }>)
   );
 }
 
-export function ProgressBar({ value, color = colors.primary, height = 9 }: { value: number; color?: string; height?: number }) {
+export function ProgressBar({ value, color = colors.primary, height = 8 }: { value: number; color?: ColorValue; height?: number }) {
   const percent = `${Math.max(0, Math.min(1, value)) * 100}%` as `${number}%`;
   return (
     <View style={{ height, borderRadius: 999, overflow: 'hidden', backgroundColor: colors.surfaceMuted }}>
@@ -78,7 +76,7 @@ export function PrimaryButton({
       onPress={onPress}
       style={({ pressed }) => ({
         minHeight: 50,
-        borderRadius: 16,
+        borderRadius: 15,
         borderCurve: 'continuous',
         paddingHorizontal: 18,
         alignItems: 'center',
@@ -98,7 +96,7 @@ export function PrimaryButton({
 export function SectionHeading({ title, action }: { title: string; action?: ReactNode }) {
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
-      <Text selectable style={{ fontSize: 21, fontWeight: '800', color: colors.text, letterSpacing: -0.4 }}>
+      <Text selectable style={{ fontSize: 20, fontWeight: '800', color: colors.text, letterSpacing: -0.4 }}>
         {title}
       </Text>
       {action}
@@ -106,7 +104,7 @@ export function SectionHeading({ title, action }: { title: string; action?: Reac
   );
 }
 
-export function Pill({ children, background = colors.surfaceMuted, color = colors.textMuted }: PropsWithChildren<{ background?: string; color?: string }>) {
+export function Pill({ children, background = colors.surfaceMuted, color = colors.textMuted }: PropsWithChildren<{ background?: ColorValue; color?: ColorValue }>) {
   return (
     <View style={{ backgroundColor: background, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}>
       <Text style={{ color, fontSize: 12, fontWeight: '800' }}>{children}</Text>
@@ -116,12 +114,12 @@ export function Pill({ children, background = colors.surfaceMuted, color = color
 
 export function EmptyState({ icon, title, body }: { icon: string; title: string; body: string }) {
   return (
-    <Card style={{ alignItems: 'center', paddingVertical: 28 }}>
+    <Card style={{ alignItems: 'center', paddingVertical: 26 }}>
       <View
         style={{
           width: 52,
           height: 52,
-          borderRadius: 18,
+          borderRadius: 17,
           backgroundColor: colors.primarySoft,
           alignItems: 'center',
           justifyContent: 'center',
