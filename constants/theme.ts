@@ -48,7 +48,7 @@ export function setActiveColorScheme(scheme: ResolvedColorScheme) {
 }
 
 export function applyNativeThemeMode(mode: AppThemeMode) {
-  Appearance.setColorScheme(mode === 'system' ? 'auto' : mode);
+  Appearance.setColorScheme(mode === 'system' ? 'unspecified' : mode);
 }
 
 function palette() {

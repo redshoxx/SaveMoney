@@ -1,7 +1,12 @@
 import { Tabs } from 'expo-router';
+import type { ColorValue } from 'react-native';
 
 import { Symbol } from '@/components/ui';
 import { colors } from '@/constants/theme';
+
+function tabIconColor(color: ColorValue) {
+  return typeof color === 'string' ? color : colors.textMuted;
+}
 
 export default function TabsLayout() {
   return (
@@ -24,19 +29,19 @@ export default function TabsLayout() {
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Start', headerTitle: 'SparFlow', tabBarIcon: ({ color }) => <Symbol name="house.fill" size={20} color={color} /> }}
+        options={{ title: 'Start', headerTitle: 'SparFlow', tabBarIcon: ({ color }) => <Symbol name="house.fill" size={20} color={tabIconColor(color)} /> }}
       />
       <Tabs.Screen
         name="goals"
-        options={{ title: 'Sparen', headerTitle: 'Sparen', tabBarIcon: ({ color }) => <Symbol name="target" size={20} color={color} /> }}
+        options={{ title: 'Sparen', headerTitle: 'Sparen', tabBarIcon: ({ color }) => <Symbol name="target" size={20} color={tabIconColor(color)} /> }}
       />
       <Tabs.Screen
         name="challenges"
-        options={{ title: 'Challenges', headerTitle: 'Challenges', tabBarIcon: ({ color }) => <Symbol name="flag.fill" size={20} color={color} /> }}
+        options={{ title: 'Challenges', headerTitle: 'Challenges', tabBarIcon: ({ color }) => <Symbol name="flag.fill" size={20} color={tabIconColor(color)} /> }}
       />
       <Tabs.Screen
         name="settings"
-        options={{ title: 'Einstellungen', headerTitle: 'Einstellungen', tabBarIcon: ({ color }) => <Symbol name="gearshape.fill" size={20} color={color} /> }}
+        options={{ title: 'Einstellungen', headerTitle: 'Einstellungen', tabBarIcon: ({ color }) => <Symbol name="gearshape.fill" size={20} color={tabIconColor(color)} /> }}
       />
     </Tabs>
   );
