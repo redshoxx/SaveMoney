@@ -2,7 +2,7 @@
   "expo": {
     "name": "SparFlow",
     "slug": "sparflow",
-    "version": "3.0.0",
+    "version": "3.1.0",
     "orientation": "portrait",
     "scheme": "sparflow",
     "userInterfaceStyle": "automatic",
@@ -25,7 +25,7 @@
       "package": "com.redshoxx.sparflow",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#173E2B"
+        "backgroundColor": "#59687C"
       }
     },
     "plugins": [
