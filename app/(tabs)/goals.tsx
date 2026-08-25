@@ -17,6 +17,44 @@ function savedThisMonth(contributions: ReturnType<typeof useAppStore>['contribut
   }, 0));
 }
 
+function CompactAction({
+  icon,
+  label,
+  onPress,
+  disabled,
+  destructive,
+}: {
+  icon: string;
+  label: string;
+  onPress: () => void;
+  disabled?: boolean;
+  destructive?: boolean;
+}) {
+  return (
+    <Pressable
+      accessibilityRole="button"
+      disabled={disabled}
+      onPress={onPress}
+      style={({ pressed }) => ({
+        minHeight: 34,
+        paddingHorizontal: 11,
+        borderRadius: 10,
+        borderWidth: destructive ? 1 : 0,
+        borderColor: destructive ? colors.danger : 'transparent',
+        backgroundColor: destructive ? 'transparent' : colors.primarySoft,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: 5,
+        opacity: disabled ? 0.35 : pressed ? 0.68 : 1,
+      })}
+    >
+      <Symbol name={icon} size={12} color={destructive ? colors.danger : colors.primaryDark} />
+      <Text style={{ color: destructive ? colors.danger : colors.primaryDark, fontSize: 11.5, fontWeight: '900' }}>{label}</Text>
+    </Pressable>
+  );
+}
+
 function AreaCard({ goal, monthSaved, onDelete }: { goal: Goal; monthSaved: number; onDelete: () => void }) {
   const recurring = goal.mode === 'recurring';
   const recurringAmount = goal.recurringAmount ?? goal.targetAmount;
@@ -27,57 +65,48 @@ function AreaCard({ goal, monthSaved, onDelete }: { goal: Goal; monthSaved: numb
   const change = (mode: 'save' | 'withdraw') => router.push({ pathname: '/save', params: { goalId: goal.id, mode } });
 
   return (
-    <View style={{ borderRadius: 18, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, gap: 11 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <View style={{ width: 40, height: 40, borderRadius: 13, alignItems: 'center', justifyContent: 'center', backgroundColor: `${goal.color}18` }}>
-          <Symbol name={completed ? 'checkmark' : goal.icon} size={18} color={goal.color} />
+    <View style={{ borderRadius: 16, padding: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, gap: 9 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
+        <View style={{ width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceMuted }}>
+          <Symbol name={completed ? 'checkmark' : goal.icon} size={16} color={colors.primaryDark} />
         </View>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 16, fontWeight: '900' }}>{goal.title}</Text>
-          <Text selectable style={{ color: colors.textMuted, fontSize: 11 }}>
+
+        <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
+          <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 15.5, fontWeight: '900' }}>{goal.title}</Text>
+          <Text selectable numberOfLines={1} style={{ color: colors.textMuted, fontSize: 10.5 }}>
             {recurring
-              ? `${formatMoney(current)} von ${formatMoney(target)} diesen Monat`
+              ? `${formatMoney(current)} / ${formatMoney(target)} diesen Monat · gesamt ${formatMoney(goal.savedAmount)}`
               : completed
                 ? `${formatMoney(goal.targetAmount)} erreicht`
-                : `${formatMoney(Math.max(0, goal.targetAmount - goal.savedAmount))} fehlen noch`}
+                : `${formatMoney(goal.savedAmount)} / ${formatMoney(goal.targetAmount)} · ${formatMoney(Math.max(0, goal.targetAmount - goal.savedAmount))} offen`}
           </Text>
         </View>
-        <Text style={{ color: goal.color, fontSize: 12, fontWeight: '900' }}>{Math.round(percentage * 100)}%</Text>
-        <Pressable accessibilityLabel={`${goal.title} verwalten`} onPress={onDelete} hitSlop={10} style={{ minWidth: 28, minHeight: 36, alignItems: 'center', justifyContent: 'center' }}>
-          <Symbol name="ellipsis" size={17} color={colors.textMuted} />
+
+        <Text style={{ color: colors.textMuted, fontSize: 11, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{Math.round(percentage * 100)}%</Text>
+        <Pressable accessibilityLabel={`${goal.title} verwalten`} onPress={onDelete} hitSlop={10} style={{ width: 30, height: 34, alignItems: 'center', justifyContent: 'center' }}>
+          <Symbol name="ellipsis" size={16} color={colors.textMuted} />
         </Pressable>
       </View>
 
-      <ProgressBar value={percentage} color={goal.color} height={7} />
+      <ProgressBar value={percentage} color={completed ? colors.success : colors.primary} height={4} />
 
-      {!completed ? (
-        <View style={{ flexDirection: 'row', gap: 8 }}>
-          <Pressable accessibilityRole="button" onPress={() => change('save')} style={({ pressed }) => ({ flex: 1, minHeight: 44, borderRadius: 13, backgroundColor: goal.color, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: pressed ? 0.75 : 1 })}>
-            <Symbol name="plus" size={13} color="#FFFFFF" />
-            <Text style={{ color: '#FFFFFF', fontSize: 12.5, fontWeight: '900' }}>Sparen</Text>
-          </Pressable>
-          <Pressable accessibilityRole="button" disabled={goal.savedAmount <= 0} onPress={() => change('withdraw')} style={({ pressed }) => ({ flex: 1, minHeight: 44, borderRadius: 13, borderWidth: 1, borderColor: goal.savedAmount > 0 ? colors.danger : colors.border, backgroundColor: goal.savedAmount > 0 ? colors.dangerSoft : colors.surfaceMuted, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: goal.savedAmount <= 0 ? 0.4 : pressed ? 0.7 : 1 })}>
-            <Symbol name="minus" size={13} color={goal.savedAmount > 0 ? colors.danger : colors.textMuted} />
-            <Text style={{ color: goal.savedAmount > 0 ? colors.danger : colors.textMuted, fontSize: 12.5, fontWeight: '900' }}>Abziehen</Text>
-          </Pressable>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
+        <Text style={{ flex: 1, color: colors.textMuted, fontSize: 10.5 }} numberOfLines={1}>
+          {recurring ? `${formatMoney(recurringAmount)} monatlich · ab Tag ${goal.recurringDay ?? 1}` : completed ? 'Abgeschlossen' : 'Aktives Sparziel'}
+        </Text>
+        <View style={{ flexDirection: 'row', gap: 6 }}>
+          {!completed ? <CompactAction icon="plus" label="Sparen" onPress={() => change('save')} /> : null}
+          <CompactAction icon="minus" label={completed ? 'Korrigieren' : 'Abziehen'} destructive onPress={() => change('withdraw')} disabled={goal.savedAmount <= 0} />
         </View>
-      ) : (
-        <Pressable accessibilityRole="button" onPress={() => change('withdraw')} style={({ pressed }) => ({ minHeight: 42, borderRadius: 13, backgroundColor: colors.surfaceMuted, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: pressed ? 0.7 : 1 })}>
-          <Symbol name="minus" size={13} color={colors.textMuted} />
-          <Text style={{ color: colors.textMuted, fontSize: 12, fontWeight: '800' }}>Betrag korrigieren</Text>
-        </Pressable>
-      )}
+      </View>
     </View>
   );
 }
 
-function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <View style={{ gap: 9 }}>
-      <View style={{ gap: 2 }}>
-        <Text style={{ color: colors.text, fontSize: 17, fontWeight: '900' }}>{title}</Text>
-        {subtitle ? <Text style={{ color: colors.textMuted, fontSize: 11 }}>{subtitle}</Text> : null}
-      </View>
+    <View style={{ gap: 8 }}>
+      <Text style={{ color: colors.text, fontSize: 16, fontWeight: '900' }}>{title}</Text>
       {children}
     </View>
   );
@@ -92,7 +121,7 @@ export default function GoalsScreen() {
   const monthlyPlanned = recurringGoals.reduce((sum, goal) => sum + (goal.recurringAmount ?? goal.targetAmount), 0);
 
   const remove = (goal: Goal) => {
-    Alert.alert('Sparbereich löschen?', `„${goal.title}“ und die zugehörigen Buchungen werden entfernt.`, [
+    Alert.alert('Sparbereich verwalten', goal.title, [
       { text: 'Abbrechen', style: 'cancel' },
       { text: 'Löschen', style: 'destructive', onPress: () => void store.deleteGoal(goal.id) },
     ]);
@@ -108,36 +137,35 @@ export default function GoalsScreen() {
   );
 
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 16, paddingTop: 12, paddingBottom: 96, gap: 16 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text style={{ color: colors.text, fontSize: 25, fontWeight: '900', letterSpacing: -0.5 }}>Sparen</Text>
-          <Text style={{ color: colors.textMuted, fontSize: 12.5 }}>Ziele und monatliche Rücklagen.</Text>
+    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 8, paddingBottom: 88, gap: 14 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: colors.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.35 }}>Sparen</Text>
+          <Text style={{ color: colors.textMuted, fontSize: 11.5 }}>Ziele und Rücklagen kompakt verwalten</Text>
         </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Sparbereich hinzufügen" onPress={() => router.push('/add-goal')} style={({ pressed }) => ({ width: 44, height: 44, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primary, opacity: pressed ? 0.72 : 1 })}>
-          <Symbol name="plus" size={18} color="#FFFFFF" />
+        <Pressable accessibilityRole="button" accessibilityLabel="Sparbereich hinzufügen" onPress={() => router.push('/add-goal')} style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySoft, opacity: pressed ? 0.7 : 1 })}>
+          <Symbol name="plus" size={16} color={colors.primaryDark} />
         </Pressable>
       </View>
 
-      <View style={{ borderRadius: 18, padding: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, flexDirection: 'row', gap: 18 }}>
-        <View style={{ flex: 1, gap: 3 }}>
-          <Text style={{ color: colors.textMuted, fontSize: 10, fontWeight: '900' }}>IN BEREICHEN</Text>
-          <Text selectable style={{ color: colors.text, fontSize: 19, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(totalInAreas)}</Text>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <View style={{ flex: 1, borderRadius: 13, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12, paddingVertical: 10 }}>
+          <Text style={{ color: colors.textMuted, fontSize: 9.5, fontWeight: '900' }}>GESAMT</Text>
+          <Text selectable style={{ color: colors.text, fontSize: 17, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(totalInAreas)}</Text>
         </View>
-        <View style={{ width: 1, backgroundColor: colors.border }} />
-        <View style={{ flex: 1, gap: 3 }}>
-          <Text style={{ color: colors.textMuted, fontSize: 10, fontWeight: '900' }}>MONAT GEPLANT</Text>
-          <Text selectable style={{ color: colors.text, fontSize: 19, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(monthlyPlanned)}</Text>
+        <View style={{ flex: 1, borderRadius: 13, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12, paddingVertical: 10 }}>
+          <Text style={{ color: colors.textMuted, fontSize: 9.5, fontWeight: '900' }}>PRO MONAT</Text>
+          <Text selectable style={{ color: colors.text, fontSize: 17, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(monthlyPlanned)}</Text>
         </View>
       </View>
 
       {store.goals.length === 0 ? (
-        <EmptyState icon="target" title="Noch kein Sparbereich" body="Lege ein Ziel oder eine monatliche Rücklage an. Danach bekommst du auf Start automatisch eine passende Spar-Empfehlung." />
+        <EmptyState icon="target" title="Noch kein Sparbereich" body="Lege ein Ziel oder eine monatliche Rücklage an." />
       ) : (
         <>
-          {recurringGoals.length ? <Section title="Monatliche Rücklagen" subtitle="Wiederkehrende Beträge, die du regelmäßig zurücklegst.">{recurringGoals.map(card)}</Section> : null}
-          {activeTargets.length ? <Section title="Sparziele">{activeTargets.map(card)}</Section> : null}
-          {completedTargets.length ? <Section title="Erreicht" subtitle="Deine abgeschlossenen Ziele bleiben sichtbar.">{completedTargets.map(card)}</Section> : null}
+          {recurringGoals.length ? <Section title="Rücklagen">{recurringGoals.map(card)}</Section> : null}
+          {activeTargets.length ? <Section title="Ziele">{activeTargets.map(card)}</Section> : null}
+          {completedTargets.length ? <Section title="Erreicht">{completedTargets.map(card)}</Section> : null}
         </>
       )}
     </ScrollView>
