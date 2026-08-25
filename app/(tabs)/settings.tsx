@@ -4,6 +4,7 @@ import { Alert, Pressable, ScrollView, Switch, Text, View } from 'react-native';
 import { MenuRow } from '@/components/savings-ui';
 import { Symbol } from '@/components/ui';
 import { colors } from '@/constants/theme';
+import type { ThemeMode } from '@/db/preferences';
 import { useAppStore } from '@/store/app-store';
 
 type GroupKey = 'display' | 'control' | 'data';
@@ -22,9 +23,49 @@ function SettingSwitch({ icon, title, value, onValueChange }: { icon: string; ti
       <Switch
         value={value}
         onValueChange={onValueChange}
-        trackColor={{ false: '#D9DEDA', true: colors.primarySoft }}
-        thumbColor={value ? colors.primary : '#FFFFFF'}
+        trackColor={{ false: colors.disabled, true: colors.primarySoft }}
+        thumbColor={value ? colors.primary : colors.surface}
       />
+    </View>
+  );
+}
+
+function ThemeSelector({ value, onChange }: { value: ThemeMode; onChange: (value: ThemeMode) => void }) {
+  const options: { value: ThemeMode; label: string; icon: string }[] = [
+    { value: 'system', label: 'System', icon: 'iphone' },
+    { value: 'light', label: 'Hell', icon: 'sun.max.fill' },
+    { value: 'dark', label: 'Dunkel', icon: 'moon.fill' },
+  ];
+
+  return (
+    <View style={{ paddingVertical: 9, gap: 8 }}>
+      <Text style={{ color: colors.textMuted, fontSize: 11, fontWeight: '800' }}>DARSTELLUNG</Text>
+      <View style={{ flexDirection: 'row', gap: 7 }}>
+        {options.map((option) => {
+          const active = option.value === value;
+          return (
+            <Pressable
+              key={option.value}
+              onPress={() => onChange(option.value)}
+              style={({ pressed }) => ({
+                flex: 1,
+                minHeight: 44,
+                borderRadius: 12,
+                borderWidth: 1,
+                borderColor: active ? colors.primary : colors.border,
+                backgroundColor: active ? colors.primarySoft : colors.surfaceMuted,
+                alignItems: 'center',
+                justifyContent: 'center',
+                flexDirection: 'row',
+                gap: 6,
+                opacity: pressed ? 0.72 : 1,
+              })}>
+              <Symbol name={option.icon} size={13} color={active ? colors.primaryDark : colors.textMuted} />
+              <Text style={{ color: active ? colors.primaryDark : colors.text, fontSize: 12, fontWeight: '900' }}>{option.label}</Text>
+            </Pressable>
+          );
+        })}
+      </View>
     </View>
   );
 }
@@ -54,6 +95,8 @@ export default function SettingsScreen() {
   return (
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ padding: 16, paddingBottom: 105, gap: 10 }}>
       <Group icon="eye.fill" title="Anzeige" open={open === 'display'} onPress={() => toggle('display')}>
+        <ThemeSelector value={store.preferences.themeMode} onChange={(value) => void store.setPreference('themeMode', value)} />
+        <Divider />
         <SettingSwitch icon="bolt.fill" title="Schnellbeträge" value={store.preferences.showQuickAmounts} onValueChange={(value) => void store.setPreference('showQuickAmounts', value)} />
         <Divider />
         <SettingSwitch icon="calendar" title="Monatsbetrag" value={store.preferences.showMonthly} onValueChange={(value) => void store.setPreference('showMonthly', value)} />
@@ -85,7 +128,7 @@ export default function SettingsScreen() {
         <MenuRow
           icon="trash.fill"
           title="Alle Spar-Daten löschen"
-          subtitle="Ziele, Challenges, Regeln und Verlauf"
+          subtitle="Ziele, Rücklagen, Challenges, Regeln und Verlauf"
           destructive
           onPress={() => Alert.alert('Alles löschen?', 'Diese Aktion kann nicht rückgängig gemacht werden.', [
             { text: 'Abbrechen', style: 'cancel' },
@@ -94,7 +137,7 @@ export default function SettingsScreen() {
         />
       </Group>
 
-      <Text selectable style={{ alignSelf: 'center', marginTop: 5, color: colors.textMuted, fontSize: 11 }}>Nur lokal · SparFlow 2.3.0</Text>
+      <Text selectable style={{ alignSelf: 'center', marginTop: 5, color: colors.textMuted, fontSize: 11 }}>Nur lokal · SparFlow 2.4.0</Text>
     </ScrollView>
   );
 }
