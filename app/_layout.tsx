@@ -1,20 +1,16 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
-import { Appearance, useColorScheme } from 'react-native';
+import { useColorScheme } from 'react-native';
 
-import { colors } from '@/constants/theme';
+import { colors, setActiveColorScheme } from '@/constants/theme';
 import { AppStoreProvider, useAppStore } from '@/store/app-store';
 
 function RootNavigator() {
   const store = useAppStore();
   const systemScheme = useColorScheme();
   const themeMode = store.preferences.themeMode;
-  const resolvedScheme = themeMode === 'system' ? (systemScheme ?? 'light') : themeMode;
-
-  useEffect(() => {
-    Appearance.setColorScheme(themeMode === 'system' ? null : themeMode);
-  }, [themeMode]);
+  const resolvedScheme = themeMode === 'system' ? (systemScheme === 'dark' ? 'dark' : 'light') : themeMode;
+  setActiveColorScheme(resolvedScheme);
 
   return (
     <>
