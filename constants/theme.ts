@@ -38,8 +38,15 @@ const dark = {
   blue: '#76AAE4',
 };
 
+export type ResolvedColorScheme = 'light' | 'dark';
+let activeScheme: ResolvedColorScheme = Appearance.getColorScheme() === 'dark' ? 'dark' : 'light';
+
+export function setActiveColorScheme(scheme: ResolvedColorScheme) {
+  activeScheme = scheme;
+}
+
 function palette() {
-  return Appearance.getColorScheme() === 'dark' ? dark : light;
+  return activeScheme === 'dark' ? dark : light;
 }
 
 export const colors = {
