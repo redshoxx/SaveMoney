@@ -94,7 +94,7 @@ export default function SettingsScreen() {
         />
       </Group>
 
-      <Text selectable style={{ alignSelf: 'center', marginTop: 5, color: colors.textMuted, fontSize: 11 }}>Nur lokal · SparFlow 2.2.0</Text>
+      <Text selectable style={{ alignSelf: 'center', marginTop: 5, color: colors.textMuted, fontSize: 11 }}>Nur lokal · SparFlow 2.3.0</Text>
     </ScrollView>
   );
 }

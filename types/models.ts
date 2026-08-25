@@ -1,8 +1,13 @@
+export type GoalMode = 'target' | 'recurring';
+
 export type Goal = {
   id: string;
   title: string;
+  mode: GoalMode;
   targetAmount: number;
   savedAmount: number;
+  recurringAmount: number | null;
+  recurringDay: number | null;
   icon: string;
   color: string;
   targetDate: string | null;
