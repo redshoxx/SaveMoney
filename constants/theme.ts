@@ -1,4 +1,4 @@
-import { Appearance, DynamicColorIOS, Platform, type ColorValue } from 'react-native';
+import { Appearance } from 'react-native';
 
 const light = {
   background: '#F5F7F4',
@@ -38,8 +38,6 @@ const dark = {
   blue: '#7AADE4',
 } as const;
 
-type Palette = typeof light;
-type PaletteKey = keyof Palette;
 export type ResolvedColorScheme = 'light' | 'dark';
 export type AppThemeMode = 'system' | ResolvedColorScheme;
 
@@ -50,33 +48,30 @@ export function setActiveColorScheme(scheme: ResolvedColorScheme) {
 }
 
 export function applyNativeThemeMode(mode: AppThemeMode) {
-  Appearance.setColorScheme(mode === 'system' ? null : mode);
+  Appearance.setColorScheme(mode === 'system' ? 'auto' : mode);
 }
 
-function resolveColor(key: PaletteKey): ColorValue {
-  if (Platform.OS === 'ios') {
-    return DynamicColorIOS({ light: light[key], dark: dark[key] });
-  }
-  return activeScheme === 'dark' ? dark[key] : light[key];
+function palette() {
+  return activeScheme === 'dark' ? dark : light;
 }
 
 export const colors = {
-  get background(): ColorValue { return resolveColor('background'); },
-  get surface(): ColorValue { return resolveColor('surface'); },
-  get surfaceMuted(): ColorValue { return resolveColor('surfaceMuted'); },
-  get text(): ColorValue { return resolveColor('text'); },
-  get textMuted(): ColorValue { return resolveColor('textMuted'); },
-  get primary(): ColorValue { return resolveColor('primary'); },
-  get primaryDark(): ColorValue { return resolveColor('primaryDark'); },
-  get primarySoft(): ColorValue { return resolveColor('primarySoft'); },
-  get border(): ColorValue { return resolveColor('border'); },
-  get success(): ColorValue { return resolveColor('success'); },
-  get warning(): ColorValue { return resolveColor('warning'); },
-  get danger(): ColorValue { return resolveColor('danger'); },
-  get dangerSoft(): ColorValue { return resolveColor('dangerSoft'); },
-  get disabled(): ColorValue { return resolveColor('disabled'); },
-  get purple(): ColorValue { return resolveColor('purple'); },
-  get blue(): ColorValue { return resolveColor('blue'); },
+  get background(): string { return palette().background; },
+  get surface(): string { return palette().surface; },
+  get surfaceMuted(): string { return palette().surfaceMuted; },
+  get text(): string { return palette().text; },
+  get textMuted(): string { return palette().textMuted; },
+  get primary(): string { return palette().primary; },
+  get primaryDark(): string { return palette().primaryDark; },
+  get primarySoft(): string { return palette().primarySoft; },
+  get border(): string { return palette().border; },
+  get success(): string { return palette().success; },
+  get warning(): string { return palette().warning; },
+  get danger(): string { return palette().danger; },
+  get dangerSoft(): string { return palette().dangerSoft; },
+  get disabled(): string { return palette().disabled; },
+  get purple(): string { return palette().purple; },
+  get blue(): string { return palette().blue; },
 };
 
 export const radius = {

@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Pressable, Text, View, type ColorValue } from 'react-native';
+import { Pressable, Text, View } from 'react-native';
 
 import { Symbol } from '@/components/ui';
 import { colors, radius, shadow } from '@/constants/theme';
@@ -13,7 +13,7 @@ export function HeroCard({ children }: { children: ReactNode }) {
   );
 }
 
-export function IconBubble({ icon, color = colors.primary, background = colors.primarySoft, size = 42 }: { icon: string; color?: ColorValue; background?: ColorValue; size?: number }) {
+export function IconBubble({ icon, color = colors.primary, background = colors.primarySoft, size = 42 }: { icon: string; color?: string; background?: string; size?: number }) {
   return (
     <View style={{ width: size, height: size, borderRadius: Math.round(size * 0.34), borderCurve: 'continuous', alignItems: 'center', justifyContent: 'center', backgroundColor: background }}>
       <Symbol name={icon} size={Math.round(size * 0.48)} color={color} />

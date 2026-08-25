@@ -1,6 +1,6 @@
 import { Image } from 'expo-image';
 import type { PropsWithChildren, ReactNode } from 'react';
-import { ActivityIndicator, Pressable, Text, View, type ColorValue } from 'react-native';
+import { ActivityIndicator, Pressable, Text, View } from 'react-native';
 
 import { colors, radius, shadow } from '@/constants/theme';
 
@@ -11,7 +11,7 @@ export function Symbol({
 }: {
   name: string;
   size?: number;
-  color?: ColorValue;
+  color?: string;
 }) {
   if (process.env.EXPO_OS !== 'ios') {
     return <Text style={{ fontSize: size * 0.78, color, fontWeight: '800' }}>•</Text>;
@@ -42,7 +42,7 @@ export function Card({ children, style }: PropsWithChildren<{ style?: object }>)
   );
 }
 
-export function ProgressBar({ value, color = colors.primary, height = 8 }: { value: number; color?: ColorValue; height?: number }) {
+export function ProgressBar({ value, color = colors.primary, height = 8 }: { value: number; color?: string; height?: number }) {
   const percent = `${Math.max(0, Math.min(1, value)) * 100}%` as `${number}%`;
   return (
     <View style={{ height, borderRadius: 999, overflow: 'hidden', backgroundColor: colors.surfaceMuted }}>
@@ -104,7 +104,7 @@ export function SectionHeading({ title, action }: { title: string; action?: Reac
   );
 }
 
-export function Pill({ children, background = colors.surfaceMuted, color = colors.textMuted }: PropsWithChildren<{ background?: ColorValue; color?: ColorValue }>) {
+export function Pill({ children, background = colors.surfaceMuted, color = colors.textMuted }: PropsWithChildren<{ background?: string; color?: string }>) {
   return (
     <View style={{ backgroundColor: background, borderRadius: 999, paddingHorizontal: 10, paddingVertical: 6 }}>
       <Text style={{ color, fontSize: 12, fontWeight: '800' }}>{children}</Text>
