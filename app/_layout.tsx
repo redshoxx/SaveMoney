@@ -15,7 +15,7 @@ class ReleaseErrorBoundary extends Component<{ children: ReactNode }, { failed: 
   }
 
   componentDidCatch(_error: Error, _info: ErrorInfo) {
-    // Deliberately avoid persisting crash details: SparFlow contains personal financial notes.
+    // Deliberately avoid persisting crash details: SparPilot contains personal financial notes.
   }
 
   render() {
@@ -25,7 +25,7 @@ class ReleaseErrorBoundary extends Component<{ children: ReactNode }, { failed: 
         <View style={{ width: 52, height: 52, borderRadius: 18, backgroundColor: colors.dangerSoft, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: colors.danger, fontSize: 24, fontWeight: '900' }}>!</Text>
         </View>
-        <Text selectable style={{ color: colors.text, fontSize: 21, fontWeight: '800', textAlign: 'center' }}>SparFlow konnte diese Ansicht nicht laden.</Text>
+        <Text selectable style={{ color: colors.text, fontSize: 21, fontWeight: '800', textAlign: 'center' }}>SparPilot konnte diese Ansicht nicht laden.</Text>
         <Text selectable style={{ color: colors.textMuted, fontSize: 14, lineHeight: 20, textAlign: 'center' }}>Deine lokalen Spar-Daten wurden dadurch nicht gelöscht. Du kannst die Oberfläche erneut laden.</Text>
         <Pressable accessibilityRole="button" onPress={() => this.setState({ failed: false })} style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: 20, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.76 : 1 })}>
           <Text selectable style={{ color: '#FFFFFF', fontWeight: '800' }}>Erneut versuchen</Text>
