@@ -11,6 +11,14 @@
       "iconURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow-icon.png",
       "versions": [
         {
+          "version": "3.3.0",
+          "date": "2026-08-26T10:24:58Z",
+          "localizedDescription": "SparFlow 3.3 mit neuem dynamischen Neon-Design, zentralen Schnellaktionen, überarbeiteter Startseite, lebendigen Challenges und Einstellungen außerhalb der Navigation.",
+          "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
+          "size": 13625049,
+          "minOSVersion": "16.4"
+        },
+        {
           "version": "3.2.0",
           "date": "2026-08-25T20:38:43Z",
           "localizedDescription": "SparFlow 3 mit reduzierter iPhone-Oberfläche, adaptiver Spar-Empfehlung, verbessertem Dark Mode und Release-Sicherheitschecks.",
@@ -99,11 +107,11 @@
           "minOSVersion": "16.4"
         }
       ],
-      "version": "3.2.0",
-      "versionDate": "2026-08-25T20:38:43Z",
-      "versionDescription": "SparFlow 3 mit reduzierter iPhone-Oberfläche, adaptiver Spar-Empfehlung, verbessertem Dark Mode und Release-Sicherheitschecks.",
+      "version": "3.3.0",
+      "versionDate": "2026-08-26T10:24:58Z",
+      "versionDescription": "SparFlow 3.3 mit neuem dynamischen Neon-Design, zentralen Schnellaktionen, überarbeiteter Startseite, lebendigen Challenges und Einstellungen außerhalb der Navigation.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 13619492
+      "size": 13625049
     }
   ]
 }
