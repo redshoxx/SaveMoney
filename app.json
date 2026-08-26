@@ -2,7 +2,7 @@
   "expo": {
     "name": "SparPilot",
     "slug": "sparflow",
-    "version": "4.4.1",
+    "version": "4.4.2",
     "orientation": "portrait",
     "scheme": "sparflow",
     "userInterfaceStyle": "automatic",

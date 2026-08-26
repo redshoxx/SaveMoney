@@ -24,7 +24,7 @@ function themeLabel(value: ThemeMode) { if (value === 'dark') return 'Dunkel'; i
 
 export default function SettingsScreen() {
   const store = useAppStore();
-  const version = Constants.expoConfig?.version ?? '4.4.0';
+  const version = Constants.expoConfig?.version ?? '4.4.2';
   const chooseTheme = () => Alert.alert('Design', 'Wähle das Farbschema für SparPilot.', [
     { text: 'System', onPress: () => void store.setPreference('themeMode', 'system') },
     { text: 'Hell', onPress: () => void store.setPreference('themeMode', 'light') },
