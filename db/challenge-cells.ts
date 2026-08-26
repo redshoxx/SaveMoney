@@ -1,30 +1,34 @@
-import * as SQLite from 'expo-sqlite';
-
+import { getDatabase } from '@/db/database';
 import type { ChallengeCell, ChallengeCellShape } from '@/types/models';
 import { makeId } from '@/utils/money';
 
-let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
+let readyPromise: Promise<void> | null = null;
 
 async function getDb() {
-  if (!dbPromise) dbPromise = SQLite.openDatabaseAsync('sparflow.db');
-  const db = await dbPromise;
-  await db.execAsync(`
-    PRAGMA foreign_keys = ON;
-    CREATE TABLE IF NOT EXISTS challenge_cells (
-      id TEXT PRIMARY KEY NOT NULL,
-      challenge_id TEXT NOT NULL,
-      cell_index INTEGER NOT NULL,
-      amount REAL NOT NULL CHECK(amount > 0),
-      completed INTEGER NOT NULL DEFAULT 0,
-      completed_at TEXT,
-      contribution_id TEXT,
-      grid_columns INTEGER NOT NULL DEFAULT 5,
-      shape TEXT NOT NULL DEFAULT 'rounded' CHECK(shape IN ('rounded', 'circle')),
-      UNIQUE(challenge_id, cell_index),
-      FOREIGN KEY(challenge_id) REFERENCES challenges(id) ON DELETE CASCADE
-    );
-    CREATE INDEX IF NOT EXISTS idx_challenge_cells_challenge ON challenge_cells(challenge_id, cell_index);
-  `);
+  const db = await getDatabase();
+  if (!readyPromise) {
+    readyPromise = db.execAsync(`
+      PRAGMA foreign_keys = ON;
+      CREATE TABLE IF NOT EXISTS challenge_cells (
+        id TEXT PRIMARY KEY NOT NULL,
+        challenge_id TEXT NOT NULL,
+        cell_index INTEGER NOT NULL,
+        amount REAL NOT NULL CHECK(amount > 0),
+        completed INTEGER NOT NULL DEFAULT 0,
+        completed_at TEXT,
+        contribution_id TEXT,
+        grid_columns INTEGER NOT NULL DEFAULT 5,
+        shape TEXT NOT NULL DEFAULT 'rounded' CHECK(shape IN ('rounded', 'circle')),
+        UNIQUE(challenge_id, cell_index),
+        FOREIGN KEY(challenge_id) REFERENCES challenges(id) ON DELETE CASCADE
+      );
+      CREATE INDEX IF NOT EXISTS idx_challenge_cells_challenge ON challenge_cells(challenge_id, cell_index);
+    `).catch((error) => {
+      readyPromise = null;
+      throw error;
+    });
+  }
+  await readyPromise;
   return db;
 }
 

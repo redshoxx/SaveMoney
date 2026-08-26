@@ -1,10 +1,12 @@
 import { router } from 'expo-router';
 import { Pressable, ScrollView, Text, View } from 'react-native';
+import Animated, { FadeInDown } from 'react-native-reanimated';
 
-import { NeonCard, NeonProgress, ProgressRing } from '@/components/neon-ui';
-import { Symbol } from '@/components/ui';
-import { accents, colors } from '@/constants/theme';
+import { ProgressRing } from '@/components/neon-ui';
+import { Card, ProgressBar, Symbol } from '@/components/ui';
+import { colors } from '@/constants/theme';
 import { useAppStore } from '@/store/app-store';
+import { formatEntityNumber } from '@/utils/entity-number';
 import { formatMoney, progress } from '@/utils/money';
 
 function isCurrentMonth(value: string) {
@@ -20,77 +22,44 @@ function monthLabel() {
 
 export default function MonthDetailsScreen() {
   const store = useAppStore();
-  const rows = store.goals
-    .filter((goal) => goal.mode === 'recurring')
-    .map((goal) => {
-      const planned = Math.max(0, goal.recurringAmount ?? goal.targetAmount);
-      const saved = Math.max(0, store.contributions.reduce((sum, item) => {
-        if (item.sourceType !== 'goal' || item.sourceId !== goal.id || !isCurrentMonth(item.createdAt)) return sum;
-        return sum + item.amount;
-      }, 0));
-      return { goal, planned, saved: Math.min(planned, saved) };
-    });
+  const rows = store.goals.filter((goal) => goal.mode === 'recurring').map((goal) => {
+    const planned = Math.max(0, goal.recurringAmount ?? goal.targetAmount);
+    const saved = Math.max(0, store.contributions.reduce((sum, item) => {
+      if (item.sourceType !== 'goal' || item.sourceId !== goal.id || !isCurrentMonth(item.createdAt)) return sum;
+      return sum + item.amount;
+    }, 0));
+    return { goal, planned, saved: Math.min(planned, saved) };
+  });
 
   const planned = rows.reduce((sum, row) => sum + row.planned, 0);
   const saved = rows.reduce((sum, row) => sum + row.saved, 0);
   const open = Math.max(0, planned - saved);
   const percentage = progress(saved, planned);
-  const summaryRows: Array<[string, number, string]> = [
-    ['Geplant', planned, colors.text],
-    ['Gespart', saved, colors.text],
-    ['Noch offen', open, open > 0 ? colors.warning : colors.success],
-  ];
 
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 8, paddingBottom: 38, gap: 14 }}>
-      <NeonCard style={{ padding: 16 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 14 }}>
-          <View style={{ flex: 1, gap: 4 }}>
-            <Text selectable style={{ color: colors.text, fontSize: 18, fontWeight: '800' }}>{monthLabel()}</Text>
-            <Text selectable style={{ color: colors.text, fontSize: 27, fontWeight: '900', letterSpacing: -0.8, fontVariant: ['tabular-nums'] }}>{formatMoney(saved)}</Text>
-            <Text style={{ color: colors.textMuted, fontSize: 11 }}>von {formatMoney(planned)} geplant</Text>
+    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 14, paddingTop: 6, paddingBottom: 34, gap: 12 }}>
+      <Animated.View entering={FadeInDown.duration(190)}>
+        <Card style={{ padding: 14 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={{ flex: 1, gap: 3 }}><Text selectable style={{ color: colors.text, fontSize: 15, fontWeight: '900' }}>{monthLabel()}</Text><Text selectable numberOfLines={1} adjustsFontSizeToFit style={{ color: colors.text, fontSize: 25, fontWeight: '900', letterSpacing: -0.7, fontVariant: ['tabular-nums'] }}>{formatMoney(saved)}</Text><Text selectable style={{ color: colors.textMuted, fontSize: 10 }}>von {formatMoney(planned)} geplant</Text></View>
+            <ProgressRing value={percentage} color={colors.primary} size={68} />
           </View>
-          <ProgressRing value={percentage} color={colors.primary} size={70} />
-        </View>
-      </NeonCard>
+        </Card>
+      </Animated.View>
 
-      <NeonCard style={{ paddingHorizontal: 13, paddingVertical: 5, gap: 0 }}>
-        {summaryRows.map(([label, value, color], index) => (
-          <View key={label}>
-            <View style={{ minHeight: 43, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
-              <Text style={{ color: colors.textMuted, fontSize: 11 }}>{label}</Text>
-              <Text selectable style={{ color, fontSize: 11.5, fontWeight: '800', fontVariant: ['tabular-nums'] }}>{formatMoney(value)}</Text>
-            </View>
-            {index < 2 ? <View style={{ height: 1, backgroundColor: colors.border }} /> : null}
-          </View>
-        ))}
-      </NeonCard>
-
-      <View style={{ gap: 9 }}>
-        <Text selectable style={{ color: colors.text, fontSize: 13, fontWeight: '800' }}>Aufteilung</Text>
-        {rows.length ? rows.map((row, index) => {
-          const accent = accents[index % accents.length] ?? colors.primary;
-          const rowProgress = progress(row.saved, row.planned);
-          return (
-            <Pressable key={row.goal.id} onPress={() => router.push({ pathname: '/save', params: { goalId: row.goal.id, mode: 'save' } })} style={({ pressed }) => ({ opacity: pressed ? 0.68 : 1 })}>
-              <NeonCard style={{ padding: 12, gap: 8 }}>
-                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
-                  <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: accent, alignItems: 'center', justifyContent: 'center' }}><Symbol name={row.goal.icon} size={14} color="#FFFFFF" /></View>
-                  <Text numberOfLines={1} style={{ flex: 1, color: colors.text, fontSize: 11.5, fontWeight: '700' }}>{row.goal.title}</Text>
-                  <Text selectable style={{ color: colors.text, fontSize: 10.5, fontWeight: '800' }}>{formatMoney(row.saved)} / {formatMoney(row.planned)}</Text>
-                </View>
-                <NeonProgress value={rowProgress} color={accent} height={4} />
-              </NeonCard>
-            </Pressable>
-          );
-        }) : (
-          <NeonCard style={{ alignItems: 'center', paddingVertical: 24 }}>
-            <Text style={{ color: colors.textMuted, fontSize: 11, textAlign: 'center' }}>Lege monatliche Rücklagen an, damit SparFlow hier deinen Monat aufteilt.</Text>
-          </NeonCard>
-        )}
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        {[['Geplant', planned, colors.text], ['Gespart', saved, colors.success], ['Offen', open, open > 0 ? colors.warning : colors.success]].map(([label, value, color]) => <View key={String(label)} style={{ flex: 1, borderRadius: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, padding: 10, gap: 3 }}><Text selectable style={{ color: colors.textMuted, fontSize: 8.5, fontWeight: '800' }}>{String(label).toUpperCase()}</Text><Text selectable numberOfLines={1} adjustsFontSizeToFit style={{ color: String(color), fontSize: 14, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(Number(value))}</Text></View>)}
       </View>
 
-      <Text style={{ color: colors.textMuted, fontSize: 10, lineHeight: 15, textAlign: 'center' }}>Überzahlungen bleiben deinem Sparziel gutgeschrieben. Die Monatsansicht begrenzt die Darstellung auf den geplanten Monatsbetrag.</Text>
+      <View style={{ gap: 7 }}>
+        <Text selectable style={{ color: colors.text, fontSize: 13.5, fontWeight: '900' }}>Aufteilung</Text>
+        {rows.length ? rows.map((row, index) => {
+          const rowProgress = progress(row.saved, row.planned);
+          return <Animated.View key={row.goal.id} entering={FadeInDown.duration(180).delay(index * 28)}><Pressable onPress={() => router.push({ pathname: '/save', params: { goalId: row.goal.id, mode: 'save' } })} style={({ pressed }) => ({ borderRadius: 16, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, padding: 12, gap: 8, opacity: pressed ? 0.72 : 1 })}><View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}><View style={{ width: 34, height: 34, borderRadius: 11, backgroundColor: `${row.goal.color}18`, alignItems: 'center', justifyContent: 'center' }}><Symbol name={row.goal.icon} size={15} color={row.goal.color} /></View><View style={{ flex: 1, minWidth: 0, gap: 2 }}><Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 11.5, fontWeight: '800' }}>{row.goal.title}</Text><Text selectable style={{ color: colors.textMuted, fontSize: 8.5 }}>{formatEntityNumber(row.goal.displayNumber)}</Text></View><Text selectable style={{ color: colors.text, fontSize: 10, fontWeight: '800' }}>{formatMoney(row.saved)} / {formatMoney(row.planned)}</Text><Symbol name="chevron.right" size={9} color={colors.textMuted} /></View><ProgressBar value={rowProgress} color={row.goal.color} height={5} /></Pressable></Animated.View>;
+        }) : <Card style={{ alignItems: 'center', paddingVertical: 22 }}><Symbol name="calendar" size={20} color={colors.textMuted} /><Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Noch kein Monatsplan</Text><Text selectable style={{ color: colors.textMuted, fontSize: 10, textAlign: 'center' }}>Lege eine monatliche Rücklage an. SparPilot teilt deinen Monat dann automatisch auf.</Text></Card>}
+      </View>
+
+      <Text selectable style={{ color: colors.textMuted, fontSize: 9.5, lineHeight: 14, textAlign: 'center' }}>Überzahlungen bleiben deinem Ziel gutgeschrieben. Im Monatsplan wird höchstens der geplante Monatsbetrag angezeigt.</Text>
     </ScrollView>
   );
 }

@@ -1,4 +1,4 @@
-import * as SQLite from 'expo-sqlite';
+import { getDatabase } from '@/db/database';
 
 export type ThemeMode = 'system' | 'light' | 'dark';
 
@@ -22,17 +22,22 @@ export const DEFAULT_PREFERENCES: AppPreferences = {
   showCompletedGoals: false,
 };
 
-let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
+let readyPromise: Promise<void> | null = null;
 
 async function getDb() {
-  if (!dbPromise) dbPromise = SQLite.openDatabaseAsync('sparflow.db');
-  const db = await dbPromise;
-  await db.execAsync(`
-    CREATE TABLE IF NOT EXISTS app_settings (
-      key TEXT PRIMARY KEY NOT NULL,
-      value TEXT NOT NULL
-    );
-  `);
+  const db = await getDatabase();
+  if (!readyPromise) {
+    readyPromise = db.execAsync(`
+      CREATE TABLE IF NOT EXISTS app_settings (
+        key TEXT PRIMARY KEY NOT NULL,
+        value TEXT NOT NULL
+      );
+    `).catch((error) => {
+      readyPromise = null;
+      throw error;
+    });
+  }
+  await readyPromise;
   return db;
 }
 

@@ -1,24 +1,28 @@
-import * as SQLite from 'expo-sqlite';
-
+import { getDatabase } from '@/db/database';
 import type { Contribution } from '@/types/models';
 import { makeId } from '@/utils/money';
 
-let dbPromise: Promise<SQLite.SQLiteDatabase> | null = null;
+let readyPromise: Promise<void> | null = null;
 
 async function getDb() {
-  if (!dbPromise) dbPromise = SQLite.openDatabaseAsync('sparflow.db');
-  const db = await dbPromise;
-  await db.execAsync(`
-    CREATE TABLE IF NOT EXISTS goal_withdrawals (
-      id TEXT PRIMARY KEY NOT NULL,
-      goal_id TEXT NOT NULL,
-      amount REAL NOT NULL CHECK(amount > 0),
-      note TEXT,
-      created_at TEXT NOT NULL
-    );
-    CREATE INDEX IF NOT EXISTS idx_goal_withdrawals_created_at ON goal_withdrawals(created_at DESC);
-    CREATE INDEX IF NOT EXISTS idx_goal_withdrawals_goal ON goal_withdrawals(goal_id);
-  `);
+  const db = await getDatabase();
+  if (!readyPromise) {
+    readyPromise = db.execAsync(`
+      CREATE TABLE IF NOT EXISTS goal_withdrawals (
+        id TEXT PRIMARY KEY NOT NULL,
+        goal_id TEXT NOT NULL,
+        amount REAL NOT NULL CHECK(amount > 0),
+        note TEXT,
+        created_at TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_goal_withdrawals_created_at ON goal_withdrawals(created_at DESC);
+      CREATE INDEX IF NOT EXISTS idx_goal_withdrawals_goal ON goal_withdrawals(goal_id);
+    `).catch((error) => {
+      readyPromise = null;
+      throw error;
+    });
+  }
+  await readyPromise;
   return db;
 }
 

@@ -2,6 +2,7 @@ export type GoalMode = 'target' | 'recurring';
 
 export type Goal = {
   id: string;
+  displayNumber: number;
   title: string;
   mode: GoalMode;
   targetAmount: number;
@@ -19,6 +20,7 @@ export type ChallengeCellShape = 'rounded' | 'circle';
 
 export type Challenge = {
   id: string;
+  displayNumber: number;
   templateId: string | null;
   title: string;
   subtitle: string;

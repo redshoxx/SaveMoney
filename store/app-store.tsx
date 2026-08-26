@@ -33,6 +33,7 @@ import {
   savePreference,
   type AppPreferences,
 } from '@/db/preferences';
+import { clearTodos } from '@/db/todos';
 import { clearWithdrawals, loadWithdrawals, removeGoalWithdrawals, withdrawGoalAmount } from '@/db/withdrawals';
 import type {
   AppSnapshot,
@@ -53,6 +54,7 @@ import {
   monthlyBuckets,
   weeklyBuckets,
 } from '@/utils/insights';
+import { cancelAllSparPilotReminders, cancelRemindersForSource } from '@/utils/local-notifications';
 
 const EMPTY: AppSnapshot = { goals: [], challenges: [], contributions: [], savingRules: [], noSpendDays: [] };
 
@@ -184,11 +186,12 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
     try {
       setError(null);
       await mutation();
-      if (preferences.haptics && process.env.EXPO_OS === 'ios') {
-        if (feedback === 'success') await Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
-        else await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      }
-      await reload();
+      const haptic = preferences.haptics && process.env.EXPO_OS === 'ios'
+        ? feedback === 'success'
+          ? Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success)
+          : Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light)
+        : Promise.resolve();
+      await Promise.all([reload(), haptic]);
     } catch (cause) {
       setError(cause instanceof Error ? cause.message : 'Aktion konnte nicht gespeichert werden.');
       throw cause;
@@ -198,9 +201,7 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
   const updatePreference = useCallback(async <K extends keyof AppPreferences>(key: K, value: AppPreferences[K]) => {
     await savePreference(key, value);
     setPreferences((current) => ({ ...current, [key]: value }));
-    if (preferences.haptics && process.env.EXPO_OS === 'ios') {
-      await Haptics.selectionAsync();
-    }
+    if (preferences.haptics && process.env.EXPO_OS === 'ios') await Haptics.selectionAsync();
   }, [preferences.haptics]);
 
   const restorePreferenceDefaults = useCallback(async () => {
@@ -250,63 +251,50 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
           recurringAmount: input.recurringAmount ?? null,
           recurringDay: input.recurringDay ?? null,
           icon: input.icon ?? (mode === 'recurring' ? 'arrow.triangle.2.circlepath' : 'target'),
-          color: input.color ?? '#1D7A46',
+          color: input.color ?? '#2D9A5B',
           targetDate: input.targetDate ?? null,
         });
         if (mode === 'recurring') {
           const recurringAmount = input.recurringAmount ?? input.targetAmount;
-          await insertSavingRule({
-            title: `${input.title.trim()} · monatlich`,
-            goalId,
-            amount: recurringAmount,
-            frequency: 'monthly',
-            dayOfMonth: input.recurringDay ?? 1,
-          });
+          await insertSavingRule({ title: `${input.title.trim()} · monatlich`, goalId, amount: recurringAmount, frequency: 'monthly', dayOfMonth: input.recurringDay ?? 1 });
         }
       }, 'success'),
-      saveToGoal: (goalId, amount, note) => runMutation(() => addGoalContribution(goalId, amount, note), 'success'),
+      saveToGoal: (goalId, amount, note) => runMutation(async () => {
+        const applied = await addGoalContribution(goalId, amount, note);
+        const goal = snapshot.goals.find((item) => item.id === goalId);
+        if (goal?.mode === 'target' && goal.savedAmount + applied >= goal.targetAmount) await cancelRemindersForSource('goal', goalId).catch(() => undefined);
+      }, 'success'),
       withdrawFromGoal: (goalId, amount, note) => runMutation(() => withdrawGoalAmount(goalId, amount, note), 'success'),
       startTemplate: (template) => runMutation(async () => {
         const alreadyActive = snapshot.challenges.some((item) => item.templateId === template.id && !item.completedAt);
         if (alreadyActive) throw new Error('Diese Challenge läuft bereits.');
-        const challengeId = await insertChallenge({
-          templateId: template.id,
-          title: template.title,
-          subtitle: template.subtitle,
-          targetAmount: template.targetAmount,
-          stepAmount: template.stepAmount,
-          totalSteps: template.totalSteps,
-          mode: template.mode,
-          durationDays: template.durationDays ?? null,
-          icon: template.icon,
-          color: template.color,
-        });
-        if (template.cellValues?.length) {
-          await createChallengeCells(challengeId, template.cellValues, template.gridColumns ?? 5, template.cellShape ?? 'rounded');
-        }
+        const challengeId = await insertChallenge({ templateId: template.id, title: template.title, subtitle: template.subtitle, targetAmount: template.targetAmount, stepAmount: template.stepAmount, totalSteps: template.totalSteps, mode: template.mode, durationDays: template.durationDays ?? null, icon: template.icon, color: template.color });
+        if (template.cellValues?.length) await createChallengeCells(challengeId, template.cellValues, template.gridColumns ?? 5, template.cellShape ?? 'rounded');
       }, 'success'),
       createCustomChallenge: (input) => runMutation(async () => {
         const challengeId = await insertChallenge({
           title: input.title,
-          subtitle: input.cellValues?.length
-            ? `${input.cellValues.length} Sparfelder · antippen und abhaken.`
-            : input.mode === 'action'
-              ? 'Sparen, wenn du die Aktion schaffst.'
-              : 'Deine eigene Spar-Challenge',
+          subtitle: input.cellValues?.length ? `${input.cellValues.length} Sparfelder · antippen und abhaken.` : input.mode === 'action' ? 'Sparen, wenn du die Aktion schaffst.' : 'Deine eigene Spar-Challenge',
           targetAmount: input.targetAmount,
           stepAmount: input.stepAmount,
           totalSteps: input.cellValues?.length ?? Math.max(1, Math.ceil(input.targetAmount / input.stepAmount)),
           mode: input.mode,
           durationDays: input.durationDays ?? null,
           icon: input.cellValues?.length ? 'square.grid.3x3.fill' : input.mode === 'random' ? 'die.face.5.fill' : 'wand.and.stars',
-          color: input.cellShape === 'circle' ? '#C98286' : '#7652B7',
+          color: input.cellShape === 'circle' ? '#4AAE8A' : '#5B8FD9',
         });
-        if (input.cellValues?.length) {
-          await createChallengeCells(challengeId, input.cellValues, input.gridColumns ?? 5, input.cellShape ?? 'rounded');
-        }
+        if (input.cellValues?.length) await createChallengeCells(challengeId, input.cellValues, input.gridColumns ?? 5, input.cellShape ?? 'rounded');
       }, 'success'),
-      completeChallengeStep: (challengeId, amountOverride) => runMutation(() => completeChallengeStepDb(challengeId, amountOverride), 'success'),
-      completeChallengeCell: (challengeId, cellIndex) => runMutation(() => completeChallengeCellDb(challengeId, cellIndex), 'success'),
+      completeChallengeStep: (challengeId, amountOverride) => runMutation(async () => {
+        const applied = await completeChallengeStepDb(challengeId, amountOverride);
+        const challenge = snapshot.challenges.find((item) => item.id === challengeId);
+        if (challenge && challenge.savedAmount + applied >= challenge.targetAmount) await cancelRemindersForSource('challenge', challengeId).catch(() => undefined);
+      }, 'success'),
+      completeChallengeCell: (challengeId, cellIndex) => runMutation(async () => {
+        const applied = await completeChallengeCellDb(challengeId, cellIndex);
+        const challenge = snapshot.challenges.find((item) => item.id === challengeId);
+        if (challenge && challenge.savedAmount + applied >= challenge.targetAmount) await cancelRemindersForSource('challenge', challengeId).catch(() => undefined);
+      }, 'success'),
       undoChallengeCell: (challengeId, cellIndex) => runMutation(() => undoChallengeCellDb(challengeId, cellIndex)),
       createRule: (input) => runMutation(() => insertSavingRule(input), 'success'),
       toggleRule: (ruleId, enabled) => runMutation(() => toggleSavingRuleDb(ruleId, enabled)),
@@ -314,14 +302,18 @@ export function AppStoreProvider({ children }: { children: React.ReactNode }) {
       deleteRule: (ruleId) => runMutation(() => removeSavingRule(ruleId)),
       markNoSpend: (goalId, amount = 0) => runMutation(() => markNoSpendDayDb(localDayKey(), goalId, amount), 'success'),
       deleteGoal: (goalId) => runMutation(async () => {
+        await cancelRemindersForSource('goal', goalId).catch(() => undefined);
         await removeGoalWithdrawals(goalId);
         await removeGoal(goalId);
       }),
       deleteChallenge: (challengeId) => runMutation(async () => {
+        await cancelRemindersForSource('challenge', challengeId).catch(() => undefined);
         await removeChallengeCells(challengeId);
         await removeChallenge(challengeId);
       }),
       resetAll: () => runMutation(async () => {
+        await cancelAllSparPilotReminders().catch(() => undefined);
+        await clearTodos();
         await clearChallengeCells();
         await clearWithdrawals();
         await clearAllData();

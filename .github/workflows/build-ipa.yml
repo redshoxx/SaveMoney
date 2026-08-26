@@ -166,7 +166,7 @@ jobs:
           const next = {
             version: process.env.VERSION,
             date: process.env.RELEASE_DATE,
-            localizedDescription: `SparPilot ${process.env.VERSION} mit neuem Sparschwein-Icon, klarer geführter Oberfläche, To-Dos sowie Erinnerungen für Sparziele und Challenges.`,
+            localizedDescription: `SparPilot ${process.env.VERSION} mit eindeutigen #Nummern für Ziele und Challenges, iPhone-12-optimierter Oberfläche, flüssigeren Animationen sowie Stabilitäts- und Performance-Fixes.`,
             downloadURL: process.env.DOWNLOAD_URL,
             size: Number(process.env.IPA_SIZE),
             minOSVersion: '16.4'

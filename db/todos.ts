@@ -1,5 +1,4 @@
-import * as SQLite from 'expo-sqlite';
-
+import { getDatabase } from '@/db/database';
 import { makeId } from '@/utils/money';
 
 export type TodoItem = {
@@ -12,23 +11,28 @@ export type TodoItem = {
   createdAt: string;
 };
 
-let databasePromise: Promise<SQLite.SQLiteDatabase> | null = null;
+let readyPromise: Promise<void> | null = null;
 
 async function getTodoDatabase() {
-  if (!databasePromise) databasePromise = SQLite.openDatabaseAsync('sparflow.db');
-  const db = await databasePromise;
-  await db.execAsync(`
-    CREATE TABLE IF NOT EXISTS todo_items (
-      id TEXT PRIMARY KEY NOT NULL,
-      title TEXT NOT NULL,
-      notes TEXT,
-      due_at TEXT NOT NULL,
-      completed_at TEXT,
-      notification_id TEXT,
-      created_at TEXT NOT NULL
-    );
-    CREATE INDEX IF NOT EXISTS idx_todo_due_at ON todo_items(completed_at, due_at);
-  `);
+  const db = await getDatabase();
+  if (!readyPromise) {
+    readyPromise = db.execAsync(`
+      CREATE TABLE IF NOT EXISTS todo_items (
+        id TEXT PRIMARY KEY NOT NULL,
+        title TEXT NOT NULL,
+        notes TEXT,
+        due_at TEXT NOT NULL,
+        completed_at TEXT,
+        notification_id TEXT,
+        created_at TEXT NOT NULL
+      );
+      CREATE INDEX IF NOT EXISTS idx_todo_due_at ON todo_items(completed_at, due_at);
+    `).catch((error) => {
+      readyPromise = null;
+      throw error;
+    });
+  }
+  await readyPromise;
   return db;
 }
 
@@ -85,4 +89,9 @@ export async function setTodoCompleted(todoId: string, completed: boolean) {
 export async function deleteTodo(todoId: string) {
   const db = await getTodoDatabase();
   await db.runAsync('DELETE FROM todo_items WHERE id = ?', todoId);
+}
+
+export async function clearTodos() {
+  const db = await getTodoDatabase();
+  await db.runAsync('DELETE FROM todo_items');
 }

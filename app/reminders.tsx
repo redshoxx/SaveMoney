@@ -1,11 +1,13 @@
 import { useLocalSearchParams } from 'expo-router';
-import { useCallback, useEffect, useState } from 'react';
-import { Alert, Linking, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Alert, KeyboardAvoidingView, Linking, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 
 import { Symbol } from '@/components/ui';
 import { colors } from '@/constants/theme';
 import { useAppStore } from '@/store/app-store';
 import type { Challenge, Goal } from '@/types/models';
+import { formatEntityNumber } from '@/utils/entity-number';
 import {
   cancelRemindersForSource,
   listScheduledSparFlowReminders,
@@ -15,10 +17,10 @@ import {
   type ScheduledSparFlowReminder,
 } from '@/utils/local-notifications';
 
-
 type ReminderTarget = {
   kind: 'goal' | 'challenge';
   id: string;
+  displayNumber: number;
   title: string;
   subtitle: string;
   color: string;
@@ -62,18 +64,13 @@ function parseDateTime(dateValue: string, timeValue: string) {
 }
 
 function reminderLabel(value: string) {
-  return new Intl.DateTimeFormat('de-AT', {
-    weekday: 'short',
-    day: '2-digit',
-    month: '2-digit',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(new Date(value));
+  return new Intl.DateTimeFormat('de-AT', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
 }
 
 function goalSuggestedDate(goal: Goal) {
   if (goal.targetDate) {
-    const value = new Date(`${goal.targetDate}T09:00:00`);
+    const normalized = goal.targetDate.slice(0, 10);
+    const value = new Date(`${normalized}T09:00:00`);
     if (Number.isFinite(value.getTime()) && value.getTime() > Date.now()) return value;
   }
   if (goal.mode === 'recurring' && goal.recurringDay) {
@@ -93,17 +90,7 @@ function challengeSuggestedDate(challenge: Challenge) {
   return value.getTime() > Date.now() ? value : null;
 }
 
-function ReminderEditor({
-  target,
-  existing,
-  onClose,
-  onChanged,
-}: {
-  target: ReminderTarget | null;
-  existing: ScheduledSparFlowReminder | null;
-  onClose: () => void;
-  onChanged: () => Promise<void>;
-}) {
+function ReminderEditor({ target, existing, onClose, onChanged }: { target: ReminderTarget | null; existing: ScheduledSparFlowReminder | null; onClose: () => void; onChanged: () => Promise<void> }) {
   const initial = existing ? new Date(existing.scheduledFor) : target?.suggestedDate ?? futureDate(1);
   const [dateText, setDateText] = useState(dateInput(initial));
   const [timeText, setTimeText] = useState(timeInput(initial));
@@ -128,13 +115,12 @@ function ReminderEditor({
       Alert.alert('Erinnerung', 'Bitte wähle einen Zeitpunkt in der Zukunft.');
       return;
     }
-
     setSaving(true);
     try {
       await scheduleLocalReminder({
         kind: target.kind,
         sourceId: target.id,
-        title: target.kind === 'goal' ? `Sparziel: ${target.title}` : `Challenge: ${target.title}`,
+        title: target.kind === 'goal' ? `Sparziel ${formatEntityNumber(target.displayNumber)}: ${target.title}` : `Challenge ${formatEntityNumber(target.displayNumber)}: ${target.title}`,
         body: target.kind === 'goal' ? 'Zeit für einen kleinen Schritt zu deinem Sparziel.' : 'Deine Challenge wartet auf den nächsten Schritt.',
         date,
         url: target.kind === 'goal' ? '/(tabs)/goals' : '/(tabs)/challenges',
@@ -160,85 +146,84 @@ function ReminderEditor({
   };
 
   return (
-    <Modal visible transparent animationType="fade" onRequestClose={onClose}>
-      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.58)', justifyContent: 'center', padding: 20 }}>
-        <View style={{ borderRadius: 22, borderCurve: 'continuous', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, padding: 16, gap: 14 }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <View style={{ width: 40, height: 40, borderRadius: 13, backgroundColor: `${target.color}18`, alignItems: 'center', justifyContent: 'center' }}>
-              <Symbol name={target.icon} size={17} color={target.color} />
-            </View>
-            <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
-              <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 15, fontWeight: '800' }}>{target.title}</Text>
-              <Text style={{ color: colors.textMuted, fontSize: 10.5 }}>Wann soll SparFlow dich erinnern?</Text>
-            </View>
-            <Pressable onPress={onClose} style={{ width: 36, height: 36, alignItems: 'center', justifyContent: 'center' }}>
-              <Symbol name="xmark" size={13} color={colors.textMuted} />
-            </Pressable>
-          </View>
+    <Modal visible transparent animationType="slide" onRequestClose={onClose}>
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined}>
+        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.52)', justifyContent: 'flex-end' }}>
+          <View style={{ maxHeight: '88%', borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 24 }}>
+            <View style={{ width: 42, height: 5, borderRadius: 999, backgroundColor: colors.border, alignSelf: 'center', marginBottom: 12 }} />
+            <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 14 }}>
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+                <View style={{ width: 40, height: 40, borderRadius: 13, backgroundColor: `${target.color}18`, alignItems: 'center', justifyContent: 'center' }}><Symbol name={target.icon} size={17} color={target.color} /></View>
+                <View style={{ flex: 1, gap: 2 }}>
+                  <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 14, fontWeight: '900' }}>{target.title}</Text>
+                  <Text selectable style={{ color: colors.primaryDark, fontSize: 10.5, fontWeight: '800' }}>{formatEntityNumber(target.displayNumber)}</Text>
+                </View>
+                <Pressable onPress={onClose} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}><Symbol name="xmark" size={13} color={colors.textMuted} /></Pressable>
+              </View>
 
-          <View style={{ gap: 7 }}>
-            <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Schnell auswählen</Text>
-            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 7 }}>
-              {[
-                ['Morgen', futureDate(1)],
-                ['In 3 Tagen', futureDate(3)],
-                ['In 1 Woche', futureDate(7)],
-              ].map(([label, value]) => (
-                <Pressable key={String(label)} onPress={() => setPreset(value as Date)} style={({ pressed }) => ({ minHeight: 40, paddingHorizontal: 11, borderRadius: 12, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.65 : 1 })}>
-                  <Text style={{ color: colors.text, fontSize: 10.5, fontWeight: '700' }}>{String(label)}</Text>
+              <View style={{ gap: 7 }}>
+                <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Schnell wählen</Text>
+                <View style={{ flexDirection: 'row', gap: 7 }}>
+                  {[
+                    ['Morgen', futureDate(1)],
+                    ['3 Tage', futureDate(3)],
+                    ['1 Woche', futureDate(7)],
+                  ].map(([label, value]) => (
+                    <Pressable key={String(label)} onPress={() => setPreset(value as Date)} style={({ pressed }) => ({ flex: 1, minHeight: 42, borderRadius: 12, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.7 : 1 })}>
+                      <Text selectable style={{ color: colors.text, fontSize: 10.5, fontWeight: '800' }}>{String(label)}</Text>
+                    </Pressable>
+                  ))}
+                </View>
+                {target.suggestedDate ? (
+                  <Pressable onPress={() => setPreset(target.suggestedDate as Date)} style={({ pressed }) => ({ minHeight: 42, borderRadius: 12, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.7 : 1 })}>
+                    <Text selectable style={{ color: colors.primaryDark, fontSize: 11, fontWeight: '900' }}>Passenden Termin übernehmen</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+
+              <View style={{ gap: 7 }}>
+                <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Datum und Uhrzeit</Text>
+                <View style={{ flexDirection: 'row', gap: 8 }}>
+                  <TextInput value={dateText} onChangeText={setDateText} placeholder="TT.MM.JJJJ" placeholderTextColor={colors.textMuted} style={{ flex: 1, minHeight: 48, borderRadius: 13, backgroundColor: colors.surfaceMuted, paddingHorizontal: 12, color: colors.text, fontSize: 16 }} />
+                  <TextInput value={timeText} onChangeText={setTimeText} placeholder="09:00" placeholderTextColor={colors.textMuted} style={{ width: 98, minHeight: 48, borderRadius: 13, backgroundColor: colors.surfaceMuted, paddingHorizontal: 12, color: colors.text, fontSize: 16 }} />
+                </View>
+              </View>
+
+              {existing ? <Text selectable style={{ color: colors.textMuted, fontSize: 10.5 }}>Aktuell: {reminderLabel(existing.scheduledFor)}</Text> : null}
+
+              <View style={{ flexDirection: 'row', gap: 8 }}>
+                {existing ? (
+                  <Pressable disabled={saving} onPress={() => void remove()} style={({ pressed }) => ({ flex: 1, minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: colors.danger, alignItems: 'center', justifyContent: 'center', opacity: saving || pressed ? 0.58 : 1 })}>
+                    <Text selectable style={{ color: colors.danger, fontWeight: '800' }}>Entfernen</Text>
+                  </Pressable>
+                ) : null}
+                <Pressable disabled={saving} onPress={() => void save()} style={({ pressed }) => ({ flex: 1, minHeight: 48, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', opacity: saving || pressed ? 0.72 : 1 })}>
+                  <Text selectable style={{ color: '#FFFFFF', fontWeight: '900' }}>{saving ? 'Speichert …' : existing ? 'Änderung speichern' : 'Erinnerung setzen'}</Text>
                 </Pressable>
-              ))}
-              {target.suggestedDate ? (
-                <Pressable onPress={() => setPreset(target.suggestedDate as Date)} style={({ pressed }) => ({ minHeight: 40, paddingHorizontal: 11, borderRadius: 12, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.65 : 1 })}>
-                  <Text style={{ color: colors.primaryDark, fontSize: 10.5, fontWeight: '800' }}>Passender Termin</Text>
-                </Pressable>
-              ) : null}
-            </View>
-          </View>
-
-          <View style={{ gap: 7 }}>
-            <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Oder genau festlegen</Text>
-            <View style={{ flexDirection: 'row', gap: 8 }}>
-              <TextInput value={dateText} onChangeText={setDateText} placeholder="TT.MM.JJJJ" placeholderTextColor={colors.textMuted} style={{ flex: 1, minHeight: 48, borderRadius: 13, backgroundColor: colors.surfaceMuted, paddingHorizontal: 12, color: colors.text, fontSize: 16 }} />
-              <TextInput value={timeText} onChangeText={setTimeText} placeholder="09:00" placeholderTextColor={colors.textMuted} style={{ width: 100, minHeight: 48, borderRadius: 13, backgroundColor: colors.surfaceMuted, paddingHorizontal: 12, color: colors.text, fontSize: 16 }} />
-            </View>
-          </View>
-
-          {existing ? <Text selectable style={{ color: colors.textMuted, fontSize: 10.5 }}>Aktuell: {reminderLabel(existing.scheduledFor)}</Text> : null}
-
-          <View style={{ flexDirection: 'row', gap: 8 }}>
-            {existing ? (
-              <Pressable disabled={saving} onPress={() => void remove()} style={({ pressed }) => ({ flex: 1, minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: colors.danger, alignItems: 'center', justifyContent: 'center', opacity: saving || pressed ? 0.55 : 1 })}>
-                <Text selectable style={{ color: colors.danger, fontWeight: '800' }}>Entfernen</Text>
-              </Pressable>
-            ) : null}
-            <Pressable disabled={saving} onPress={() => void save()} style={({ pressed }) => ({ flex: 1, minHeight: 48, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', opacity: saving || pressed ? 0.65 : 1 })}>
-              <Text selectable style={{ color: '#FFFFFF', fontWeight: '800' }}>{saving ? 'Speichert …' : existing ? 'Änderung speichern' : 'Erinnerung setzen'}</Text>
-            </Pressable>
+              </View>
+            </ScrollView>
           </View>
         </View>
-      </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
 
-function ReminderRow({ target, reminder, onPress }: { target: ReminderTarget; reminder: ScheduledSparFlowReminder | null; onPress: () => void }) {
+function ReminderRow({ target, reminder, onPress, index }: { target: ReminderTarget; reminder: ScheduledSparFlowReminder | null; onPress: () => void; index: number }) {
   return (
-    <Pressable onPress={onPress} style={({ pressed }) => ({ minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 11, paddingVertical: 8, opacity: pressed ? 0.65 : 1 })}>
-      <View style={{ width: 40, height: 40, borderRadius: 13, backgroundColor: `${target.color}18`, alignItems: 'center', justifyContent: 'center' }}>
-        <Symbol name={target.icon} size={17} color={target.color} />
-      </View>
-      <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
-        <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 13, fontWeight: '800' }}>{target.title}</Text>
-        <Text selectable numberOfLines={1} style={{ color: reminder ? colors.primaryDark : colors.textMuted, fontSize: 10.5 }}>
-          {reminder ? `Erinnerung: ${reminderLabel(reminder.scheduledFor)}` : target.subtitle}
-        </Text>
-      </View>
-      <View style={{ minWidth: 80, minHeight: 38, paddingHorizontal: 10, borderRadius: 12, backgroundColor: reminder ? colors.primarySoft : colors.surfaceMuted, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-        <Symbol name={reminder ? 'bell.fill' : 'bell'} size={12} color={reminder ? colors.primaryDark : colors.textMuted} />
-        <Text selectable style={{ color: reminder ? colors.primaryDark : colors.textMuted, fontSize: 10, fontWeight: '800' }}>{reminder ? 'Ändern' : 'Setzen'}</Text>
-      </View>
-    </Pressable>
+    <Animated.View entering={FadeInDown.duration(180).delay(Math.min(index, 8) * 25)} layout={LinearTransition.duration(180)}>
+      <Pressable onPress={onPress} style={({ pressed }) => ({ minHeight: 66, flexDirection: 'row', alignItems: 'center', gap: 10, paddingVertical: 8, opacity: pressed ? 0.7 : 1 })}>
+        <View style={{ width: 40, height: 40, borderRadius: 13, backgroundColor: `${target.color}18`, alignItems: 'center', justifyContent: 'center' }}><Symbol name={target.icon} size={17} color={target.color} /></View>
+        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+          <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 12.5, fontWeight: '800' }}>{target.title}</Text>
+          <Text selectable style={{ color: colors.textMuted, fontSize: 9.5 }}>{formatEntityNumber(target.displayNumber)} · {reminder ? reminderLabel(reminder.scheduledFor) : target.subtitle}</Text>
+        </View>
+        <View style={{ minWidth: 68, minHeight: 36, paddingHorizontal: 9, borderRadius: 11, backgroundColor: reminder ? colors.primarySoft : colors.surfaceMuted, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 5 }}>
+          <Symbol name={reminder ? 'bell.fill' : 'bell'} size={11} color={reminder ? colors.primaryDark : colors.textMuted} />
+          <Text selectable style={{ color: reminder ? colors.primaryDark : colors.textMuted, fontSize: 9.5, fontWeight: '800' }}>{reminder ? 'Ändern' : 'Setzen'}</Text>
+        </View>
+      </Pressable>
+    </Animated.View>
   );
 }
 
@@ -248,120 +233,96 @@ export default function RemindersScreen() {
   const [scheduled, setScheduled] = useState<ScheduledSparFlowReminder[]>([]);
   const [permission, setPermission] = useState<boolean | null>(null);
   const [target, setTarget] = useState<ReminderTarget | null>(null);
-  const [openedParamId, setOpenedParamId] = useState<string | null>(null);
+  const [openedParamKey, setOpenedParamKey] = useState<string | null>(null);
 
   const reload = useCallback(async () => {
-    const [items, granted] = await Promise.all([
-      listScheduledSparFlowReminders(),
-      notificationPermissionGranted(),
-    ]);
+    const [items, granted] = await Promise.all([listScheduledSparFlowReminders(), notificationPermissionGranted()]);
     setScheduled(items);
     setPermission(granted);
   }, []);
 
-  useEffect(() => {
-    void reload();
-  }, [reload]);
+  useEffect(() => { void reload(); }, [reload]);
 
-  const goalTargets: ReminderTarget[] = store.goals
-    .filter((goal) => goal.mode === 'recurring' || goal.savedAmount < goal.targetAmount)
-    .map((goal) => ({
-      kind: 'goal',
-      id: goal.id,
-      title: goal.title,
-      subtitle: goal.mode === 'recurring' ? 'Monatliche Rücklage' : 'Sparziel',
-      color: goal.color,
-      icon: goal.icon,
-      suggestedDate: goalSuggestedDate(goal),
-    }));
-
-  const challengeTargets: ReminderTarget[] = store.challenges
-    .filter((challenge) => !challenge.completedAt)
-    .map((challenge) => ({
-      kind: 'challenge',
-      id: challenge.id,
-      title: challenge.title,
-      subtitle: 'Aktive Challenge',
-      color: challenge.color,
-      icon: challenge.icon,
-      suggestedDate: challengeSuggestedDate(challenge),
-    }));
+  const targets = useMemo<ReminderTarget[]>(() => [
+    ...store.goals
+      .filter((goal) => goal.mode === 'recurring' || goal.savedAmount < goal.targetAmount)
+      .map((goal) => ({ kind: 'goal' as const, id: goal.id, displayNumber: goal.displayNumber, title: goal.title, subtitle: goal.mode === 'recurring' ? 'Monatliche Rücklage' : 'Sparziel', color: goal.color, icon: goal.icon, suggestedDate: goalSuggestedDate(goal) })),
+    ...store.challenges
+      .filter((challenge) => !challenge.completedAt)
+      .map((challenge) => ({ kind: 'challenge' as const, id: challenge.id, displayNumber: challenge.displayNumber, title: challenge.title, subtitle: 'Aktive Challenge', color: challenge.color, icon: challenge.icon, suggestedDate: challengeSuggestedDate(challenge) })),
+  ], [store.challenges, store.goals]);
 
   useEffect(() => {
-    if (!params.id || openedParamId === params.id) return;
-    const source = params.kind === 'challenge' ? challengeTargets : goalTargets;
-    const match = source.find((item) => item.id === params.id);
+    if (!params.id) return;
+    const key = `${params.kind ?? 'goal'}:${params.id}`;
+    if (openedParamKey === key) return;
+    const match = targets.find((item) => item.id === params.id && item.kind === (params.kind === 'challenge' ? 'challenge' : 'goal'));
     if (match) {
       setTarget(match);
-      setOpenedParamId(params.id);
+      setOpenedParamKey(key);
     }
-  }, [challengeTargets, goalTargets, openedParamId, params.id, params.kind]);
+  }, [openedParamKey, params.id, params.kind, targets]);
 
-  const existingFor = (kind: 'goal' | 'challenge', id: string) => scheduled.find((item) => item.kind === kind && item.sourceId === id) ?? null;
+  const existingFor = (item: ReminderTarget) => scheduled.find((reminder) => reminder.kind === item.kind && reminder.sourceId === item.id) ?? null;
 
   const enableNotifications = async () => {
     const granted = await requestNotificationPermission();
     setPermission(granted);
     if (!granted) {
-      Alert.alert('Benachrichtigungen sind aus', 'Du kannst sie jederzeit in den iPhone-Einstellungen für SparFlow aktivieren.', [
+      Alert.alert('Benachrichtigungen sind aus', 'Aktiviere sie in den iPhone-Einstellungen für SparPilot.', [
         { text: 'Später', style: 'cancel' },
         { text: 'Einstellungen öffnen', onPress: () => void Linking.openSettings() },
       ]);
     }
   };
 
+  const goals = targets.filter((item) => item.kind === 'goal');
+  const challenges = targets.filter((item) => item.kind === 'challenge');
+
   return (
     <>
-      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingVertical: 14, paddingBottom: 40, gap: 18 }}>
-        <View style={{ gap: 5 }}>
-          <Text selectable style={{ color: colors.text, fontSize: 17, fontWeight: '800' }}>Du entscheidest, wann SparFlow dich erinnert.</Text>
-          <Text selectable style={{ color: colors.textMuted, fontSize: 12, lineHeight: 17 }}>Erinnerungen sind optional. Setze nur dort eine Glocke, wo sie dir wirklich hilft.</Text>
+      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingVertical: 12, paddingBottom: 36, gap: 16 }}>
+        <View style={{ gap: 3 }}>
+          <Text selectable style={{ color: colors.text, fontSize: 18, fontWeight: '900' }}>Erinnerungen</Text>
+          <Text selectable style={{ color: colors.textMuted, fontSize: 10.5, lineHeight: 15 }}>Nur das einstellen, woran du wirklich erinnert werden möchtest.</Text>
         </View>
 
         {permission === false ? (
-          <View style={{ borderRadius: 16, borderCurve: 'continuous', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, padding: 13, gap: 10 }}>
-            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
-              <Symbol name="bell.slash" size={16} color={colors.warning} />
-              <Text selectable style={{ flex: 1, color: colors.text, fontSize: 12.5, fontWeight: '800' }}>Benachrichtigungen sind noch nicht aktiviert</Text>
-            </View>
-            <Pressable onPress={() => void enableNotifications()} style={({ pressed }) => ({ minHeight: 44, borderRadius: 13, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.68 : 1 })}>
-              <Text selectable style={{ color: '#FFFFFF', fontWeight: '800' }}>Benachrichtigungen aktivieren</Text>
-            </Pressable>
+          <Pressable onPress={() => void enableNotifications()} style={({ pressed }) => ({ borderRadius: 14, backgroundColor: colors.primarySoft, padding: 12, flexDirection: 'row', alignItems: 'center', gap: 9, opacity: pressed ? 0.72 : 1 })}>
+            <Symbol name="bell.slash" size={14} color={colors.warning} />
+            <View style={{ flex: 1, gap: 2 }}><Text selectable style={{ color: colors.text, fontSize: 11.5, fontWeight: '800' }}>Benachrichtigungen aktivieren</Text><Text selectable style={{ color: colors.textMuted, fontSize: 9.5 }}>Für Ziel- und Challenge-Erinnerungen erforderlich.</Text></View>
+            <Symbol name="chevron.right" size={10} color={colors.textMuted} />
+          </Pressable>
+        ) : null}
+
+        {targets.length === 0 ? (
+          <View style={{ borderRadius: 18, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, padding: 18, alignItems: 'center', gap: 7 }}>
+            <Symbol name="bell" size={21} color={colors.textMuted} />
+            <Text selectable style={{ color: colors.text, fontSize: 12.5, fontWeight: '800' }}>Noch nichts zum Erinnern</Text>
+            <Text selectable style={{ color: colors.textMuted, fontSize: 10.5, textAlign: 'center' }}>Lege zuerst ein Ziel an oder starte eine Challenge.</Text>
           </View>
         ) : null}
 
-        <View style={{ gap: 8 }}>
-          <View style={{ gap: 2 }}>
-            <Text selectable style={{ color: colors.text, fontSize: 15, fontWeight: '800' }}>Sparziele</Text>
-            <Text selectable style={{ color: colors.textMuted, fontSize: 10.5 }}>Zum Beispiel am Zahltag oder kurz vor deinem Zieltermin.</Text>
+        {goals.length ? (
+          <View style={{ gap: 7 }}>
+            <Text selectable style={{ color: colors.text, fontSize: 13.5, fontWeight: '900' }}>Sparziele</Text>
+            <View style={{ borderRadius: 17, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12 }}>
+              {goals.map((item, index) => <ReminderRow key={item.id} target={item} reminder={existingFor(item)} index={index} onPress={() => setTarget(item)} />)}
+            </View>
           </View>
-          <View style={{ borderRadius: 18, borderCurve: 'continuous', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12 }}>
-            {goalTargets.length ? goalTargets.map((item, index) => (
-              <View key={item.id}>
-                {index ? <View style={{ height: 1, backgroundColor: colors.border, marginLeft: 51 }} /> : null}
-                <ReminderRow target={item} reminder={existingFor('goal', item.id)} onPress={() => setTarget(item)} />
-              </View>
-            )) : <Text selectable style={{ color: colors.textMuted, fontSize: 11.5, paddingVertical: 18, textAlign: 'center' }}>Keine offenen Sparziele.</Text>}
-          </View>
-        </View>
+        ) : null}
 
-        <View style={{ gap: 8 }}>
-          <View style={{ gap: 2 }}>
-            <Text selectable style={{ color: colors.text, fontSize: 15, fontWeight: '800' }}>Challenges</Text>
-            <Text selectable style={{ color: colors.textMuted, fontSize: 10.5 }}>Eine Erinnerung reicht meistens, um im Rhythmus zu bleiben.</Text>
+        {challenges.length ? (
+          <View style={{ gap: 7 }}>
+            <Text selectable style={{ color: colors.text, fontSize: 13.5, fontWeight: '900' }}>Challenges</Text>
+            <View style={{ borderRadius: 17, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12 }}>
+              {challenges.map((item, index) => <ReminderRow key={item.id} target={item} reminder={existingFor(item)} index={goals.length + index} onPress={() => setTarget(item)} />)}
+            </View>
           </View>
-          <View style={{ borderRadius: 18, borderCurve: 'continuous', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12 }}>
-            {challengeTargets.length ? challengeTargets.map((item, index) => (
-              <View key={item.id}>
-                {index ? <View style={{ height: 1, backgroundColor: colors.border, marginLeft: 51 }} /> : null}
-                <ReminderRow target={item} reminder={existingFor('challenge', item.id)} onPress={() => setTarget(item)} />
-              </View>
-            )) : <Text selectable style={{ color: colors.textMuted, fontSize: 11.5, paddingVertical: 18, textAlign: 'center' }}>Keine aktive Challenge.</Text>}
-          </View>
-        </View>
+        ) : null}
       </ScrollView>
 
-      <ReminderEditor target={target} existing={target ? existingFor(target.kind, target.id) : null} onClose={() => setTarget(null)} onChanged={reload} />
+      <ReminderEditor target={target} existing={target ? existingFor(target) : null} onClose={() => setTarget(null)} onChanged={reload} />
     </>
   );
 }

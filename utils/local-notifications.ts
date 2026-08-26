@@ -133,6 +133,11 @@ export async function cancelRemindersForSource(kind: ReminderKind, sourceId: str
   await Promise.all(matching.map((item) => cancelScheduledReminder(item.notificationId)));
 }
 
+export async function cancelAllSparPilotReminders() {
+  const reminders = await listScheduledSparFlowReminders();
+  await Promise.all(reminders.map((item) => cancelScheduledReminder(item.notificationId)));
+}
+
 export function subscribeToNotificationNavigation(onNavigate: (url: string) => void) {
   const subscription = Notifications.addNotificationResponseReceivedListener((response) => {
     const data = response.notification.request.content.data as Record<string, unknown> | undefined;

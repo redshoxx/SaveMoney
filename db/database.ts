@@ -14,6 +14,7 @@ import type {
 import { makeId } from '@/utils/money';
 
 let databasePromise: Promise<SQLite.SQLiteDatabase> | null = null;
+let databaseReadyPromise: Promise<void> | null = null;
 
 async function ensureColumn(db: SQLite.SQLiteDatabase, table: string, column: string, definition: string) {
   const rows = await db.getAllAsync<{ name: string }>(`PRAGMA table_info(${table})`);
@@ -22,16 +23,47 @@ async function ensureColumn(db: SQLite.SQLiteDatabase, table: string, column: st
   }
 }
 
-async function getDatabase() {
-  if (!databasePromise) databasePromise = SQLite.openDatabaseAsync('sparflow.db');
-  const db = await databasePromise;
+async function backfillDisplayNumbers(db: SQLite.SQLiteDatabase) {
+  const rows = await db.getAllAsync<{
+    kind: 'goal' | 'challenge';
+    id: string;
+    created_at: string;
+    display_number: number | null;
+  }>(`
+    SELECT 'goal' AS kind, id, created_at, display_number FROM goals
+    UNION ALL
+    SELECT 'challenge' AS kind, id, created_at, display_number FROM challenges
+    ORDER BY created_at ASC, id ASC
+  `);
 
+  let highest = rows.reduce((max, row) => Math.max(max, Number(row.display_number) || 0), 0);
+  const missing = rows.filter((row) => !Number(row.display_number));
+
+  if (missing.length) {
+    await db.withTransactionAsync(async () => {
+      for (const row of missing) {
+        highest += 1;
+        const table = row.kind === 'goal' ? 'goals' : 'challenges';
+        await db.runAsync(`UPDATE ${table} SET display_number = ? WHERE id = ?`, highest, row.id);
+      }
+    });
+  }
+
+  await db.runAsync(
+    `INSERT INTO app_counters (key, value) VALUES ('entity_number', ?)
+     ON CONFLICT(key) DO UPDATE SET value = MAX(value, excluded.value)`,
+    highest,
+  );
+}
+
+async function initializeDatabase(db: SQLite.SQLiteDatabase) {
   await db.execAsync(`
     PRAGMA journal_mode = WAL;
     PRAGMA foreign_keys = ON;
 
     CREATE TABLE IF NOT EXISTS goals (
       id TEXT PRIMARY KEY NOT NULL,
+      display_number INTEGER,
       title TEXT NOT NULL,
       target_amount REAL NOT NULL CHECK(target_amount > 0),
       saved_amount REAL NOT NULL DEFAULT 0 CHECK(saved_amount >= 0),
@@ -42,6 +74,7 @@ async function getDatabase() {
 
     CREATE TABLE IF NOT EXISTS challenges (
       id TEXT PRIMARY KEY NOT NULL,
+      display_number INTEGER,
       template_id TEXT,
       title TEXT NOT NULL,
       subtitle TEXT NOT NULL DEFAULT '',
@@ -86,23 +119,60 @@ async function getDatabase() {
       created_at TEXT NOT NULL
     );
 
-    CREATE INDEX IF NOT EXISTS idx_contributions_created_at ON contributions(created_at DESC);
-    CREATE INDEX IF NOT EXISTS idx_rules_goal ON saving_rules(goal_id);
+    CREATE TABLE IF NOT EXISTS app_counters (
+      key TEXT PRIMARY KEY NOT NULL,
+      value INTEGER NOT NULL DEFAULT 0
+    );
   `);
 
   await ensureColumn(db, 'goals', 'target_date', 'TEXT');
   await ensureColumn(db, 'goals', 'mode', "TEXT NOT NULL DEFAULT 'target'");
   await ensureColumn(db, 'goals', 'recurring_amount', 'REAL');
   await ensureColumn(db, 'goals', 'recurring_day', 'INTEGER');
+  await ensureColumn(db, 'goals', 'display_number', 'INTEGER');
   await ensureColumn(db, 'challenges', 'mode', "TEXT NOT NULL DEFAULT 'fixed'");
   await ensureColumn(db, 'challenges', 'duration_days', 'INTEGER');
+  await ensureColumn(db, 'challenges', 'display_number', 'INTEGER');
 
+  await db.runAsync(
+    "UPDATE goals SET target_date = substr(target_date, 1, 10) WHERE target_date IS NOT NULL AND instr(target_date, 'T') > 0",
+  );
+  await backfillDisplayNumbers(db);
+
+  await db.execAsync(`
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_goals_display_number ON goals(display_number) WHERE display_number IS NOT NULL;
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_challenges_display_number ON challenges(display_number) WHERE display_number IS NOT NULL;
+    CREATE INDEX IF NOT EXISTS idx_contributions_created_at ON contributions(created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_contributions_source ON contributions(source_type, source_id, created_at DESC);
+    CREATE INDEX IF NOT EXISTS idx_rules_goal ON saving_rules(goal_id);
+  `);
+}
+
+export async function getDatabase() {
+  if (!databasePromise) databasePromise = SQLite.openDatabaseAsync('sparflow.db');
+  const db = await databasePromise;
+  if (!databaseReadyPromise) {
+    databaseReadyPromise = initializeDatabase(db).catch((error) => {
+      databaseReadyPromise = null;
+      throw error;
+    });
+  }
+  await databaseReadyPromise;
   return db;
+}
+
+async function nextEntityNumber(db: SQLite.SQLiteDatabase) {
+  await db.runAsync("INSERT OR IGNORE INTO app_counters (key, value) VALUES ('entity_number', 0)");
+  await db.runAsync("UPDATE app_counters SET value = value + 1 WHERE key = 'entity_number'");
+  const row = await db.getFirstAsync<{ value: number }>("SELECT value FROM app_counters WHERE key = 'entity_number'");
+  if (!row) throw new Error('Interne Nummer konnte nicht erzeugt werden.');
+  return Number(row.value);
 }
 
 function mapGoal(row: Record<string, unknown>): Goal {
   return {
     id: String(row.id),
+    displayNumber: Number(row.display_number) || 0,
     title: String(row.title),
     mode: (row.mode ? String(row.mode) : 'target') as GoalMode,
     targetAmount: Number(row.target_amount),
@@ -119,6 +189,7 @@ function mapGoal(row: Record<string, unknown>): Goal {
 function mapChallenge(row: Record<string, unknown>): Challenge {
   return {
     id: String(row.id),
+    displayNumber: Number(row.display_number) || 0,
     templateId: row.template_id ? String(row.template_id) : null,
     title: String(row.title),
     subtitle: String(row.subtitle ?? ''),
@@ -203,20 +274,26 @@ export async function insertGoal(input: {
   const db = await getDatabase();
   const id = makeId('goal');
   const mode = input.mode ?? 'target';
-  await db.runAsync(
-    `INSERT INTO goals (id, title, mode, target_amount, saved_amount, recurring_amount, recurring_day, icon, color, target_date, created_at)
-     VALUES (?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)`,
-    id,
-    input.title.trim(),
-    mode,
-    input.targetAmount,
-    mode === 'recurring' ? input.recurringAmount ?? input.targetAmount : null,
-    mode === 'recurring' ? input.recurringDay ?? 1 : null,
-    input.icon,
-    input.color,
-    input.targetDate ?? null,
-    new Date().toISOString(),
-  );
+  const createdAt = new Date().toISOString();
+
+  await db.withTransactionAsync(async () => {
+    const displayNumber = await nextEntityNumber(db);
+    await db.runAsync(
+      `INSERT INTO goals (id, display_number, title, mode, target_amount, saved_amount, recurring_amount, recurring_day, icon, color, target_date, created_at)
+       VALUES (?, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?)`,
+      id,
+      displayNumber,
+      input.title.trim(),
+      mode,
+      input.targetAmount,
+      mode === 'recurring' ? input.recurringAmount ?? input.targetAmount : null,
+      mode === 'recurring' ? input.recurringDay ?? 1 : null,
+      input.icon,
+      input.color,
+      input.targetDate?.slice(0, 10) ?? null,
+      createdAt,
+    );
+  });
   return id;
 }
 
@@ -262,15 +339,20 @@ export async function insertChallenge(input: {
 }) {
   const db = await getDatabase();
   const id = makeId('challenge');
-  await db.runAsync(
-    `INSERT INTO challenges (
-      id, template_id, title, subtitle, target_amount, saved_amount, step_amount,
-      total_steps, completed_steps, mode, duration_days, icon, color, created_at, completed_at
-    ) VALUES (?, ?, ?, ?, ?, 0, ?, ?, 0, ?, ?, ?, ?, ?, NULL)`,
-    id, input.templateId ?? null, input.title.trim(), input.subtitle.trim(), input.targetAmount,
-    input.stepAmount, input.totalSteps, input.mode ?? 'fixed', input.durationDays ?? null,
-    input.icon, input.color, new Date().toISOString(),
-  );
+  const createdAt = new Date().toISOString();
+
+  await db.withTransactionAsync(async () => {
+    const displayNumber = await nextEntityNumber(db);
+    await db.runAsync(
+      `INSERT INTO challenges (
+        id, display_number, template_id, title, subtitle, target_amount, saved_amount, step_amount,
+        total_steps, completed_steps, mode, duration_days, icon, color, created_at, completed_at
+      ) VALUES (?, ?, ?, ?, ?, ?, 0, ?, ?, 0, ?, ?, ?, ?, ?, NULL)`,
+      id, displayNumber, input.templateId ?? null, input.title.trim(), input.subtitle.trim(), input.targetAmount,
+      input.stepAmount, input.totalSteps, input.mode ?? 'fixed', input.durationDays ?? null,
+      input.icon, input.color, createdAt,
+    );
+  });
   return id;
 }
 
@@ -290,7 +372,8 @@ export async function completeChallengeStep(challengeId: string, overrideAmount?
 
   await db.withTransactionAsync(async () => {
     await db.runAsync(
-      `UPDATE challenges SET saved_amount = MIN(target_amount, saved_amount + ?), completed_steps = completed_steps + 1,
+      `UPDATE challenges SET saved_amount = MIN(target_amount, saved_amount + ?),
+       completed_steps = MIN(total_steps, completed_steps + 1),
        completed_at = COALESCE(?, completed_at) WHERE id = ?`,
       applied, completedAt, challengeId,
     );
