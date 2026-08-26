@@ -195,7 +195,6 @@ function AddTodoModal({ visible, onClose, onCreated }: { visible: boolean; onClo
                       value={selectedDate}
                       mode="time"
                       display={process.env.EXPO_OS === 'ios' ? 'compact' : 'default'}
-                      minuteInterval={5}
                       locale="de-AT"
                       accentColor={colors.primary}
                       onValueChange={(_, next) => {
