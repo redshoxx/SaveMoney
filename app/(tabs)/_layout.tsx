@@ -1,5 +1,6 @@
-import { Tabs } from 'expo-router';
+import { router, Tabs } from 'expo-router';
 import type { ColorValue } from 'react-native';
+import { View } from 'react-native';
 
 import { Symbol } from '@/components/ui';
 import { colors } from '@/constants/theme';
@@ -18,10 +19,12 @@ export default function TabsLayout() {
         tabBarInactiveTintColor: colors.textMuted,
         tabBarStyle: {
           backgroundColor: colors.surface,
-          borderTopColor: colors.border,
-          paddingTop: 4,
+          borderTopColor: `${colors.primary}38`,
+          borderTopWidth: 1,
+          paddingTop: 5,
+          boxShadow: `0 -8px 28px ${colors.glow}`,
         },
-        tabBarItemStyle: { minHeight: 44 },
+        tabBarItemStyle: { minHeight: 46 },
         tabBarLabelStyle: { fontSize: 9.5, fontWeight: '800' },
       }}
     >
@@ -34,13 +37,41 @@ export default function TabsLayout() {
         options={{ title: 'Sparen', tabBarIcon: ({ color }) => <Symbol name="target" size={18} color={tabIconColor(color)} /> }}
       />
       <Tabs.Screen
-        name="challenges"
-        options={{ title: 'Challenges', tabBarIcon: ({ color }) => <Symbol name="flag.fill" size={18} color={tabIconColor(color)} /> }}
+        name="quick"
+        listeners={{
+          tabPress: (event) => {
+            event.preventDefault();
+            router.push('/actions');
+          },
+        }}
+        options={{
+          title: '',
+          tabBarLabel: () => null,
+          tabBarIcon: () => (
+            <View
+              style={{
+                width: 48,
+                height: 48,
+                marginTop: -14,
+                borderRadius: 24,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: colors.primary,
+                borderWidth: 1,
+                borderColor: `${colors.primaryDark}85`,
+                boxShadow: `0 0 22px ${colors.primary}`,
+              }}
+            >
+              <Symbol name="plus" size={20} color="#FFFFFF" />
+            </View>
+          ),
+        }}
       />
       <Tabs.Screen
-        name="settings"
-        options={{ title: 'Einstellungen', tabBarIcon: ({ color }) => <Symbol name="gearshape.fill" size={18} color={tabIconColor(color)} /> }}
+        name="challenges"
+        options={{ title: 'Challenges', tabBarIcon: ({ color }) => <Symbol name="trophy.fill" size={18} color={tabIconColor(color)} /> }}
       />
+      <Tabs.Screen name="settings" options={{ href: null }} />
     </Tabs>
   );
 }
