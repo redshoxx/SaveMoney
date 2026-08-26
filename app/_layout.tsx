@@ -25,10 +25,10 @@ class ReleaseErrorBoundary extends Component<{ children: ReactNode }, { failed: 
         <View style={{ width: 52, height: 52, borderRadius: 18, backgroundColor: colors.dangerSoft, alignItems: 'center', justifyContent: 'center' }}>
           <Text style={{ color: colors.danger, fontSize: 24, fontWeight: '900' }}>!</Text>
         </View>
-        <Text style={{ color: colors.text, fontSize: 21, fontWeight: '800', textAlign: 'center' }}>SparFlow konnte diese Ansicht nicht laden.</Text>
-        <Text style={{ color: colors.textMuted, fontSize: 14, lineHeight: 20, textAlign: 'center' }}>Deine lokalen Spar-Daten wurden dadurch nicht gelöscht. Du kannst die Oberfläche erneut laden.</Text>
+        <Text selectable style={{ color: colors.text, fontSize: 21, fontWeight: '800', textAlign: 'center' }}>SparFlow konnte diese Ansicht nicht laden.</Text>
+        <Text selectable style={{ color: colors.textMuted, fontSize: 14, lineHeight: 20, textAlign: 'center' }}>Deine lokalen Spar-Daten wurden dadurch nicht gelöscht. Du kannst die Oberfläche erneut laden.</Text>
         <Pressable accessibilityRole="button" onPress={() => this.setState({ failed: false })} style={({ pressed }) => ({ minHeight: 48, paddingHorizontal: 20, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.76 : 1 })}>
-          <Text style={{ color: '#FFFFFF', fontWeight: '800' }}>Erneut versuchen</Text>
+          <Text selectable style={{ color: '#FFFFFF', fontWeight: '800' }}>Erneut versuchen</Text>
         </Pressable>
       </View>
     );
@@ -73,11 +73,12 @@ function RootNavigator() {
         <Stack.Screen name="index" options={{ headerShown: false }} />
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="settings" options={{ title: 'Einstellungen' }} />
-        <Stack.Screen name="actions" options={{ title: 'Schnellaktionen', presentation: 'modal' }} />
-        <Stack.Screen name="save" options={{ title: 'Betrag ändern', presentation: 'modal' }} />
-        <Stack.Screen name="goal-detail" options={{ title: 'Ziel Detail' }} />
-        <Stack.Screen name="month-details" options={{ title: 'Monatsdetails' }} />
-        <Stack.Screen name="add-goal" options={{ title: 'Neuer Sparbereich', presentation: 'modal' }} />
+        <Stack.Screen name="reminders" options={{ title: 'Erinnerungen' }} />
+        <Stack.Screen name="actions" options={{ title: 'Weitere Funktionen', presentation: 'modal' }} />
+        <Stack.Screen name="save" options={{ title: 'Sparen', presentation: 'modal' }} />
+        <Stack.Screen name="goal-detail" options={{ title: 'Ziel' }} />
+        <Stack.Screen name="month-details" options={{ title: 'Monatsplan' }} />
+        <Stack.Screen name="add-goal" options={{ title: 'Neues Ziel', presentation: 'modal' }} />
         <Stack.Screen name="add-challenge" options={{ title: 'Eigene Challenge', presentation: 'modal' }} />
         <Stack.Screen name="achievements" options={{ title: 'Erfolge' }} />
         <Stack.Screen name="statistics" options={{ title: 'Statistiken' }} />
