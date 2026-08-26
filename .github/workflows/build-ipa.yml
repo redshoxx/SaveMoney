@@ -52,7 +52,7 @@ jobs:
           NODE
           echo "version=$VERSION" >> "$GITHUB_OUTPUT"
           echo "build_number=$BUILD_NUMBER" >> "$GITHUB_OUTPUT"
-          echo "SparFlow $VERSION ($BUILD_NUMBER)"
+          echo "SparPilot $VERSION ($BUILD_NUMBER)"
 
       - name: Install dependencies
         shell: bash
@@ -94,10 +94,15 @@ jobs:
 
       - name: Build unsigned device app
         working-directory: ios
+        shell: bash
         run: |
+          WORKSPACE=$(find . -maxdepth 1 -name '*.xcworkspace' -print -quit)
+          test -n "$WORKSPACE"
+          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          echo "Building workspace $WORKSPACE with scheme $SCHEME"
           xcodebuild \
-            -workspace SparFlow.xcworkspace \
-            -scheme SparFlow \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
             -configuration Release \
             -sdk iphoneos \
             -derivedDataPath build \
@@ -108,19 +113,20 @@ jobs:
 
       - name: Package IPA
         working-directory: ios
+        shell: bash
         run: |
-          APP_PATH="build/Build/Products/Release-iphoneos/SparFlow.app"
-          test -d "$APP_PATH"
+          APP_PATH=$(find build/Build/Products/Release-iphoneos -maxdepth 1 -name '*.app' -print -quit)
+          test -n "$APP_PATH"
           rm -rf Payload SparFlow.ipa
           mkdir Payload
-          cp -R "$APP_PATH" Payload/SparFlow.app
+          cp -R "$APP_PATH" Payload/SparPilot.app
           zip -qry SparFlow.ipa Payload
           mv SparFlow.ipa ../SparFlow.ipa
 
       - name: Upload IPA artifact
         uses: actions/upload-artifact@v6
         with:
-          name: SparFlow-SideStore-IPA
+          name: SparPilot-SideStore-IPA
           path: SparFlow.ipa
           if-no-files-found: error
 
@@ -140,7 +146,8 @@ jobs:
           AUTO_TAG="sidestore-latest"
           cp assets/icon.png SparFlow-icon.png
           gh release view "$AUTO_TAG" >/dev/null 2>&1 || \
-            gh release create "$AUTO_TAG" --title "SparFlow SideStore Auto Update" --notes "Latest automatic SideStore build."
+            gh release create "$AUTO_TAG" --title "SparPilot SideStore Auto Update" --notes "Latest automatic SideStore build."
+          gh release edit "$AUTO_TAG" --title "SparPilot SideStore Auto Update" --notes "Latest automatic SideStore build of SparPilot."
           gh release upload "$AUTO_TAG" SparFlow.ipa SparFlow-icon.png --clobber
 
           export IPA_SIZE=$(stat -f%z SparFlow.ipa)
@@ -152,11 +159,14 @@ jobs:
           node - <<'NODE'
           const fs = require('fs');
           const source = JSON.parse(fs.readFileSync('sidestore-source.live.json', 'utf8'));
+          source.name = 'SparPilot';
           const app = source.apps[0];
+          app.name = 'SparPilot';
+          app.localizedDescription = 'Lokale Spar-App mit klaren Zielen, Aufgaben, Challenges und Erinnerungen. Einfach sparen, ohne Account und ohne Cloud-Zwang.';
           const next = {
             version: process.env.VERSION,
             date: process.env.RELEASE_DATE,
-            localizedDescription: `SparFlow ${process.env.VERSION} mit To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges im neuen 4.1-Design.`,
+            localizedDescription: `SparPilot ${process.env.VERSION} mit neuem Sparschwein-Icon, klarer geführter Oberfläche, To-Dos sowie Erinnerungen für Sparziele und Challenges.`,
             downloadURL: process.env.DOWNLOAD_URL,
             size: Number(process.env.IPA_SIZE),
             minOSVersion: '16.4'
@@ -203,5 +213,5 @@ jobs:
           TAG="${GITHUB_REF_NAME}"
           cp assets/icon.png SparFlow-icon.png
           gh release view "$TAG" >/dev/null 2>&1 || \
-            gh release create "$TAG" --title "SparFlow $TAG" --notes "Unsigned iPhone IPA for SideStore sideloading."
+            gh release create "$TAG" --title "SparPilot $TAG" --notes "Unsigned iPhone IPA for SideStore sideloading."
           gh release upload "$TAG" SparFlow.ipa SparFlow-icon.png --clobber
