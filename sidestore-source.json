@@ -1,19 +1,19 @@
 {
-  "name": "SparFlow",
+  "name": "SparPilot",
   "identifier": "com.redshoxx.sparflow.source",
   "sourceURL": "https://raw.githubusercontent.com/redshoxx/SaveMoney/main/sidestore-source.json",
   "apps": [
     {
-      "name": "SparFlow",
+      "name": "SparPilot",
       "bundleIdentifier": "com.redshoxx.sparflow",
       "developerName": "redshoxx",
-      "localizedDescription": "Lokale Spar-App mit Zielen, Challenges, Streaks, XP, Statistiken, Sparregeln und spielerischem Sparen.",
+      "localizedDescription": "Lokale Spar-App mit klaren Zielen, Aufgaben, Challenges und Erinnerungen. Einfach sparen, ohne Account und ohne Cloud-Zwang.",
       "iconURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow-icon.png",
       "versions": [
         {
           "version": "4.1.0",
           "date": "2026-08-26T13:55:27Z",
-          "localizedDescription": "SparFlow 4.1.0 mit To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges im neuen 4.1-Design.",
+          "localizedDescription": "SparPilot 4.1.0 mit klar geführter Oberfläche, To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges. Das neue Sparschwein-Icon macht die Sparfunktion sofort erkennbar.",
           "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
           "size": 13855904,
           "minOSVersion": "16.4"
@@ -109,7 +109,7 @@
       ],
       "version": "4.1.0",
       "versionDate": "2026-08-26T13:55:27Z",
-      "versionDescription": "SparFlow 4.1.0 mit To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges im neuen 4.1-Design.",
+      "versionDescription": "SparPilot 4.1.0 mit klar geführter Oberfläche, To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges. Das neue Sparschwein-Icon macht die Sparfunktion sofort erkennbar.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
       "size": 13855904
     }

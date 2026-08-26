@@ -24,7 +24,7 @@ Notifications.setNotificationHandler({
 export async function configureLocalNotifications() {
   if (process.env.EXPO_OS === 'android') {
     await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-      name: 'SparFlow Erinnerungen',
+      name: 'SparPilot Erinnerungen',
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 150, 250],
       sound: 'default',
@@ -76,7 +76,7 @@ export async function scheduleLocalReminder(input: {
   await configureLocalNotifications();
   const granted = await requestNotificationPermission();
   if (!granted) {
-    throw new Error('Benachrichtigungen sind deaktiviert. Aktiviere sie in den iPhone-Einstellungen für SparFlow.');
+    throw new Error('Benachrichtigungen sind deaktiviert. Aktiviere sie in den iPhone-Einstellungen für SparPilot.');
   }
 
   await cancelRemindersForSource(input.kind, input.sourceId);
@@ -122,7 +122,7 @@ export async function listScheduledSparFlowReminders(): Promise<ScheduledSparFlo
       kind,
       sourceId,
       scheduledFor,
-      title: request.content.title ?? 'SparFlow Erinnerung',
+      title: request.content.title ?? 'SparPilot Erinnerung',
     }];
   });
 }

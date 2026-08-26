@@ -108,7 +108,7 @@ export default function HomeScreen() {
 
   if (store.goals.length === 0) {
     nextTitle = 'Lege zuerst ein Sparziel an';
-    nextBody = 'Dann weiß SparFlow, wofür du sparen möchtest und kann dir den nächsten Schritt zeigen.';
+    nextBody = 'Dann weiß SparPilot, wofür du sparen möchtest und kann dir den nächsten Schritt zeigen.';
     nextLabel = 'Erstes Ziel anlegen';
     nextIcon = 'target';
     nextColor = colors.primary;
@@ -154,7 +154,7 @@ export default function HomeScreen() {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
         <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
           <Text selectable style={{ color: colors.text, fontSize: 24, fontWeight: '900', letterSpacing: -0.7 }}>Heute</Text>
-          <Text selectable style={{ color: colors.textMuted, fontSize: 11 }}>SparFlow zeigt dir nur, was jetzt wichtig ist.</Text>
+          <Text selectable style={{ color: colors.textMuted, fontSize: 11 }}>SparPilot zeigt dir nur, was jetzt wichtig ist.</Text>
         </View>
         <HeaderIconButton name="bell" onPress={() => router.push('/reminders')} />
         <HeaderIconButton name="gearshape.fill" onPress={() => router.push('/settings')} />
