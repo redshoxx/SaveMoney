@@ -1,6 +1,7 @@
+import DateTimePicker from '@expo/ui/community/datetime-picker';
 import { useLocalSearchParams } from 'expo-router';
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { Alert, KeyboardAvoidingView, Linking, Modal, Pressable, ScrollView, Text, TextInput, View } from 'react-native';
+import { Alert, Linking, Modal, Pressable, ScrollView, Text, View } from 'react-native';
 import Animated, { FadeInDown, LinearTransition } from 'react-native-reanimated';
 
 import { Symbol } from '@/components/ui';
@@ -28,18 +29,6 @@ type ReminderTarget = {
   suggestedDate: Date | null;
 };
 
-function pad(value: number) {
-  return String(value).padStart(2, '0');
-}
-
-function dateInput(date: Date) {
-  return `${pad(date.getDate())}.${pad(date.getMonth() + 1)}.${date.getFullYear()}`;
-}
-
-function timeInput(date: Date) {
-  return `${pad(date.getHours())}:${pad(date.getMinutes())}`;
-}
-
 function futureDate(days: number, hour = 9) {
   const value = new Date();
   value.setDate(value.getDate() + days);
@@ -48,23 +37,27 @@ function futureDate(days: number, hour = 9) {
   return value;
 }
 
-function parseDateTime(dateValue: string, timeValue: string) {
-  const dateMatch = dateValue.trim().match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
-  const timeMatch = timeValue.trim().match(/^(\d{1,2}):(\d{2})$/);
-  if (!dateMatch || !timeMatch) return null;
-  const day = Number(dateMatch[1]);
-  const month = Number(dateMatch[2]);
-  const year = Number(dateMatch[3]);
-  const hour = Number(timeMatch[1]);
-  const minute = Number(timeMatch[2]);
-  if (month < 1 || month > 12 || day < 1 || day > 31 || hour > 23 || minute > 59) return null;
-  const result = new Date(year, month - 1, day, hour, minute, 0, 0);
-  if (result.getFullYear() !== year || result.getMonth() !== month - 1 || result.getDate() !== day) return null;
-  return result;
+function mergeDatePart(current: Date, next: Date) {
+  const value = new Date(current);
+  value.setFullYear(next.getFullYear(), next.getMonth(), next.getDate());
+  return value;
+}
+
+function mergeTimePart(current: Date, next: Date) {
+  const value = new Date(current);
+  value.setHours(next.getHours(), next.getMinutes(), 0, 0);
+  return value;
 }
 
 function reminderLabel(value: string) {
-  return new Intl.DateTimeFormat('de-AT', { weekday: 'short', day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }).format(new Date(value));
+  return new Intl.DateTimeFormat('de-AT', {
+    weekday: 'short',
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  }).format(new Date(value));
 }
 
 function goalSuggestedDate(goal: Goal) {
@@ -92,26 +85,20 @@ function challengeSuggestedDate(challenge: Challenge) {
 
 function ReminderEditor({ target, existing, onClose, onChanged }: { target: ReminderTarget | null; existing: ScheduledSparFlowReminder | null; onClose: () => void; onChanged: () => Promise<void> }) {
   const initial = existing ? new Date(existing.scheduledFor) : target?.suggestedDate ?? futureDate(1);
-  const [dateText, setDateText] = useState(dateInput(initial));
-  const [timeText, setTimeText] = useState(timeInput(initial));
+  const [selectedDate, setSelectedDate] = useState(initial);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
     const next = existing ? new Date(existing.scheduledFor) : target?.suggestedDate ?? futureDate(1);
-    setDateText(dateInput(next));
-    setTimeText(timeInput(next));
+    setSelectedDate(next);
   }, [existing, target]);
 
   if (!target) return null;
 
-  const setPreset = (value: Date) => {
-    setDateText(dateInput(value));
-    setTimeText(timeInput(value));
-  };
+  const setPreset = (value: Date) => setSelectedDate(new Date(value));
 
   const save = async () => {
-    const date = parseDateTime(dateText, timeText);
-    if (!date || date.getTime() <= Date.now() + 3_000) {
+    if (!Number.isFinite(selectedDate.getTime()) || selectedDate.getTime() <= Date.now() + 3_000) {
       Alert.alert('Erinnerung', 'Bitte wähle einen Zeitpunkt in der Zukunft.');
       return;
     }
@@ -122,7 +109,7 @@ function ReminderEditor({ target, existing, onClose, onChanged }: { target: Remi
         sourceId: target.id,
         title: target.kind === 'goal' ? `Sparziel ${formatEntityNumber(target.displayNumber)}: ${target.title}` : `Challenge ${formatEntityNumber(target.displayNumber)}: ${target.title}`,
         body: target.kind === 'goal' ? 'Zeit für einen kleinen Schritt zu deinem Sparziel.' : 'Deine Challenge wartet auf den nächsten Schritt.',
-        date,
+        date: selectedDate,
         url: target.kind === 'goal' ? '/(tabs)/goals' : '/(tabs)/challenges',
       });
       await onChanged();
@@ -147,64 +134,106 @@ function ReminderEditor({ target, existing, onClose, onChanged }: { target: Remi
 
   return (
     <Modal visible transparent animationType="slide" onRequestClose={onClose}>
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={process.env.EXPO_OS === 'ios' ? 'padding' : undefined}>
-        <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.52)', justifyContent: 'flex-end' }}>
-          <View style={{ maxHeight: '88%', borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 24 }}>
-            <View style={{ width: 42, height: 5, borderRadius: 999, backgroundColor: colors.border, alignSelf: 'center', marginBottom: 12 }} />
-            <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={{ gap: 14 }}>
-              <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-                <View style={{ width: 40, height: 40, borderRadius: 13, backgroundColor: `${target.color}18`, alignItems: 'center', justifyContent: 'center' }}><Symbol name={target.icon} size={17} color={target.color} /></View>
-                <View style={{ flex: 1, gap: 2 }}>
-                  <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 14, fontWeight: '900' }}>{target.title}</Text>
-                  <Text selectable style={{ color: colors.primaryDark, fontSize: 10.5, fontWeight: '800' }}>{formatEntityNumber(target.displayNumber)}</Text>
-                </View>
-                <Pressable onPress={onClose} style={{ width: 40, height: 40, alignItems: 'center', justifyContent: 'center' }}><Symbol name="xmark" size={13} color={colors.textMuted} /></Pressable>
+      <View style={{ flex: 1, backgroundColor: 'rgba(0,0,0,0.52)', justifyContent: 'flex-end' }}>
+        <View style={{ maxHeight: '92%', borderTopLeftRadius: 24, borderTopRightRadius: 24, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 16, paddingTop: 10, paddingBottom: 24 }}>
+          <View style={{ width: 42, height: 5, borderRadius: 999, backgroundColor: colors.border, alignSelf: 'center', marginBottom: 12 }} />
+          <ScrollView contentContainerStyle={{ gap: 14 }}>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+              <View style={{ width: 40, height: 40, borderRadius: 13, backgroundColor: `${target.color}18`, alignItems: 'center', justifyContent: 'center' }}><Symbol name={target.icon} size={17} color={target.color} /></View>
+              <View style={{ flex: 1, gap: 2 }}>
+                <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 14, fontWeight: '900' }}>{target.title}</Text>
+                <Text selectable style={{ color: colors.primaryDark, fontSize: 10.5, fontWeight: '800' }}>{formatEntityNumber(target.displayNumber)}</Text>
               </View>
+              <Pressable accessibilityLabel="Erinnerung schließen" onPress={onClose} style={({ pressed }) => ({ width: 42, height: 42, borderRadius: 13, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.62 : 1 })}><Symbol name="xmark" size={13} color={colors.textMuted} /></Pressable>
+            </View>
 
-              <View style={{ gap: 7 }}>
-                <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Schnell wählen</Text>
-                <View style={{ flexDirection: 'row', gap: 7 }}>
-                  {[
-                    ['Morgen', futureDate(1)],
-                    ['3 Tage', futureDate(3)],
-                    ['1 Woche', futureDate(7)],
-                  ].map(([label, value]) => (
-                    <Pressable key={String(label)} onPress={() => setPreset(value as Date)} style={({ pressed }) => ({ flex: 1, minHeight: 42, borderRadius: 12, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.7 : 1 })}>
-                      <Text selectable style={{ color: colors.text, fontSize: 10.5, fontWeight: '800' }}>{String(label)}</Text>
-                    </Pressable>
-                  ))}
-                </View>
-                {target.suggestedDate ? (
-                  <Pressable onPress={() => setPreset(target.suggestedDate as Date)} style={({ pressed }) => ({ minHeight: 42, borderRadius: 12, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.7 : 1 })}>
-                    <Text selectable style={{ color: colors.primaryDark, fontSize: 11, fontWeight: '900' }}>Passenden Termin übernehmen</Text>
+            <View style={{ gap: 7 }}>
+              <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Schnell wählen</Text>
+              <View style={{ flexDirection: 'row', gap: 7 }}>
+                {[
+                  ['Morgen', futureDate(1)],
+                  ['3 Tage', futureDate(3)],
+                  ['1 Woche', futureDate(7)],
+                ].map(([label, value]) => (
+                  <Pressable key={String(label)} onPress={() => setPreset(value as Date)} style={({ pressed }) => ({ flex: 1, minHeight: 44, borderRadius: 12, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.7 : 1 })}>
+                    <Text selectable style={{ color: colors.text, fontSize: 10.5, fontWeight: '800' }}>{String(label)}</Text>
                   </Pressable>
-                ) : null}
+                ))}
               </View>
-
-              <View style={{ gap: 7 }}>
-                <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Datum und Uhrzeit</Text>
-                <View style={{ flexDirection: 'row', gap: 8 }}>
-                  <TextInput value={dateText} onChangeText={setDateText} placeholder="TT.MM.JJJJ" placeholderTextColor={colors.textMuted} style={{ flex: 1, minHeight: 48, borderRadius: 13, backgroundColor: colors.surfaceMuted, paddingHorizontal: 12, color: colors.text, fontSize: 16 }} />
-                  <TextInput value={timeText} onChangeText={setTimeText} placeholder="09:00" placeholderTextColor={colors.textMuted} style={{ width: 98, minHeight: 48, borderRadius: 13, backgroundColor: colors.surfaceMuted, paddingHorizontal: 12, color: colors.text, fontSize: 16 }} />
-                </View>
-              </View>
-
-              {existing ? <Text selectable style={{ color: colors.textMuted, fontSize: 10.5 }}>Aktuell: {reminderLabel(existing.scheduledFor)}</Text> : null}
-
-              <View style={{ flexDirection: 'row', gap: 8 }}>
-                {existing ? (
-                  <Pressable disabled={saving} onPress={() => void remove()} style={({ pressed }) => ({ flex: 1, minHeight: 48, borderRadius: 14, borderWidth: 1, borderColor: colors.danger, alignItems: 'center', justifyContent: 'center', opacity: saving || pressed ? 0.58 : 1 })}>
-                    <Text selectable style={{ color: colors.danger, fontWeight: '800' }}>Entfernen</Text>
-                  </Pressable>
-                ) : null}
-                <Pressable disabled={saving} onPress={() => void save()} style={({ pressed }) => ({ flex: 1, minHeight: 48, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', opacity: saving || pressed ? 0.72 : 1 })}>
-                  <Text selectable style={{ color: '#FFFFFF', fontWeight: '900' }}>{saving ? 'Speichert …' : existing ? 'Änderung speichern' : 'Erinnerung setzen'}</Text>
+              {target.suggestedDate ? (
+                <Pressable onPress={() => setPreset(target.suggestedDate as Date)} style={({ pressed }) => ({ minHeight: 44, borderRadius: 12, backgroundColor: colors.primarySoft, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, opacity: pressed ? 0.7 : 1 })}>
+                  <Symbol name="sparkles" size={12} color={colors.primaryDark} />
+                  <Text selectable style={{ color: colors.primaryDark, fontSize: 11, fontWeight: '900' }}>Passenden Termin übernehmen</Text>
                 </Pressable>
+              ) : null}
+            </View>
+
+            <View style={{ gap: 8 }}>
+              <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Datum und Uhrzeit</Text>
+              <View style={{ borderRadius: 16, backgroundColor: colors.surfaceMuted, overflow: 'hidden' }}>
+                <View style={{ minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12 }}>
+                  <View style={{ width: 34, height: 34, borderRadius: 11, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}><Symbol name="calendar" size={14} color={colors.primaryDark} /></View>
+                  <View style={{ flex: 1, gap: 1 }}>
+                    <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Datum</Text>
+                    <Text selectable style={{ color: colors.textMuted, fontSize: 9.5 }}>Antippen und im Kalender auswählen</Text>
+                  </View>
+                  <DateTimePicker
+                    value={selectedDate}
+                    mode="date"
+                    display={process.env.EXPO_OS === 'ios' ? 'compact' : 'default'}
+                    minimumDate={new Date()}
+                    locale="de-AT"
+                    accentColor={colors.primary}
+                    onValueChange={(_, next) => {
+                      if (next) setSelectedDate((current) => mergeDatePart(current, next));
+                    }}
+                    style={{ minWidth: 116 }}
+                  />
+                </View>
+                <View style={{ height: 1, backgroundColor: colors.border, marginLeft: 56 }} />
+                <View style={{ minHeight: 58, flexDirection: 'row', alignItems: 'center', gap: 10, paddingHorizontal: 12 }}>
+                  <View style={{ width: 34, height: 34, borderRadius: 11, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' }}><Symbol name="clock.fill" size={14} color={colors.primaryDark} /></View>
+                  <View style={{ flex: 1, gap: 1 }}>
+                    <Text selectable style={{ color: colors.text, fontSize: 12, fontWeight: '800' }}>Uhrzeit</Text>
+                    <Text selectable style={{ color: colors.textMuted, fontSize: 9.5 }}>Antippen und Uhrzeit auswählen</Text>
+                  </View>
+                  <DateTimePicker
+                    value={selectedDate}
+                    mode="time"
+                    display={process.env.EXPO_OS === 'ios' ? 'compact' : 'default'}
+                    locale="de-AT"
+                    accentColor={colors.primary}
+                    onValueChange={(_, next) => {
+                      if (next) setSelectedDate((current) => mergeTimePart(current, next));
+                    }}
+                    style={{ minWidth: 92 }}
+                  />
+                </View>
               </View>
-            </ScrollView>
-          </View>
+              <View style={{ minHeight: 45, borderRadius: 13, backgroundColor: colors.primarySoft, paddingHorizontal: 12, flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+                <Symbol name="bell.fill" size={12} color={colors.primaryDark} />
+                <View style={{ flex: 1, gap: 1 }}>
+                  <Text selectable style={{ color: colors.textMuted, fontSize: 8.5, fontWeight: '800' }}>ERINNERUNG</Text>
+                  <Text selectable style={{ color: colors.text, fontSize: 11.5, fontWeight: '800' }}>{reminderLabel(selectedDate.toISOString())}</Text>
+                </View>
+              </View>
+            </View>
+
+            {existing ? <Text selectable style={{ color: colors.textMuted, fontSize: 10 }}>Bisher: {reminderLabel(existing.scheduledFor)}</Text> : null}
+
+            <View style={{ flexDirection: 'row', gap: 8 }}>
+              {existing ? (
+                <Pressable disabled={saving} onPress={() => void remove()} style={({ pressed }) => ({ flex: 1, minHeight: 50, borderRadius: 14, borderWidth: 1, borderColor: colors.danger, alignItems: 'center', justifyContent: 'center', opacity: saving || pressed ? 0.58 : 1 })}>
+                  <Text selectable style={{ color: colors.danger, fontWeight: '800', fontSize: 12.5 }}>Entfernen</Text>
+                </Pressable>
+              ) : null}
+              <Pressable disabled={saving} onPress={() => void save()} style={({ pressed }) => ({ flex: 1, minHeight: 50, borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 10, opacity: saving || pressed ? 0.72 : 1 })}>
+                <Text selectable numberOfLines={1} adjustsFontSizeToFit style={{ color: '#FFFFFF', fontWeight: '900', fontSize: 13 }}>{saving ? 'Speichert …' : existing ? 'Änderung speichern' : 'Erinnerung setzen'}</Text>
+              </Pressable>
+            </View>
+          </ScrollView>
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </Modal>
   );
 }
