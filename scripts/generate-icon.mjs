@@ -4,8 +4,10 @@ import zlib from 'node:zlib';
 
 const WIDTH = 1024;
 const HEIGHT = 1024;
-const BG = [23, 62, 43];
-const FG = [244, 248, 245];
+const BG = [12, 18, 25];
+const PIG = [215, 238, 222];
+const COIN = [246, 194, 71];
+const DETAIL = [22, 48, 40];
 
 function crc32(buffer) {
   let crc = 0xffffffff;
@@ -27,6 +29,10 @@ function chunk(type, data) {
   return Buffer.concat([length, typeBuffer, data, crc]);
 }
 
+function insideEllipse(x, y, cx, cy, rx, ry) {
+  return ((x - cx) ** 2) / (rx ** 2) + ((y - cy) ** 2) / (ry ** 2) <= 1;
+}
+
 function insideRoundedRect(x, y, left, top, right, bottom, radius) {
   if (x >= left + radius && x <= right - radius && y >= top && y <= bottom) return true;
   if (y >= top + radius && y <= bottom - radius && x >= left && x <= right) return true;
@@ -39,41 +45,62 @@ function insideRoundedRect(x, y, left, top, right, bottom, radius) {
   return corners.some(([cx, cy]) => (x - cx) ** 2 + (y - cy) ** 2 <= radius ** 2);
 }
 
+function pointInTriangle(px, py, [ax, ay], [bx, by], [cx, cy]) {
+  const d1 = (px - bx) * (ay - by) - (ax - bx) * (py - by);
+  const d2 = (px - cx) * (by - cy) - (bx - cx) * (py - cy);
+  const d3 = (px - ax) * (cy - ay) - (cx - ax) * (py - ay);
+  const hasNegative = d1 < 0 || d2 < 0 || d3 < 0;
+  const hasPositive = d1 > 0 || d2 > 0 || d3 > 0;
+  return !(hasNegative && hasPositive);
+}
+
 function distanceToSegment(px, py, x1, y1, x2, y2) {
   const dx = x2 - x1;
   const dy = y2 - y1;
   const lengthSquared = dx * dx + dy * dy;
-  const t = lengthSquared === 0
-    ? 0
-    : Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lengthSquared));
+  const t = lengthSquared === 0 ? 0 : Math.max(0, Math.min(1, ((px - x1) * dx + (py - y1) * dy) / lengthSquared));
   return Math.hypot(px - (x1 + t * dx), py - (y1 + t * dy));
 }
 
-function pointInTriangle(px, py, [ax, ay], [bx, by], [cx, cy]) {
-  const s1 = (px - cx) * (ay - cy) - (ax - cx) * (py - cy);
-  const s2 = (px - ax) * (by - ay) - (bx - ax) * (py - ay);
-  const s3 = (px - bx) * (cy - by) - (cx - bx) * (py - by);
-  const hasNegative = s1 < 0 || s2 < 0 || s3 < 0;
-  const hasPositive = s1 > 0 || s2 > 0 || s3 > 0;
-  return !(hasNegative && hasPositive);
+function pigShape(x, y) {
+  const body = insideEllipse(x, y, 535, 585, 270, 190);
+  const head = insideEllipse(x, y, 300, 570, 135, 120);
+  const snout = insideRoundedRect(x, y, 145, 545, 275, 625, 38);
+  const ear = pointInTriangle(x, y, [250, 485], [300, 360], [365, 485]);
+  const frontLeg = insideRoundedRect(x, y, 355, 700, 455, 835, 28);
+  const rearLeg = insideRoundedRect(x, y, 610, 700, 710, 835, 28);
+  const tailStem = distanceToSegment(x, y, 775, 550, 835, 505) <= 18;
+  const tailRing = Math.abs(Math.hypot(x - 850, y - 500) - 45) <= 15 && x >= 835;
+  return body || head || snout || ear || frontLeg || rearLeg || tailStem || tailRing;
 }
 
-function isForeground(x, y) {
-  const bars = [
-    [260, 600, 360, 760, 28],
-    [420, 500, 520, 760, 28],
-    [580, 380, 680, 760, 28],
-  ];
-  if (bars.some(([left, top, right, bottom, radius]) => insideRoundedRect(x, y, left, top, right, bottom, radius))) {
-    return true;
+function euroMark(x, y) {
+  const arcDistance = Math.abs(Math.hypot(x - 530, y - 250) - 48);
+  const arc = arcDistance <= 12 && x <= 552;
+  const upper = x >= 495 && x <= 570 && y >= 226 && y <= 240;
+  const lower = x >= 495 && x <= 570 && y >= 258 && y <= 272;
+  return arc || upper || lower;
+}
+
+function pixelColor(x, y) {
+  const coinOuter = insideEllipse(x, y, 535, 250, 118, 118);
+  const coinInner = insideEllipse(x, y, 535, 250, 96, 96);
+  const pig = pigShape(x, y);
+
+  if (coinOuter) {
+    if (!coinInner) return PIG;
+    if (euroMark(x, y)) return DETAIL;
+    return COIN;
   }
 
-  const trend = [[245, 485], [405, 370], [525, 430], [735, 255]];
-  for (let index = 0; index < trend.length - 1; index += 1) {
-    if (distanceToSegment(x, y, ...trend[index], ...trend[index + 1]) <= 28) return true;
+  if (pig) {
+    const slot = insideRoundedRect(x, y, 430, 392, 640, 426, 17);
+    const eye = insideEllipse(x, y, 265, 548, 15, 15);
+    if (slot || eye) return DETAIL;
+    return PIG;
   }
 
-  return pointInTriangle(x, y, [735, 255], [640, 272], [705, 345]);
+  return BG;
 }
 
 const raw = Buffer.alloc((WIDTH * 3 + 1) * HEIGHT);
@@ -81,7 +108,7 @@ let offset = 0;
 for (let y = 0; y < HEIGHT; y += 1) {
   raw[offset++] = 0;
   for (let x = 0; x < WIDTH; x += 1) {
-    const color = isForeground(x, y) ? FG : BG;
+    const color = pixelColor(x, y);
     raw[offset++] = color[0];
     raw[offset++] = color[1];
     raw[offset++] = color[2];
@@ -109,4 +136,4 @@ for (const filename of ['icon.png', 'adaptive-icon.png']) {
   fs.writeFileSync(path.join('assets', filename), png);
 }
 
-console.log(`Generated SparFlow icon (${png.length} bytes)`);
+console.log(`Generated SparPilot savings icon (${png.length} bytes)`);
