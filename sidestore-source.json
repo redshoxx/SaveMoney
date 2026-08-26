@@ -12,10 +12,10 @@
       "versions": [
         {
           "version": "4.0.0",
-          "date": "2026-08-26T11:10:09Z",
+          "date": "2026-08-26T13:09:51Z",
           "localizedDescription": "SparFlow 4.0.0 mit minimalistischem 4.0-Design, neuer Startseite, Ziel- und Monatsdetails, überarbeiteten Challenges sowie schneller Einzahlen- und Abziehen-Bedienung.",
           "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-          "size": 13626495,
+          "size": 13855848,
           "minOSVersion": "16.4"
         },
         {
@@ -108,10 +108,10 @@
         }
       ],
       "version": "4.0.0",
-      "versionDate": "2026-08-26T11:10:09Z",
+      "versionDate": "2026-08-26T13:09:51Z",
       "versionDescription": "SparFlow 4.0.0 mit minimalistischem 4.0-Design, neuer Startseite, Ziel- und Monatsdetails, überarbeiteten Challenges sowie schneller Einzahlen- und Abziehen-Bedienung.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 13626495
+      "size": 13855848
     }
   ]
 }
