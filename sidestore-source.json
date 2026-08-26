@@ -12,10 +12,10 @@
       "versions": [
         {
           "version": "4.1.0",
-          "date": "2026-08-26T13:25:43Z",
+          "date": "2026-08-26T13:55:27Z",
           "localizedDescription": "SparFlow 4.1.0 mit To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges im neuen 4.1-Design.",
           "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-          "size": 13855847,
+          "size": 13855904,
           "minOSVersion": "16.4"
         },
         {
@@ -108,10 +108,10 @@
         }
       ],
       "version": "4.1.0",
-      "versionDate": "2026-08-26T13:25:43Z",
+      "versionDate": "2026-08-26T13:55:27Z",
       "versionDescription": "SparFlow 4.1.0 mit To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges im neuen 4.1-Design.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 13855847
+      "size": 13855904
     }
   ]
 }
