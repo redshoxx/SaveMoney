@@ -96,7 +96,10 @@ export default function HomeScreen() {
     <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 8, paddingBottom: 106, gap: 13 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
         <HeaderIconButton name="line.3.horizontal" onPress={() => router.push('/actions')} />
-        <HeaderIconButton name="bell" onPress={() => Alert.alert('Benachrichtigungen', 'SparFlow erinnert dich nur mit den von dir aktivierten lokalen Funktionen.')} />
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+          <HeaderIconButton name="bell" onPress={() => Alert.alert('Benachrichtigungen', 'SparFlow erinnert dich nur mit den von dir aktivierten lokalen Funktionen.')} />
+          <HeaderIconButton name="gearshape.fill" onPress={() => router.push('/settings')} />
+        </View>
       </View>
 
       <View style={{ gap: 2, paddingHorizontal: 1 }}>
