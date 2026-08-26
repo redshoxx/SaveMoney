@@ -11,6 +11,14 @@
       "iconURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow-icon.png",
       "versions": [
         {
+          "version": "4.4.2",
+          "date": "2026-08-26T21:39:23Z",
+          "localizedDescription": "SparPilot 4.4.2 mit eindeutigen #Nummern für Ziele und Challenges, iPhone-12-optimierter Oberfläche, flüssigeren Animationen sowie Stabilitäts- und Performance-Fixes.",
+          "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
+          "size": 14271784,
+          "minOSVersion": "16.4"
+        },
+        {
           "version": "4.4.1",
           "date": "2026-08-26T18:35:00Z",
           "localizedDescription": "SparPilot 4.4.1 mit eindeutigen #Nummern für Ziele und Challenges, iPhone-12-optimierter Oberfläche, flüssigeren Animationen sowie Stabilitäts- und Performance-Fixes.",
@@ -97,21 +105,13 @@
           "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
           "size": 13599193,
           "minOSVersion": "16.4"
-        },
-        {
-          "version": "2.3.0",
-          "date": "2026-08-25T14:15:08Z",
-          "localizedDescription": "Minimalistisches SparFlow mit schnellerem Sparen, neuer Navigation und erweiterten Einstellungen.",
-          "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-          "size": 13593542,
-          "minOSVersion": "16.4"
         }
       ],
-      "version": "4.4.1",
-      "versionDate": "2026-08-26T18:35:00Z",
-      "versionDescription": "SparPilot 4.4.1 mit eindeutigen #Nummern für Ziele und Challenges, iPhone-12-optimierter Oberfläche, flüssigeren Animationen sowie Stabilitäts- und Performance-Fixes.",
+      "version": "4.4.2",
+      "versionDate": "2026-08-26T21:39:23Z",
+      "versionDescription": "SparPilot 4.4.2 mit eindeutigen #Nummern für Ziele und Challenges, iPhone-12-optimierter Oberfläche, flüssigeren Animationen sowie Stabilitäts- und Performance-Fixes.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 14250394
+      "size": 14271784
     }
   ]
 }
