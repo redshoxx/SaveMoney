@@ -11,6 +11,14 @@
       "iconURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow-icon.png",
       "versions": [
         {
+          "version": "4.0.0",
+          "date": "2026-08-26T11:10:09Z",
+          "localizedDescription": "SparFlow 4.0.0 mit minimalistischem 4.0-Design, neuer Startseite, Ziel- und Monatsdetails, überarbeiteten Challenges sowie schneller Einzahlen- und Abziehen-Bedienung.",
+          "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
+          "size": 13626495,
+          "minOSVersion": "16.4"
+        },
+        {
           "version": "3.3.0",
           "date": "2026-08-26T10:54:26Z",
           "localizedDescription": "SparFlow 3.3 mit neuem dynamischen Neon-Design, zentralen Schnellaktionen, überarbeiteter Startseite, lebendigen Challenges und Einstellungen außerhalb der Navigation.",
@@ -97,21 +105,13 @@
           "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
           "size": 15302361,
           "minOSVersion": "16.4"
-        },
-        {
-          "version": "2.0.0",
-          "date": "2026-08-24T10:41:10Z",
-          "localizedDescription": "Automatischer SparFlow-Build aus dem aktuellen main-Stand.",
-          "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-          "size": 15301312,
-          "minOSVersion": "16.4"
         }
       ],
-      "version": "3.3.0",
-      "versionDate": "2026-08-26T10:54:26Z",
-      "versionDescription": "SparFlow 3.3 mit neuem dynamischen Neon-Design, zentralen Schnellaktionen, überarbeiteter Startseite, lebendigen Challenges und Einstellungen außerhalb der Navigation.",
+      "version": "4.0.0",
+      "versionDate": "2026-08-26T11:10:09Z",
+      "versionDescription": "SparFlow 4.0.0 mit minimalistischem 4.0-Design, neuer Startseite, Ziel- und Monatsdetails, überarbeiteten Challenges sowie schneller Einzahlen- und Abziehen-Bedienung.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 13626538
+      "size": 13626495
     }
   ]
 }
