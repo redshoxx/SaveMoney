@@ -2,7 +2,7 @@ import { router } from 'expo-router';
 import { useMemo, useState } from 'react';
 import { ActivityIndicator, Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
-import { GlowIcon, NeonAction, NeonCard, NeonProgress, ProfileButton, PulseOrb, ScreenHeader } from '@/components/neon-ui';
+import { HeaderIconButton, MiniTrend, NeonAction, NeonCard, ProgressRing } from '@/components/neon-ui';
 import { Symbol } from '@/components/ui';
 import { colors } from '@/constants/theme';
 import { useAppStore } from '@/store/app-store';
@@ -21,6 +21,13 @@ function monthName() {
   return value.charAt(0).toUpperCase() + value.slice(1);
 }
 
+function greeting() {
+  const hour = new Date().getHours();
+  if (hour < 11) return 'Guten Morgen';
+  if (hour < 17) return 'Guten Tag';
+  return 'Guten Abend';
+}
+
 type MonthlyRow = {
   goal: Goal;
   planned: number;
@@ -28,6 +35,14 @@ type MonthlyRow = {
   covered: number;
   remaining: number;
 };
+
+function SmallGoalIcon({ goal }: { goal: Goal }) {
+  return (
+    <View style={{ width: 30, height: 30, borderRadius: 10, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center' }}>
+      <Symbol name={goal.icon} size={13} color={goal.color} />
+    </View>
+  );
+}
 
 export default function HomeScreen() {
   const store = useAppStore();
@@ -56,7 +71,6 @@ export default function HomeScreen() {
   const monthProgress = monthPlanned > 0 ? Math.min(1, monthCovered / monthPlanned) : 0;
   const openRows = monthlyRows.filter((row) => row.remaining > 0).sort((a, b) => b.remaining - a.remaining);
   const monthLabel = monthName();
-  const monthMax = Math.max(1, ...store.monthlyData.map((item) => Math.abs(item.value)));
   const changeVsPrevious = store.periodMetrics.previousMonth > 0
     ? ((store.periodMetrics.month - store.periodMetrics.previousMonth) / store.periodMetrics.previousMonth) * 100
     : store.periodMetrics.month > 0 ? 100 : 0;
@@ -79,110 +93,103 @@ export default function HomeScreen() {
   }
 
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 14, paddingBottom: 104, gap: 13 }}>
-      <ScreenHeader title="SparFlow" subtitle="Dein finanzieller Flow für heute." right={<ProfileButton />} />
+    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 8, paddingBottom: 106, gap: 13 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+        <HeaderIconButton name="line.3.horizontal" onPress={() => router.push('/actions')} />
+        <HeaderIconButton name="bell" onPress={() => Alert.alert('Benachrichtigungen', 'SparFlow erinnert dich nur mit den von dir aktivierten lokalen Funktionen.')} />
+      </View>
+
+      <View style={{ gap: 2, paddingHorizontal: 1 }}>
+        <Text selectable style={{ color: colors.text, fontSize: 23, fontWeight: '800', letterSpacing: -0.6 }}>{greeting()}! 👋</Text>
+        <Text selectable style={{ color: colors.textMuted, fontSize: 12 }}>Schön, dass du heute hier bist.</Text>
+      </View>
 
       {store.error ? (
-        <Pressable onPress={() => void store.reload()} style={({ pressed }) => ({ minHeight: 44, borderRadius: 13, paddingHorizontal: 12, backgroundColor: colors.dangerSoft, flexDirection: 'row', alignItems: 'center', gap: 8, opacity: pressed ? 0.72 : 1 })}>
-          <Symbol name="exclamationmark.triangle.fill" size={15} color={colors.danger} />
+        <Pressable onPress={() => void store.reload()} style={({ pressed }) => ({ minHeight: 42, borderRadius: 13, paddingHorizontal: 12, backgroundColor: colors.dangerSoft, flexDirection: 'row', alignItems: 'center', gap: 8, opacity: pressed ? 0.72 : 1 })}>
+          <Symbol name="exclamationmark.triangle.fill" size={14} color={colors.danger} />
           <Text style={{ flex: 1, color: colors.danger, fontSize: 12, fontWeight: '800' }}>Daten neu laden</Text>
         </Pressable>
       ) : null}
 
       {lastSuccess != null ? (
-        <NeonCard accent={colors.success} glow style={{ paddingVertical: 11 }}>
-          <Pressable onPress={() => setLastSuccess(null)} style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <GlowIcon name="checkmark" color={colors.success} size={14} />
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: colors.text, fontSize: 13, fontWeight: '900' }}>+{formatMoney(lastSuccess)} geschafft</Text>
-              <Text style={{ color: colors.textMuted, fontSize: 10.5 }}>Weiter so – dein Fortschritt wurde aktualisiert.</Text>
-            </View>
-          </Pressable>
-        </NeonCard>
+        <Pressable onPress={() => setLastSuccess(null)} style={({ pressed }) => ({ borderRadius: 15, paddingHorizontal: 13, paddingVertical: 10, backgroundColor: `${colors.success}18`, flexDirection: 'row', alignItems: 'center', gap: 9, opacity: pressed ? 0.72 : 1 })}>
+          <Symbol name="checkmark.circle.fill" size={17} color={colors.success} />
+          <Text style={{ color: colors.success, fontSize: 12.5, fontWeight: '800' }}>+{formatMoney(lastSuccess)} gespeichert</Text>
+        </Pressable>
       ) : null}
 
-      <NeonCard accent={colors.purple} glow style={{ padding: 16, gap: 13 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
-          <PulseOrb color={colors.magenta} />
-          <Text style={{ flex: 1, color: colors.textMuted, fontSize: 10.5, fontWeight: '900', letterSpacing: 0.7 }}>GESAMTERSPARNIS</Text>
-          <View style={{ borderRadius: 999, backgroundColor: `${colors.success}18`, paddingHorizontal: 8, paddingVertical: 5 }}>
-            <Text style={{ color: colors.success, fontSize: 10, fontWeight: '900' }}>{changeVsPrevious >= 0 ? '+' : ''}{Math.round(changeVsPrevious)}% Monat</Text>
+      <NeonCard style={{ padding: 16, minHeight: 145 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', gap: 12 }}>
+          <View style={{ flex: 1, gap: 5 }}>
+            <Text style={{ color: colors.textMuted, fontSize: 11, fontWeight: '700' }}>Gesamt gespart</Text>
+            <Text selectable style={{ color: colors.text, fontSize: 28, fontWeight: '900', letterSpacing: -0.9, fontVariant: ['tabular-nums'] }}>{formatMoney(store.totalSaved)}</Text>
+            <Text style={{ color: changeVsPrevious >= 0 ? colors.success : colors.danger, fontSize: 10.5, fontWeight: '700' }}>{changeVsPrevious >= 0 ? '+' : ''}{Math.round(changeVsPrevious)} % diesen Monat</Text>
           </View>
-        </View>
-        <Text selectable style={{ color: colors.text, fontSize: 38, lineHeight: 42, fontWeight: '900', letterSpacing: -1.4, fontVariant: ['tabular-nums'] }}>{formatMoney(store.totalSaved)}</Text>
-        <View style={{ height: 62, flexDirection: 'row', alignItems: 'flex-end', gap: 6 }}>
-          {store.monthlyData.map((item, index) => {
-            const height = Math.max(8, Math.min(58, (Math.abs(item.value) / monthMax) * 58));
-            const accent = index === store.monthlyData.length - 1 ? colors.magenta : index >= store.monthlyData.length - 3 ? colors.blue : colors.primary;
-            return (
-              <View key={`${item.label}-${index}`} style={{ flex: 1, alignItems: 'center', gap: 4 }}>
-                <View style={{ width: '72%', height, borderRadius: 999, backgroundColor: accent, opacity: 0.78, boxShadow: `0 0 10px ${accent}` }} />
-                <Text style={{ color: colors.textMuted, fontSize: 8 }}>{item.label}</Text>
-              </View>
-            );
-          })}
+          <View style={{ width: 94, paddingTop: 8 }}>
+            <MiniTrend values={store.monthlyData.map((item) => item.value)} color={colors.primary} height={58} />
+          </View>
         </View>
       </NeonCard>
 
-      <NeonCard accent={colors.blue}>
-        <Pressable onPress={() => router.push('/(tabs)/goals')} style={({ pressed }) => ({ gap: 11, opacity: pressed ? 0.74 : 1 })}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <GlowIcon name="calendar" color={colors.blue} size={16} />
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={{ color: colors.text, fontSize: 14, fontWeight: '900' }}>Monatsübersicht · {monthLabel}</Text>
-              <Text style={{ color: colors.textMuted, fontSize: 11 }}>{monthPlanned > 0 ? `${formatMoney(monthCovered)} von ${formatMoney(monthPlanned)} geplant` : 'Noch keine Monatsrücklage geplant'}</Text>
+      <Pressable onPress={() => router.push('/month-details')} style={({ pressed }) => ({ opacity: pressed ? 0.75 : 1 })}>
+        <NeonCard style={{ padding: 15 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 15 }}>
+            <ProgressRing value={monthProgress} color={colors.primary} size={68} />
+            <View style={{ flex: 1, gap: 3 }}>
+              <Text style={{ color: colors.textMuted, fontSize: 11 }}>{monthLabel} Überblick</Text>
+              <Text selectable style={{ color: colors.text, fontSize: 23, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(monthCovered)}</Text>
+              <Text style={{ color: colors.textMuted, fontSize: 11 }}>von {formatMoney(monthPlanned)} geplant</Text>
+              <Text style={{ color: colors.textMuted, fontSize: 10 }}>Noch {formatMoney(monthRemaining)} diesen Monat</Text>
             </View>
-            {monthPlanned > 0 ? <Text style={{ color: colors.blue, fontSize: 15, fontWeight: '900' }}>{Math.round(monthProgress * 100)}%</Text> : null}
             <Symbol name="chevron.right" size={11} color={colors.textMuted} />
           </View>
-          {monthPlanned > 0 ? <NeonProgress value={monthProgress} color={colors.blue} height={5} /> : null}
-        </Pressable>
-      </NeonCard>
+        </NeonCard>
+      </Pressable>
 
       {monthPlanned > 0 ? (
-        <NeonCard accent={monthRemaining > 0 ? colors.purple : colors.success} glow={monthRemaining > 0}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <GlowIcon name={monthRemaining > 0 ? 'sparkles' : 'checkmark.circle.fill'} color={monthRemaining > 0 ? colors.purple : colors.success} size={16} />
-            <View style={{ flex: 1 }}>
-              <Text style={{ color: colors.text, fontSize: 14, fontWeight: '900' }}>Was fehlt noch?</Text>
-              <Text style={{ color: colors.textMuted, fontSize: 10.5 }}>Deine nächsten Schritte diesen Monat</Text>
+        <NeonCard style={{ padding: 14, gap: 8 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10 }}>
+            <View style={{ gap: 2 }}>
+              <Text style={{ color: colors.text, fontSize: 12.5, fontWeight: '800' }}>Was fehlt noch?</Text>
+              <Text style={{ color: monthRemaining > 0 ? colors.warning : colors.success, fontSize: 11, fontWeight: '700' }}>{monthRemaining > 0 ? `Noch ${formatMoney(monthRemaining)} diesen Monat` : 'Alles für diesen Monat geschafft'}</Text>
             </View>
-            {monthRemaining > 0 ? <Text style={{ color: colors.primaryDark, fontSize: 17, fontWeight: '900' }}>{formatMoney(monthRemaining)}</Text> : null}
+            <Symbol name="arrow.up.right" size={11} color={colors.textMuted} />
           </View>
-          {monthRemaining > 0 ? (
-            <View style={{ gap: 6 }}>
-              {openRows.slice(0, 3).map((row, index) => {
-                const accent = [colors.purple, colors.cyan, colors.orange][index % 3];
-                return (
-                  <Pressable key={row.goal.id} onPress={() => router.push({ pathname: '/save', params: { goalId: row.goal.id, mode: 'save' } })} style={({ pressed }) => ({ minHeight: 40, borderRadius: 11, paddingHorizontal: 10, backgroundColor: colors.surfaceMuted, flexDirection: 'row', alignItems: 'center', gap: 8, opacity: pressed ? 0.68 : 1 })}>
-                    <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: accent, boxShadow: `0 0 9px ${accent}` }} />
-                    <Text numberOfLines={1} style={{ flex: 1, color: colors.text, fontSize: 12, fontWeight: '800' }}>{row.goal.title}</Text>
-                    <Text style={{ color: accent, fontSize: 12, fontWeight: '900' }}>{formatMoney(row.remaining)}</Text>
-                    <Symbol name="chevron.right" size={9} color={colors.textMuted} />
-                  </Pressable>
-                );
-              })}
-            </View>
-          ) : <Text style={{ color: colors.success, fontSize: 13, fontWeight: '900' }}>Monat geschafft. Alle Rücklagen sind abgedeckt.</Text>}
+
+          <View style={{ gap: 3 }}>
+            {openRows.slice(0, 3).map((row) => (
+              <Pressable
+                key={row.goal.id}
+                onPress={() => router.push({ pathname: '/save', params: { goalId: row.goal.id, mode: 'save' } })}
+                style={({ pressed }) => ({ minHeight: 42, flexDirection: 'row', alignItems: 'center', gap: 9, opacity: pressed ? 0.65 : 1 })}
+              >
+                <SmallGoalIcon goal={row.goal} />
+                <Text numberOfLines={1} style={{ flex: 1, color: colors.text, fontSize: 11.5, fontWeight: '700' }}>{row.goal.title}</Text>
+                <Text style={{ color: colors.text, fontSize: 11.5, fontWeight: '800' }}>{formatMoney(row.remaining)}</Text>
+                <Symbol name="chevron.right" size={9} color={colors.textMuted} />
+              </Pressable>
+            ))}
+          </View>
         </NeonCard>
       ) : null}
 
       {goal && coach && coach.suggestedAmount > 0 ? (
-        <NeonCard accent={colors.magenta} glow>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-            <GlowIcon name="sparkles" color={colors.magenta} size={16} />
-            <View style={{ flex: 1, gap: 2 }}>
-              <Text style={{ color: colors.textMuted, fontSize: 9.5, fontWeight: '900', letterSpacing: 0.5 }}>HEUTE EMPFOHLEN</Text>
-              <Text numberOfLines={1} style={{ color: colors.text, fontSize: 14, fontWeight: '900' }}>{goal.title}</Text>
+        <NeonCard style={{ padding: 14 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
+            <View style={{ flex: 1, gap: 3 }}>
+              <Text style={{ color: colors.textMuted, fontSize: 10.5, fontWeight: '700' }}>Heute empfohlen</Text>
+              <Text style={{ color: colors.textMuted, fontSize: 10 }}>Spare heute</Text>
+              <Text selectable style={{ color: colors.text, fontSize: 22, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(coach.suggestedAmount)}</Text>
+              <Text numberOfLines={1} style={{ color: colors.cyan, fontSize: 10 }}>Für {goal.title}</Text>
             </View>
-            <Text style={{ color: colors.magenta, fontSize: 20, fontWeight: '900' }}>{formatMoney(coach.suggestedAmount)}</Text>
-          </View>
-          <View style={{ flexDirection: 'row', gap: 7 }}>
-            <NeonAction icon="plus" label={saving ? 'Speichert …' : 'Jetzt sparen'} onPress={() => void smartSave()} color={colors.magenta} />
-            <NeonAction icon="slider.horizontal.3" label="Ändern" onPress={() => router.push({ pathname: '/save', params: { goalId: goal.id, mode: 'save' } })} muted />
+            <NeonAction icon="plus" label={saving ? 'Speichert …' : 'Jetzt sparen'} onPress={() => void smartSave()} color={colors.primary} />
           </View>
         </NeonCard>
       ) : null}
+
+      <Pressable onPress={() => router.push('/(tabs)/goals')} style={({ pressed }) => ({ alignSelf: 'center', opacity: pressed ? 0.55 : 1, paddingVertical: 4 })}>
+        <Text style={{ color: colors.textMuted, fontSize: 10.5, fontWeight: '700' }}>Alle Ziele anzeigen</Text>
+      </Pressable>
     </ScrollView>
   );
 }

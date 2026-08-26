@@ -15,63 +15,66 @@ export default function TabsLayout() {
       screenOptions={{
         headerShown: false,
         sceneStyle: { backgroundColor: colors.background },
-        tabBarActiveTintColor: colors.primaryDark,
+        tabBarActiveTintColor: colors.text,
         tabBarInactiveTintColor: colors.textMuted,
+        tabBarShowLabel: false,
         tabBarStyle: {
           backgroundColor: colors.surface,
-          borderTopColor: `${colors.primary}38`,
+          borderTopColor: colors.border,
           borderTopWidth: 1,
-          paddingTop: 5,
-          boxShadow: `0 -8px 28px ${colors.glow}`,
+          height: 72,
+          paddingTop: 8,
+          paddingBottom: 10,
         },
-        tabBarItemStyle: { minHeight: 46 },
-        tabBarLabelStyle: { fontSize: 9.5, fontWeight: '800' },
+        tabBarItemStyle: { minHeight: 50 },
       }}
     >
       <Tabs.Screen
         name="index"
-        options={{ title: 'Start', tabBarIcon: ({ color }) => <Symbol name="house.fill" size={18} color={tabIconColor(color)} /> }}
+        options={{ title: 'Start', tabBarIcon: ({ color }) => <Symbol name="house.fill" size={19} color={tabIconColor(color)} /> }}
       />
       <Tabs.Screen
         name="goals"
-        options={{ title: 'Sparen', tabBarIcon: ({ color }) => <Symbol name="target" size={18} color={tabIconColor(color)} /> }}
+        options={{ title: 'Sparen', tabBarIcon: ({ color }) => <Symbol name="target" size={19} color={tabIconColor(color)} /> }}
       />
       <Tabs.Screen
         name="quick"
         listeners={{
           tabPress: (event) => {
             event.preventDefault();
-            router.push('/actions');
+            router.push({ pathname: '/save', params: { mode: 'save' } });
           },
         }}
         options={{
           title: '',
-          tabBarLabel: () => null,
           tabBarIcon: () => (
             <View
               style={{
-                width: 48,
-                height: 48,
-                marginTop: -14,
-                borderRadius: 24,
+                width: 52,
+                height: 52,
+                marginTop: -15,
+                borderRadius: 26,
                 alignItems: 'center',
                 justifyContent: 'center',
                 backgroundColor: colors.primary,
-                borderWidth: 1,
-                borderColor: `${colors.primaryDark}85`,
-                boxShadow: `0 0 22px ${colors.primary}`,
+                borderWidth: 2,
+                borderColor: colors.surface,
+                boxShadow: '0 8px 18px rgba(0,0,0,0.28)',
               }}
             >
-              <Symbol name="plus" size={20} color="#FFFFFF" />
+              <Symbol name="plus" size={21} color="#FFFFFF" />
             </View>
           ),
         }}
       />
       <Tabs.Screen
         name="challenges"
-        options={{ title: 'Challenges', tabBarIcon: ({ color }) => <Symbol name="trophy.fill" size={18} color={tabIconColor(color)} /> }}
+        options={{ title: 'Challenges', tabBarIcon: ({ color }) => <Symbol name="trophy.fill" size={19} color={tabIconColor(color)} /> }}
       />
-      <Tabs.Screen name="settings" options={{ href: null }} />
+      <Tabs.Screen
+        name="settings"
+        options={{ title: 'Profil', tabBarIcon: ({ color }) => <Symbol name="person" size={19} color={tabIconColor(color)} /> }}
+      />
     </Tabs>
   );
 }

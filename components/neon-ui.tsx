@@ -1,7 +1,7 @@
 import { router } from 'expo-router';
 import type { PropsWithChildren, ReactNode } from 'react';
 import { Animated, Pressable, Text, View } from 'react-native';
-import { useEffect, useRef } from 'react';
+import { useEffect, useMemo, useRef } from 'react';
 
 import { colors } from '@/constants/theme';
 import { Symbol } from '@/components/ui';
@@ -16,83 +16,60 @@ export function NeonCard({
     <View
       style={[
         {
-          borderRadius: 20,
+          borderRadius: 18,
           borderCurve: 'continuous',
           borderWidth: 1,
-          borderColor: glow ? `${accent}80` : colors.border,
+          borderColor: glow ? `${accent}55` : colors.border,
           backgroundColor: colors.surface,
           padding: 14,
-          gap: 12,
-          boxShadow: glow ? `0 0 24px ${accent}35` : '0 8px 20px rgba(0,0,0,0.18)',
+          gap: 11,
+          boxShadow: glow ? `0 8px 24px ${accent}18` : '0 5px 16px rgba(0,0,0,0.12)',
           overflow: 'hidden',
         },
         style,
       ]}
     >
-      {glow ? (
-        <View
-          pointerEvents="none"
-          style={{
-            position: 'absolute',
-            width: 130,
-            height: 130,
-            borderRadius: 65,
-            right: -58,
-            top: -66,
-            backgroundColor: `${accent}16`,
-          }}
-        />
-      ) : null}
       {children}
     </View>
   );
 }
 
 export function GlowIcon({ name, color = colors.primary, size = 18 }: { name: string; color?: string; size?: number }) {
+  const box = Math.max(34, size + 20);
   return (
     <View
       style={{
-        width: size + 24,
-        height: size + 24,
-        borderRadius: 15,
-        backgroundColor: `${color}1F`,
-        borderWidth: 1,
-        borderColor: `${color}45`,
+        width: box,
+        height: box,
+        borderRadius: 11,
+        borderCurve: 'continuous',
+        backgroundColor: color,
         alignItems: 'center',
         justifyContent: 'center',
-        boxShadow: `0 0 18px ${color}35`,
       }}
     >
-      <Symbol name={name} size={size} color={color} />
+      <Symbol name={name} size={size} color="#FFFFFF" />
     </View>
   );
 }
 
-export function NeonProgress({ value, color = colors.primary, height = 6 }: { value: number; color?: string; height?: number }) {
+export function NeonProgress({ value, color = colors.primary, height = 5 }: { value: number; color?: string; height?: number }) {
   const percent = `${Math.max(0, Math.min(1, value)) * 100}%` as `${number}%`;
   return (
     <View style={{ height, borderRadius: 999, backgroundColor: colors.surfaceMuted, overflow: 'hidden' }}>
-      <View
-        style={{
-          width: percent,
-          height: '100%',
-          borderRadius: 999,
-          backgroundColor: color,
-          boxShadow: `0 0 14px ${color}`,
-        }}
-      />
+      <View style={{ width: percent, height: '100%', borderRadius: 999, backgroundColor: color }} />
     </View>
   );
 }
 
-export function PulseOrb({ color = colors.primary, size = 9 }: { color?: string; size?: number }) {
-  const pulse = useRef(new Animated.Value(0.55)).current;
+export function PulseOrb({ color = colors.primary, size = 8 }: { color?: string; size?: number }) {
+  const pulse = useRef(new Animated.Value(0.65)).current;
 
   useEffect(() => {
     const animation = Animated.loop(
       Animated.sequence([
         Animated.timing(pulse, { toValue: 1, duration: 1100, useNativeDriver: true }),
-        Animated.timing(pulse, { toValue: 0.55, duration: 1100, useNativeDriver: true }),
+        Animated.timing(pulse, { toValue: 0.65, duration: 1100, useNativeDriver: true }),
       ]),
     );
     animation.start();
@@ -108,34 +85,33 @@ export function PulseOrb({ color = colors.primary, size = 9 }: { color?: string;
         backgroundColor: color,
         opacity: pulse,
         transform: [{ scale: pulse }],
-        boxShadow: `0 0 12px ${color}`,
       }}
     />
   );
 }
 
-export function ProfileButton() {
+export function HeaderIconButton({ name, onPress, color = colors.text }: { name: string; onPress: () => void; color?: string }) {
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel="Profil und Einstellungen öffnen"
-      onPress={() => router.push('/settings')}
+      onPress={onPress}
+      hitSlop={8}
       style={({ pressed }) => ({
-        width: 42,
-        height: 42,
-        borderRadius: 21,
-        borderWidth: 1,
-        borderColor: `${colors.primary}70`,
-        backgroundColor: colors.primarySoft,
+        width: 36,
+        height: 36,
+        borderRadius: 12,
         alignItems: 'center',
         justifyContent: 'center',
-        opacity: pressed ? 0.72 : 1,
-        boxShadow: `0 0 16px ${colors.glow}`,
+        opacity: pressed ? 0.55 : 1,
       })}
     >
-      <Symbol name="person.crop.circle.fill" size={22} color={colors.primaryDark} />
+      <Symbol name={name} size={18} color={color} />
     </Pressable>
   );
+}
+
+export function ProfileButton() {
+  return <HeaderIconButton name="person" onPress={() => router.push('/(tabs)/settings')} />;
 }
 
 export function ScreenHeader({
@@ -152,8 +128,8 @@ export function ScreenHeader({
   return (
     <View style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}>
       <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
-        {eyebrow ? <Text style={{ color: colors.primaryDark, fontSize: 10, fontWeight: '900', letterSpacing: 0.8 }}>{eyebrow}</Text> : null}
-        <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 27, fontWeight: '900', letterSpacing: -0.8 }}>{title}</Text>
+        {eyebrow ? <Text style={{ color: colors.primaryDark, fontSize: 10, fontWeight: '800', letterSpacing: 0.6 }}>{eyebrow}</Text> : null}
+        <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 25, fontWeight: '800', letterSpacing: -0.7 }}>{title}</Text>
         {subtitle ? <Text selectable numberOfLines={2} style={{ color: colors.textMuted, fontSize: 12, lineHeight: 17 }}>{subtitle}</Text> : null}
       </View>
       {right ?? <ProfileButton />}
@@ -180,21 +156,67 @@ export function NeonAction({
       onPress={onPress}
       style={({ pressed }) => ({
         minHeight: 38,
-        paddingHorizontal: 12,
+        paddingHorizontal: 13,
         borderRadius: 12,
-        borderWidth: 1,
-        borderColor: muted ? colors.border : `${color}70`,
-        backgroundColor: muted ? colors.surfaceMuted : `${color}20`,
+        borderWidth: muted ? 1 : 0,
+        borderColor: colors.border,
+        backgroundColor: muted ? colors.surfaceMuted : color,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
         gap: 6,
-        opacity: pressed ? 0.68 : 1,
-        boxShadow: muted ? undefined : `0 0 12px ${color}24`,
+        opacity: pressed ? 0.7 : 1,
       })}
     >
-      <Symbol name={icon} size={12} color={muted ? colors.textMuted : color} />
-      <Text style={{ color: muted ? colors.textMuted : color, fontSize: 11.5, fontWeight: '900' }}>{label}</Text>
+      <Symbol name={icon} size={12} color={muted ? colors.textMuted : '#FFFFFF'} />
+      <Text style={{ color: muted ? colors.text : '#FFFFFF', fontSize: 11.5, fontWeight: '800' }}>{label}</Text>
     </Pressable>
+  );
+}
+
+export function ProgressRing({ value, color = colors.primary, size = 70 }: { value: number; color?: string; size?: number }) {
+  const percentage = Math.round(Math.max(0, Math.min(1, value)) * 100);
+  return (
+    <View
+      style={{
+        width: size,
+        height: size,
+        borderRadius: size / 2,
+        borderWidth: 6,
+        borderColor: color,
+        backgroundColor: colors.surfaceMuted,
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <Text selectable style={{ color: colors.text, fontSize: size * 0.23, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{percentage}%</Text>
+    </View>
+  );
+}
+
+export function MiniTrend({ values, color = colors.primary, height = 54 }: { values: number[]; color?: string; height?: number }) {
+  const normalized = useMemo(() => {
+    const source = values.length ? values : [0, 0, 0, 0, 0, 0];
+    const max = Math.max(1, ...source.map((value) => Math.abs(value)));
+    return source.slice(-12).map((value) => Math.max(4, (Math.abs(value) / max) * height));
+  }, [height, values]);
+
+  return (
+    <View style={{ height, flexDirection: 'row', alignItems: 'flex-end', gap: 3 }}>
+      {normalized.map((barHeight, index) => (
+        <View
+          key={`${index}-${barHeight}`}
+          style={{
+            flex: 1,
+            minWidth: 2,
+            maxWidth: 5,
+            height: barHeight,
+            borderRadius: 999,
+            backgroundColor: color,
+            opacity: 0.45 + ((index + 1) / normalized.length) * 0.55,
+          }}
+        />
+      ))}
+    </View>
   );
 }

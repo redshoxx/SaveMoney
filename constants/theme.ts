@@ -1,49 +1,49 @@
 import { Appearance } from 'react-native';
 
 const light = {
-  background: '#F6F7FF',
+  background: '#F3F4F6',
   surface: '#FFFFFF',
-  surfaceMuted: '#EEF0FA',
-  text: '#10131D',
-  textMuted: '#6F7890',
-  primary: '#6F47FF',
-  primaryDark: '#5637D8',
-  primarySoft: '#ECE7FF',
-  border: '#DDE2F0',
-  success: '#16A56C',
-  warning: '#E78A21',
-  danger: '#D95368',
-  dangerSoft: '#FDE8EC',
-  disabled: '#D8DDEA',
-  purple: '#A947FF',
-  blue: '#3478FF',
-  cyan: '#00AFC7',
-  magenta: '#CB42F5',
-  orange: '#F49A2F',
-  glow: 'rgba(111,71,255,0.24)',
+  surfaceMuted: '#ECEEF1',
+  text: '#111318',
+  textMuted: '#6F747C',
+  primary: '#7E5CE6',
+  primaryDark: '#6546C9',
+  primarySoft: '#EEE9FF',
+  border: '#DDE0E5',
+  success: '#3E9B63',
+  warning: '#C77C2D',
+  danger: '#D3545D',
+  dangerSoft: '#FCEBED',
+  disabled: '#D5D8DE',
+  purple: '#805EE2',
+  blue: '#5D8FD7',
+  cyan: '#41AAAD',
+  magenta: '#9A63DB',
+  orange: '#D27A2D',
+  glow: 'rgba(126,92,230,0.16)',
 } as const;
 
 const dark = {
-  background: '#050814',
-  surface: '#0B1020',
-  surfaceMuted: '#12192A',
-  text: '#F8F9FF',
-  textMuted: '#8E98B0',
-  primary: '#7B4DFF',
-  primaryDark: '#C7B7FF',
-  primarySoft: '#21154C',
-  border: '#222B42',
-  success: '#33D69A',
-  warning: '#FFB04A',
-  danger: '#FF6B80',
-  dangerSoft: '#351523',
-  disabled: '#2A3144',
-  purple: '#C34CFF',
-  blue: '#3B82FF',
-  cyan: '#12D8F4',
-  magenta: '#F04DFF',
-  orange: '#FF9D2E',
-  glow: 'rgba(123,77,255,0.38)',
+  background: '#0C0F12',
+  surface: '#171A1F',
+  surfaceMuted: '#20242A',
+  text: '#F5F6F7',
+  textMuted: '#9AA0A8',
+  primary: '#875FE4',
+  primaryDark: '#A98CF3',
+  primarySoft: '#2B2340',
+  border: '#2A2F36',
+  success: '#49A96C',
+  warning: '#D68A39',
+  danger: '#EB656D',
+  dangerSoft: '#351D21',
+  disabled: '#343941',
+  purple: '#875FE4',
+  blue: '#5D91D8',
+  cyan: '#4DB4B7',
+  magenta: '#A56CE0',
+  orange: '#D77C2D',
+  glow: 'rgba(135,95,228,0.20)',
 } as const;
 
 export type ResolvedColorScheme = 'light' | 'dark';
@@ -86,13 +86,13 @@ export const colors = {
   get glow(): string { return palette().glow; },
 };
 
-export const accents = ['#7B4DFF', '#3B82FF', '#12D8F4', '#C34CFF', '#FF9D2E'] as const;
+export const accents = ['#875FE4', '#5D91D8', '#4DB4B7', '#49A96C', '#D77C2D'] as const;
 
 export const radius = {
-  sm: 11,
-  md: 15,
-  lg: 20,
-  xl: 26,
+  sm: 10,
+  md: 14,
+  lg: 18,
+  xl: 24,
 };
 
-export const shadow = '0 10px 28px rgba(0, 0, 0, 0.22)';
+export const shadow = '0 6px 18px rgba(0, 0, 0, 0.14)';
