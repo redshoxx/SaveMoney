@@ -11,6 +11,14 @@
       "iconURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow-icon.png",
       "versions": [
         {
+          "version": "4.1.0",
+          "date": "2026-08-26T13:25:43Z",
+          "localizedDescription": "SparFlow 4.1.0 mit To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges im neuen 4.1-Design.",
+          "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
+          "size": 13855847,
+          "minOSVersion": "16.4"
+        },
+        {
           "version": "4.0.0",
           "date": "2026-08-26T13:09:51Z",
           "localizedDescription": "SparFlow 4.0.0 mit minimalistischem 4.0-Design, neuer Startseite, Ziel- und Monatsdetails, überarbeiteten Challenges sowie schneller Einzahlen- und Abziehen-Bedienung.",
@@ -97,21 +105,13 @@
           "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
           "size": 15302352,
           "minOSVersion": "16.4"
-        },
-        {
-          "version": "2.0.1",
-          "date": "2026-08-24T20:39:10Z",
-          "localizedDescription": "Widget-Fix und aktueller automatischer SparFlow-Build.",
-          "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-          "size": 15302361,
-          "minOSVersion": "16.4"
         }
       ],
-      "version": "4.0.0",
-      "versionDate": "2026-08-26T13:09:51Z",
-      "versionDescription": "SparFlow 4.0.0 mit minimalistischem 4.0-Design, neuer Startseite, Ziel- und Monatsdetails, überarbeiteten Challenges sowie schneller Einzahlen- und Abziehen-Bedienung.",
+      "version": "4.1.0",
+      "versionDate": "2026-08-26T13:25:43Z",
+      "versionDescription": "SparFlow 4.1.0 mit To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges im neuen 4.1-Design.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 13855848
+      "size": 13855847
     }
   ]
 }
