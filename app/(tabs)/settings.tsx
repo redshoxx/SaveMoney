@@ -57,7 +57,7 @@ function themeLabel(value: ThemeMode) {
 
 export default function SettingsScreen() {
   const store = useAppStore();
-  const version = Constants.expoConfig?.version ?? '3.3.0';
+  const version = Constants.expoConfig?.version ?? '4.0.0';
 
   const chooseTheme = () => {
     Alert.alert('Design', 'Wähle das Farbschema für SparFlow.', [
@@ -73,7 +73,7 @@ export default function SettingsScreen() {
       <Text selectable style={{ color: colors.text, fontSize: 20, fontWeight: '800', textAlign: 'center' }}>Einstellungen</Text>
 
       <Section>
-        <Row icon="person.crop.circle" title="Profil" value="Lokal" onPress={() => Alert.alert('Profil', 'SparFlow 3.3.0 verwendet kein Benutzerkonto. Deine Daten bleiben lokal auf diesem Gerät.')} />
+        <Row icon="person.crop.circle" title="Profil" value="Lokal" onPress={() => Alert.alert('Profil', `SparFlow ${version} verwendet kein Benutzerkonto. Deine Daten bleiben lokal auf diesem Gerät.`)} />
         <Divider />
         <SwitchRow icon="lock.fill" title="Schnell-Sparen bestätigen" value={store.preferences.confirmQuickSave} onValueChange={(value) => void store.setPreference('confirmQuickSave', value)} />
         <Divider />
