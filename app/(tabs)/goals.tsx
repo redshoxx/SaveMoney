@@ -2,8 +2,9 @@ import { router } from 'expo-router';
 import type { ReactNode } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
-import { EmptyState, ProgressBar, Symbol } from '@/components/ui';
-import { colors } from '@/constants/theme';
+import { GlowIcon, NeonAction, NeonCard, NeonProgress, ProfileButton, ScreenHeader } from '@/components/neon-ui';
+import { EmptyState, Symbol } from '@/components/ui';
+import { accents, colors } from '@/constants/theme';
 import { useAppStore } from '@/store/app-store';
 import type { Goal } from '@/types/models';
 import { formatMoney, progress } from '@/utils/money';
@@ -17,45 +18,7 @@ function savedThisMonth(contributions: ReturnType<typeof useAppStore>['contribut
   }, 0));
 }
 
-function CompactAction({
-  icon,
-  label,
-  onPress,
-  disabled,
-  destructive,
-}: {
-  icon: string;
-  label: string;
-  onPress: () => void;
-  disabled?: boolean;
-  destructive?: boolean;
-}) {
-  return (
-    <Pressable
-      accessibilityRole="button"
-      disabled={disabled}
-      onPress={onPress}
-      style={({ pressed }) => ({
-        minHeight: 34,
-        paddingHorizontal: 11,
-        borderRadius: 10,
-        borderWidth: destructive ? 1 : 0,
-        borderColor: destructive ? colors.danger : 'transparent',
-        backgroundColor: destructive ? 'transparent' : colors.primarySoft,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'center',
-        gap: 5,
-        opacity: disabled ? 0.35 : pressed ? 0.68 : 1,
-      })}
-    >
-      <Symbol name={icon} size={12} color={destructive ? colors.danger : colors.primaryDark} />
-      <Text style={{ color: destructive ? colors.danger : colors.primaryDark, fontSize: 11.5, fontWeight: '900' }}>{label}</Text>
-    </Pressable>
-  );
-}
-
-function AreaCard({ goal, monthSaved, onDelete }: { goal: Goal; monthSaved: number; onDelete: () => void }) {
+function AreaCard({ goal, monthSaved, accent, onDelete }: { goal: Goal; monthSaved: number; accent: string; onDelete: () => void }) {
   const recurring = goal.mode === 'recurring';
   const recurringAmount = goal.recurringAmount ?? goal.targetAmount;
   const completed = !recurring && goal.savedAmount >= goal.targetAmount;
@@ -65,48 +28,54 @@ function AreaCard({ goal, monthSaved, onDelete }: { goal: Goal; monthSaved: numb
   const change = (mode: 'save' | 'withdraw') => router.push({ pathname: '/save', params: { goalId: goal.id, mode } });
 
   return (
-    <View style={{ borderRadius: 16, padding: 12, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, gap: 9 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 9 }}>
-        <View style={{ width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceMuted }}>
-          <Symbol name={completed ? 'checkmark' : goal.icon} size={16} color={colors.primaryDark} />
-        </View>
-
-        <View style={{ flex: 1, minWidth: 0, gap: 1 }}>
+    <NeonCard accent={accent} glow={percentage >= 0.95} style={{ padding: 13, gap: 10 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <GlowIcon name={completed ? 'checkmark.seal.fill' : goal.icon} color={accent} size={16} />
+        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
           <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 15.5, fontWeight: '900' }}>{goal.title}</Text>
           <Text selectable numberOfLines={1} style={{ color: colors.textMuted, fontSize: 10.5 }}>
             {recurring
-              ? `${formatMoney(current)} / ${formatMoney(target)} diesen Monat · gesamt ${formatMoney(goal.savedAmount)}`
+              ? `${formatMoney(current)} von ${formatMoney(target)} diesen Monat`
               : completed
                 ? `${formatMoney(goal.targetAmount)} erreicht`
-                : `${formatMoney(goal.savedAmount)} / ${formatMoney(goal.targetAmount)} · ${formatMoney(Math.max(0, goal.targetAmount - goal.savedAmount))} offen`}
+                : `${formatMoney(goal.savedAmount)} von ${formatMoney(goal.targetAmount)}`}
           </Text>
         </View>
-
-        <Text style={{ color: colors.textMuted, fontSize: 11, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{Math.round(percentage * 100)}%</Text>
-        <Pressable accessibilityLabel={`${goal.title} verwalten`} onPress={onDelete} hitSlop={10} style={{ width: 30, height: 34, alignItems: 'center', justifyContent: 'center' }}>
-          <Symbol name="ellipsis" size={16} color={colors.textMuted} />
+        <View style={{ alignItems: 'flex-end', gap: 2 }}>
+          <Text style={{ color: accent, fontSize: 13, fontWeight: '900' }}>{Math.round(percentage * 100)}%</Text>
+          <Text style={{ color: colors.textMuted, fontSize: 9 }}>{recurring ? 'Monat' : completed ? 'Fertig' : 'Ziel'}</Text>
+        </View>
+        <Pressable accessibilityLabel={`${goal.title} verwalten`} onPress={onDelete} hitSlop={10} style={{ width: 28, height: 34, alignItems: 'center', justifyContent: 'center' }}>
+          <Symbol name="ellipsis" size={15} color={colors.textMuted} />
         </Pressable>
       </View>
 
-      <ProgressBar value={percentage} color={completed ? colors.success : colors.primary} height={4} />
+      <NeonProgress value={percentage} color={accent} height={5} />
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 8 }}>
-        <Text style={{ flex: 1, color: colors.textMuted, fontSize: 10.5 }} numberOfLines={1}>
-          {recurring ? `${formatMoney(recurringAmount)} monatlich · ab Tag ${goal.recurringDay ?? 1}` : completed ? 'Abgeschlossen' : 'Aktives Sparziel'}
-        </Text>
-        <View style={{ flexDirection: 'row', gap: 6 }}>
-          {!completed ? <CompactAction icon="plus" label="Sparen" onPress={() => change('save')} /> : null}
-          <CompactAction icon="minus" label={completed ? 'Korrigieren' : 'Abziehen'} destructive onPress={() => change('withdraw')} disabled={goal.savedAmount <= 0} />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 7 }}>
+        <View style={{ flex: 1 }}>
+          <Text numberOfLines={1} style={{ color: colors.textMuted, fontSize: 10.5 }}>
+            {recurring
+              ? `${formatMoney(recurringAmount)} monatlich · Tag ${goal.recurringDay ?? 1}`
+              : completed
+                ? `Gesamt ${formatMoney(goal.savedAmount)}`
+                : `${formatMoney(Math.max(0, goal.targetAmount - goal.savedAmount))} offen`}
+          </Text>
         </View>
+        {!completed ? <NeonAction icon="plus" label="Sparen" onPress={() => change('save')} color={accent} /> : null}
+        <NeonAction icon="minus" label={completed ? 'Korrigieren' : 'Abziehen'} onPress={() => change('withdraw')} muted />
       </View>
-    </View>
+    </NeonCard>
   );
 }
 
-function Section({ title, children }: { title: string; children: ReactNode }) {
+function Section({ title, subtitle, children }: { title: string; subtitle?: string; children: ReactNode }) {
   return (
     <View style={{ gap: 8 }}>
-      <Text style={{ color: colors.text, fontSize: 16, fontWeight: '900' }}>{title}</Text>
+      <View style={{ gap: 2 }}>
+        <Text style={{ color: colors.text, fontSize: 17, fontWeight: '900' }}>{title}</Text>
+        {subtitle ? <Text style={{ color: colors.textMuted, fontSize: 10.5 }}>{subtitle}</Text> : null}
+      </View>
       {children}
     </View>
   );
@@ -127,45 +96,69 @@ export default function GoalsScreen() {
     ]);
   };
 
-  const card = (goal: Goal) => (
+  const card = (goal: Goal, index: number) => (
     <AreaCard
       key={goal.id}
       goal={goal}
       monthSaved={goal.mode === 'recurring' ? savedThisMonth(store.contributions, goal.id) : 0}
+      accent={accents[index % accents.length] ?? colors.primary}
       onDelete={() => remove(goal)}
     />
   );
 
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 8, paddingBottom: 88, gap: 14 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <View style={{ flex: 1 }}>
-          <Text style={{ color: colors.text, fontSize: 22, fontWeight: '900', letterSpacing: -0.35 }}>Sparen</Text>
-          <Text style={{ color: colors.textMuted, fontSize: 11.5 }}>Ziele und Rücklagen kompakt verwalten</Text>
-        </View>
-        <Pressable accessibilityRole="button" accessibilityLabel="Sparbereich hinzufügen" onPress={() => router.push('/add-goal')} style={({ pressed }) => ({ width: 38, height: 38, borderRadius: 12, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.primarySoft, opacity: pressed ? 0.7 : 1 })}>
-          <Symbol name="plus" size={16} color={colors.primaryDark} />
-        </Pressable>
+    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 14, paddingBottom: 104, gap: 15 }}>
+      <ScreenHeader
+        title="Meine Bereiche"
+        subtitle="Rücklagen und Ziele – klar, schnell und lebendig."
+        right={<ProfileButton />}
+      />
+
+      <View style={{ flexDirection: 'row', gap: 8 }}>
+        <NeonCard accent={colors.blue} style={{ flex: 1, padding: 12, gap: 5 }}>
+          <GlowIcon name="tray.full.fill" color={colors.blue} size={14} />
+          <Text style={{ color: colors.textMuted, fontSize: 9.5, fontWeight: '900' }}>IN BEREICHEN</Text>
+          <Text selectable style={{ color: colors.text, fontSize: 18, fontWeight: '900' }}>{formatMoney(totalInAreas)}</Text>
+        </NeonCard>
+        <NeonCard accent={colors.purple} style={{ flex: 1, padding: 12, gap: 5 }}>
+          <GlowIcon name="calendar" color={colors.purple} size={14} />
+          <Text style={{ color: colors.textMuted, fontSize: 9.5, fontWeight: '900' }}>MONAT GEPLANT</Text>
+          <Text selectable style={{ color: colors.text, fontSize: 18, fontWeight: '900' }}>{formatMoney(monthlyPlanned)}</Text>
+        </NeonCard>
       </View>
 
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
-        <View style={{ flex: 1, borderRadius: 13, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12, paddingVertical: 10 }}>
-          <Text style={{ color: colors.textMuted, fontSize: 9.5, fontWeight: '900' }}>GESAMT</Text>
-          <Text selectable style={{ color: colors.text, fontSize: 17, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(totalInAreas)}</Text>
+      <Pressable
+        accessibilityRole="button"
+        onPress={() => router.push('/add-goal')}
+        style={({ pressed }) => ({
+          minHeight: 48,
+          borderRadius: 15,
+          borderWidth: 1,
+          borderColor: `${colors.primary}60`,
+          backgroundColor: colors.primarySoft,
+          paddingHorizontal: 13,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 10,
+          opacity: pressed ? 0.72 : 1,
+          boxShadow: `0 0 18px ${colors.glow}`,
+        })}
+      >
+        <GlowIcon name="plus" color={colors.primaryDark} size={14} />
+        <View style={{ flex: 1 }}>
+          <Text style={{ color: colors.text, fontSize: 13, fontWeight: '900' }}>Neuen Sparbereich anlegen</Text>
+          <Text style={{ color: colors.textMuted, fontSize: 10.5 }}>Zielbetrag oder monatliche Rücklage</Text>
         </View>
-        <View style={{ flex: 1, borderRadius: 13, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingHorizontal: 12, paddingVertical: 10 }}>
-          <Text style={{ color: colors.textMuted, fontSize: 9.5, fontWeight: '900' }}>PRO MONAT</Text>
-          <Text selectable style={{ color: colors.text, fontSize: 17, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(monthlyPlanned)}</Text>
-        </View>
-      </View>
+        <Symbol name="chevron.right" size={10} color={colors.primaryDark} />
+      </Pressable>
 
       {store.goals.length === 0 ? (
         <EmptyState icon="target" title="Noch kein Sparbereich" body="Lege ein Ziel oder eine monatliche Rücklage an." />
       ) : (
         <>
-          {recurringGoals.length ? <Section title="Rücklagen">{recurringGoals.map(card)}</Section> : null}
-          {activeTargets.length ? <Section title="Ziele">{activeTargets.map(card)}</Section> : null}
-          {completedTargets.length ? <Section title="Erreicht">{completedTargets.map(card)}</Section> : null}
+          {recurringGoals.length ? <Section title="Monatliche Rücklagen" subtitle="Regelmäßig zurücklegen, ohne künstlichen Endbetrag.">{recurringGoals.map((goal, index) => card(goal, index))}</Section> : null}
+          {activeTargets.length ? <Section title="Sparziele">{activeTargets.map((goal, index) => card(goal, index + recurringGoals.length))}</Section> : null}
+          {completedTargets.length ? <Section title="Erreicht" subtitle="Deine abgeschlossenen Ziele bleiben als Erfolg sichtbar.">{completedTargets.map((goal, index) => card(goal, index + recurringGoals.length + activeTargets.length))}</Section> : null}
         </>
       )}
     </ScrollView>
