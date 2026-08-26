@@ -60,7 +60,7 @@ export default function SettingsScreen() {
   const version = Constants.expoConfig?.version ?? '4.1.0';
 
   const chooseTheme = () => {
-    Alert.alert('Design', 'Wähle das Farbschema für SparFlow.', [
+    Alert.alert('Design', 'Wähle das Farbschema für SparPilot.', [
       { text: 'System', onPress: () => void store.setPreference('themeMode', 'system') },
       { text: 'Hell', onPress: () => void store.setPreference('themeMode', 'light') },
       { text: 'Dunkel', onPress: () => void store.setPreference('themeMode', 'dark') },
@@ -73,7 +73,7 @@ export default function SettingsScreen() {
       <Text selectable style={{ color: colors.text, fontSize: 20, fontWeight: '800', textAlign: 'center' }}>Einstellungen</Text>
 
       <Section>
-        <Row icon="person.crop.circle" title="Profil" value="Lokal" onPress={() => Alert.alert('Profil', `SparFlow ${version} verwendet kein Benutzerkonto. Deine Daten bleiben lokal auf diesem Gerät.`)} />
+        <Row icon="person.crop.circle" title="Profil" value="Lokal" onPress={() => Alert.alert('Profil', `SparPilot ${version} verwendet kein Benutzerkonto. Deine Daten bleiben lokal auf diesem Gerät.`)} />
         <Divider />
         <SwitchRow icon="lock.fill" title="Schnell-Sparen bestätigen" value={store.preferences.confirmQuickSave} onValueChange={(value) => void store.setPreference('confirmQuickSave', value)} />
         <Divider />
@@ -92,9 +92,9 @@ export default function SettingsScreen() {
       </Section>
 
       <Section>
-        <Row icon="questionmark.circle" title="Hilfe & Support" onPress={() => Alert.alert('Hilfe & Support', 'SparFlow ist vollständig lokal. Bei Problemen kannst du zuerst „Daten neu laden“ verwenden.')} />
+        <Row icon="questionmark.circle" title="Hilfe & Support" onPress={() => Alert.alert('Hilfe & Support', 'SparPilot ist vollständig lokal. Bei Problemen kannst du zuerst „Daten neu laden“ verwenden.')} />
         <Divider />
-        <Row icon="info.circle" title="Über SparFlow" value={version} onPress={() => Alert.alert('Über SparFlow', `SparFlow ${version}\nLokale Spar-App mit Zielen, Challenges und Monatsplanung.`)} />
+        <Row icon="info.circle" title="Über SparPilot" value={version} onPress={() => Alert.alert('Über SparPilot', `SparPilot ${version}\nLokale Spar-App mit Zielen, Challenges, Aufgaben und Erinnerungen.`)} />
       </Section>
 
       <Section>
