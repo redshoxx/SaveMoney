@@ -55,7 +55,23 @@ jobs:
           echo "SparFlow $VERSION ($BUILD_NUMBER)"
 
       - name: Install dependencies
-        run: npm install --no-audit --no-fund
+        shell: bash
+        run: |
+          npm config set fetch-retries 5
+          npm config set fetch-retry-factor 2
+          npm config set fetch-retry-mintimeout 20000
+          npm config set fetch-retry-maxtimeout 120000
+          for attempt in 1 2 3; do
+            echo "npm install attempt ${attempt}/3"
+            if npm install --no-audit --no-fund; then
+              exit 0
+            fi
+            if [ "$attempt" -lt 3 ]; then
+              sleep $((attempt * 15))
+            fi
+          done
+          echo "npm install failed after 3 attempts"
+          exit 1
 
       - name: Check Expo dependency compatibility
         run: npx expo install --check
@@ -140,7 +156,7 @@ jobs:
           const next = {
             version: process.env.VERSION,
             date: process.env.RELEASE_DATE,
-            localizedDescription: 'SparFlow 3 mit reduzierter iPhone-Oberfläche, adaptiver Spar-Empfehlung, verbessertem Dark Mode und Release-Sicherheitschecks.',
+            localizedDescription: 'SparFlow 3.3 mit neuem dynamischen Neon-Design, zentralen Schnellaktionen, überarbeiteter Startseite, lebendigen Challenges und Einstellungen außerhalb der Navigation.',
             downloadURL: process.env.DOWNLOAD_URL,
             size: Number(process.env.IPA_SIZE),
             minOSVersion: '16.4'
