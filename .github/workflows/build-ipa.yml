@@ -156,7 +156,7 @@ jobs:
           const next = {
             version: process.env.VERSION,
             date: process.env.RELEASE_DATE,
-            localizedDescription: `SparFlow ${process.env.VERSION} mit minimalistischem 4.0-Design, neuer Startseite, Ziel- und Monatsdetails, überarbeiteten Challenges sowie schneller Einzahlen- und Abziehen-Bedienung.`,
+            localizedDescription: `SparFlow ${process.env.VERSION} mit To-Dos, lokalen Fälligkeits-Benachrichtigungen sowie Erinnerungen für Sparziele und Challenges im neuen 4.1-Design.`,
             downloadURL: process.env.DOWNLOAD_URL,
             size: Number(process.env.IPA_SIZE),
             minOSVersion: '16.4'

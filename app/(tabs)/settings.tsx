@@ -57,7 +57,7 @@ function themeLabel(value: ThemeMode) {
 
 export default function SettingsScreen() {
   const store = useAppStore();
-  const version = Constants.expoConfig?.version ?? '4.0.0';
+  const version = Constants.expoConfig?.version ?? '4.1.0';
 
   const chooseTheme = () => {
     Alert.alert('Design', 'Wähle das Farbschema für SparFlow.', [
