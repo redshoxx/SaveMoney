@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SparFlow",
+    "name": "SparPilot",
     "slug": "sparflow",
     "version": "4.1.0",
     "orientation": "portrait",
@@ -25,7 +25,7 @@
       "package": "com.redshoxx.sparflow",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#050814"
+        "backgroundColor": "#0C1219"
       }
     },
     "plugins": [
@@ -35,7 +35,7 @@
         "expo-notifications",
         {
           "defaultChannel": "sparflow-reminders",
-          "color": "#7B4DFF"
+          "color": "#F6C247"
         }
       ]
     ],
