@@ -12,21 +12,8 @@ type ActionMode = 'save' | 'withdraw';
 
 function KeyButton({ label, onPress, icon }: { label?: string; onPress: () => void; icon?: string }) {
   return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={onPress}
-      style={({ pressed }) => ({
-        flex: 1,
-        minHeight: 58,
-        borderRadius: 12,
-        borderCurve: 'continuous',
-        backgroundColor: colors.surfaceMuted,
-        alignItems: 'center',
-        justifyContent: 'center',
-        opacity: pressed ? 0.62 : 1,
-      })}
-    >
-      {icon ? <Symbol name={icon} size={17} color={colors.text} /> : <Text style={{ color: colors.text, fontSize: 22, fontWeight: '500', fontVariant: ['tabular-nums'] }}>{label}</Text>}
+    <Pressable onPress={onPress} style={({ pressed }) => ({ flex: 1, minHeight: 56, borderRadius: 13, borderCurve: 'continuous', backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.62 : 1 })}>
+      {icon ? <Symbol name={icon} size={17} color={colors.text} /> : <Text selectable style={{ color: colors.text, fontSize: 21, fontWeight: '600', fontVariant: ['tabular-nums'] }}>{label}</Text>}
     </Pressable>
   );
 }
@@ -39,15 +26,13 @@ export default function SaveScreen() {
   const selectableGoals = action === 'withdraw' ? store.goals.filter((goal) => goal.savedAmount > 0) : store.goals;
   const initialGoal = requestedGoal && selectableGoals.some((goal) => goal.id === requestedGoal.id)
     ? requestedGoal
-    : action === 'withdraw'
-      ? selectableGoals[0]
-      : (store.primaryGoal ?? selectableGoals[0]);
+    : (store.primaryGoal ?? selectableGoals[0]);
 
   const [goalId, setGoalId] = useState(initialGoal?.id ?? '');
-  const [amountText, setAmountText] = useState('25');
+  const [amountText, setAmountText] = useState('');
   const [saving, setSaving] = useState(false);
   const amount = useMemo(() => Number(amountText.replace(',', '.')), [amountText]);
-  const selectedGoal = store.goals.find((goal) => goal.id === goalId);
+  const selectedGoal = selectableGoals.find((goal) => goal.id === goalId) ?? null;
 
   const append = (value: string) => {
     setAmountText((current) => {
@@ -61,18 +46,20 @@ export default function SaveScreen() {
     });
   };
 
-  const backspace = () => setAmountText((current) => current.length <= 1 ? '0' : current.slice(0, -1));
-
-  const addQuick = (value: number) => {
-    const current = Number(amountText.replace(',', '.')) || 0;
-    setAmountText(String(Math.round((current + value) * 100) / 100).replace('.', ','));
-  };
+  const backspace = () => setAmountText((current) => current.length <= 1 ? '' : current.slice(0, -1));
 
   const submit = async () => {
-    if (!goalId) return Alert.alert('SparFlow', action === 'withdraw' ? 'Es gibt noch keinen angesparten Betrag zum Abziehen.' : 'Bitte lege zuerst einen Sparbereich an.');
-    if (!Number.isFinite(amount) || amount <= 0) return Alert.alert('SparFlow', 'Bitte gib einen gültigen Betrag ein.');
+    if (!goalId) {
+      Alert.alert('Sparen', action === 'withdraw' ? 'Es gibt noch keinen Betrag, den du entnehmen kannst.' : 'Lege zuerst ein Sparziel an.');
+      return;
+    }
+    if (!Number.isFinite(amount) || amount <= 0) {
+      Alert.alert('Betrag', 'Wähle einen Betrag oder gib ihn über das Zahlenfeld ein.');
+      return;
+    }
     if (action === 'withdraw' && selectedGoal && amount > selectedGoal.savedAmount) {
-      return Alert.alert('SparFlow', `In „${selectedGoal.title}“ sind aktuell ${formatMoney(selectedGoal.savedAmount)} verfügbar.`);
+      Alert.alert('Zu hoher Betrag', `In „${selectedGoal.title}“ sind aktuell ${formatMoney(selectedGoal.savedAmount)} verfügbar.`);
+      return;
     }
 
     setSaving(true);
@@ -81,86 +68,95 @@ export default function SaveScreen() {
       else await store.saveToGoal(goalId, amount);
       router.back();
     } catch (error) {
-      Alert.alert('SparFlow', error instanceof Error ? error.message : 'Der Betrag konnte nicht geändert werden.');
+      Alert.alert('SparFlow', error instanceof Error ? error.message : 'Der Betrag konnte nicht gespeichert werden.');
     } finally {
       setSaving(false);
     }
   };
 
+  if (!selectableGoals.length) {
+    return (
+      <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ padding: 18, gap: 14 }}>
+        <View style={{ borderRadius: 20, borderCurve: 'continuous', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, padding: 18, gap: 12, alignItems: 'center' }}>
+          <View style={{ width: 50, height: 50, borderRadius: 16, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}><Symbol name="target" size={21} color={colors.primary} /></View>
+          <Text selectable style={{ color: colors.text, fontSize: 15, fontWeight: '900', textAlign: 'center' }}>{action === 'withdraw' ? 'Noch nichts zum Entnehmen vorhanden' : 'Du brauchst zuerst ein Ziel'}</Text>
+          <Text selectable style={{ color: colors.textMuted, fontSize: 11, lineHeight: 16, textAlign: 'center' }}>{action === 'withdraw' ? 'Sobald du Geld in einem Ziel gespeichert hast, kannst du es hier wieder entnehmen.' : 'Damit SparFlow weiß, wohin dein Geld gehört.'}</Text>
+          {action === 'save' ? (
+            <Pressable onPress={() => router.replace('/add-goal')} style={({ pressed }) => ({ minHeight: 48, alignSelf: 'stretch', borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.7 : 1 })}>
+              <Text selectable style={{ color: '#FFFFFF', fontWeight: '900' }}>Erstes Ziel anlegen</Text>
+            </Pressable>
+          ) : null}
+        </View>
+      </ScrollView>
+    );
+  }
+
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 8, paddingBottom: 32, gap: 14 }}>
-      <View style={{ gap: 4 }}>
-        <Text selectable style={{ color: colors.text, fontSize: 20, fontWeight: '800' }}>{action === 'withdraw' ? 'Abziehen' : 'Einzahlen'}</Text>
-        <Text style={{ color: colors.textMuted, fontSize: 11 }}>{action === 'withdraw' ? 'Betrag aus einem Sparziel entnehmen' : 'Schnell & einfach sparen'}</Text>
+    <ScrollView contentInsetAdjustmentBehavior="automatic" keyboardShouldPersistTaps="handled" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 8, paddingBottom: 34, gap: 18 }}>
+      <View style={{ gap: 3 }}>
+        <Text selectable style={{ color: colors.text, fontSize: 20, fontWeight: '900' }}>{action === 'withdraw' ? 'Geld entnehmen' : 'Geld zurücklegen'}</Text>
+        <Text selectable style={{ color: colors.textMuted, fontSize: 11 }}>{action === 'withdraw' ? 'Wähle Ziel und Betrag.' : 'Drei einfache Schritte.'}</Text>
       </View>
 
-      {selectableGoals.length ? (
+      <View style={{ gap: 8 }}>
+        <Text selectable style={{ color: colors.text, fontSize: 13, fontWeight: '900' }}>1. {action === 'withdraw' ? 'Woher möchtest du Geld nehmen?' : 'Wofür möchtest du sparen?'}</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ gap: 7 }}>
           {selectableGoals.map((goal) => {
             const selected = goal.id === goalId;
             return (
-              <Pressable
-                key={goal.id}
-                onPress={() => setGoalId(goal.id)}
-                style={({ pressed }) => ({
-                  minHeight: 38,
-                  paddingHorizontal: 11,
-                  borderRadius: 12,
-                  borderWidth: 1,
-                  borderColor: selected ? colors.primary : colors.border,
-                  backgroundColor: selected ? colors.primarySoft : colors.surface,
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  gap: 7,
-                  opacity: pressed ? 0.68 : 1,
-                })}
-              >
-                <Symbol name={goal.icon} size={13} color={selected ? colors.primaryDark : goal.color} />
-                <Text numberOfLines={1} style={{ color: selected ? colors.primaryDark : colors.text, fontSize: 11, fontWeight: '800', maxWidth: 150 }}>{goal.title}</Text>
+              <Pressable key={goal.id} onPress={() => setGoalId(goal.id)} style={({ pressed }) => ({ minHeight: 44, paddingHorizontal: 12, borderRadius: 13, borderWidth: 1.5, borderColor: selected ? colors.primary : colors.border, backgroundColor: selected ? colors.primarySoft : colors.surface, flexDirection: 'row', alignItems: 'center', gap: 7, opacity: pressed ? 0.68 : 1 })}>
+                <Symbol name={selected ? 'checkmark.circle.fill' : goal.icon} size={14} color={selected ? colors.primary : goal.color} />
+                <Text selectable numberOfLines={1} style={{ color: selected ? colors.primaryDark : colors.text, fontSize: 11.5, fontWeight: '800', maxWidth: 150 }}>{goal.title}</Text>
               </Pressable>
             );
           })}
         </ScrollView>
-      ) : (
-        <Pressable onPress={() => action === 'save' ? router.replace('/add-goal') : undefined} style={({ pressed }) => ({ minHeight: 48, borderRadius: 14, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.72 : 1 })}>
-          <Text style={{ color: colors.text, fontSize: 12.5, fontWeight: '800' }}>{action === 'save' ? 'Sparziel anlegen' : 'Noch kein angesparter Betrag vorhanden'}</Text>
-        </Pressable>
-      )}
-
-      <View style={{ alignItems: 'center', paddingVertical: 5, gap: 5 }}>
-        <Text selectable style={{ color: colors.text, fontSize: 38, lineHeight: 45, fontWeight: '800', letterSpacing: -1.2, fontVariant: ['tabular-nums'] }}>€ {amountText || '0'}</Text>
-        {selectedGoal ? <Text style={{ color: colors.textMuted, fontSize: 10.5 }}>{selectedGoal.title} · {formatMoney(selectedGoal.savedAmount)} aktuell</Text> : null}
+        {selectedGoal ? <Text selectable style={{ color: colors.textMuted, fontSize: 10 }}>Aktuell in diesem Ziel: {formatMoney(selectedGoal.savedAmount)}</Text> : null}
       </View>
 
-      <View style={{ flexDirection: 'row', gap: 7 }}>
-        {quickAmounts.map((value) => (
-          <Pressable key={value} onPress={() => addQuick(value)} style={({ pressed }) => ({ flex: 1, minHeight: 34, borderRadius: 10, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.62 : 1 })}>
-            <Text style={{ color: colors.text, fontSize: 10.5, fontWeight: '800' }}>+{value} €</Text>
-          </Pressable>
-        ))}
-      </View>
-
-      <View style={{ gap: 7 }}>
-        {[['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']].map((row) => (
-          <View key={row.join('')} style={{ flexDirection: 'row', gap: 7 }}>
-            {row.map((digit) => <KeyButton key={digit} label={digit} onPress={() => append(digit)} />)}
-          </View>
-        ))}
+      <View style={{ gap: 9 }}>
+        <Text selectable style={{ color: colors.text, fontSize: 13, fontWeight: '900' }}>2. Betrag wählen</Text>
         <View style={{ flexDirection: 'row', gap: 7 }}>
-          <KeyButton label="," onPress={() => append(',')} />
-          <KeyButton label="0" onPress={() => append('0')} />
-          <KeyButton icon="delete.left" onPress={backspace} />
+          {quickAmounts.map((value) => {
+            const selected = amount === value;
+            return (
+              <Pressable key={value} onPress={() => setAmountText(String(value))} style={({ pressed }) => ({ flex: 1, minHeight: 42, borderRadius: 12, backgroundColor: selected ? colors.primarySoft : colors.surfaceMuted, borderWidth: selected ? 1.5 : 0, borderColor: selected ? colors.primary : 'transparent', alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.62 : 1 })}>
+                <Text selectable style={{ color: selected ? colors.primaryDark : colors.text, fontSize: 11.5, fontWeight: '900' }}>{value} €</Text>
+              </Pressable>
+            );
+          })}
+        </View>
+
+        <View style={{ alignItems: 'center', paddingVertical: 3, gap: 3 }}>
+          <Text selectable style={{ color: colors.text, fontSize: 38, lineHeight: 45, fontWeight: '900', letterSpacing: -1.2, fontVariant: ['tabular-nums'] }}>€ {amountText || '0'}</Text>
+          <Text selectable style={{ color: colors.textMuted, fontSize: 9.5 }}>Oder eigenen Betrag eingeben</Text>
+        </View>
+
+        <View style={{ gap: 7 }}>
+          {[['1', '2', '3'], ['4', '5', '6'], ['7', '8', '9']].map((row) => (
+            <View key={row.join('')} style={{ flexDirection: 'row', gap: 7 }}>
+              {row.map((digit) => <KeyButton key={digit} label={digit} onPress={() => append(digit)} />)}
+            </View>
+          ))}
+          <View style={{ flexDirection: 'row', gap: 7 }}>
+            <KeyButton label="," onPress={() => append(',')} />
+            <KeyButton label="0" onPress={() => append('0')} />
+            <KeyButton icon="delete.left" onPress={backspace} />
+          </View>
         </View>
       </View>
 
-      <PrimaryButton
-        title={Number.isFinite(amount) && amount > 0 ? `${formatMoney(amount)} ${action === 'withdraw' ? 'abziehen' : 'einzahlen'}` : (action === 'withdraw' ? 'Abziehen' : 'Einzahlen')}
-        icon={action === 'withdraw' ? 'minus' : 'plus'}
-        tone={action === 'withdraw' ? 'danger' : 'primary'}
-        loading={saving}
-        disabled={!goalId || !Number.isFinite(amount) || amount <= 0}
-        onPress={() => void submit()}
-      />
+      <View style={{ gap: 7 }}>
+        <Text selectable style={{ color: colors.text, fontSize: 13, fontWeight: '900' }}>3. Bestätigen</Text>
+        <PrimaryButton
+          title={Number.isFinite(amount) && amount > 0 && selectedGoal ? `${formatMoney(amount)} ${action === 'withdraw' ? 'aus ' : 'in '}${selectedGoal.title} ${action === 'withdraw' ? 'entnehmen' : 'einzahlen'}` : (action === 'withdraw' ? 'Betrag entnehmen' : 'Betrag einzahlen')}
+          icon={action === 'withdraw' ? 'minus' : 'plus'}
+          tone={action === 'withdraw' ? 'danger' : 'primary'}
+          loading={saving}
+          disabled={!goalId || !Number.isFinite(amount) || amount <= 0}
+          onPress={() => void submit()}
+        />
+      </View>
     </ScrollView>
   );
 }
