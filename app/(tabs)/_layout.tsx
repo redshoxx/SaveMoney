@@ -77,7 +77,7 @@ export default function TabsLayout() {
       />
       <Tabs.Screen
         name="settings"
-        options={{ title: 'Profil', tabBarIcon: ({ color }) => <Symbol name="person" size={19} color={tabIconColor(color)} /> }}
+        options={{ href: null }}
       />
     </Tabs>
   );
