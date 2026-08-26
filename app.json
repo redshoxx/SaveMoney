@@ -30,7 +30,14 @@
     },
     "plugins": [
       "expo-router",
-      "expo-sqlite"
+      "expo-sqlite",
+      [
+        "expo-notifications",
+        {
+          "defaultChannel": "sparflow-reminders",
+          "color": "#7B4DFF"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true

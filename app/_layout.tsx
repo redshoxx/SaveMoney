@@ -1,10 +1,11 @@
-import { Stack } from 'expo-router';
+import { router, Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import React, { Component, useEffect, type ErrorInfo, type ReactNode } from 'react';
 import { Pressable, Text, View, useColorScheme } from 'react-native';
 
 import { applyNativeThemeMode, colors, setActiveColorScheme } from '@/constants/theme';
 import { AppStoreProvider, useAppStore } from '@/store/app-store';
+import { configureLocalNotifications, getLastNotificationUrl, subscribeToNotificationNavigation } from '@/utils/local-notifications';
 
 class ReleaseErrorBoundary extends Component<{ children: ReactNode }, { failed: boolean }> {
   state = { failed: false };
@@ -46,6 +47,15 @@ function RootNavigator() {
     applyNativeThemeMode(themeMode);
     return () => applyNativeThemeMode('system');
   }, [themeMode]);
+
+  useEffect(() => {
+    void configureLocalNotifications();
+    const unsubscribe = subscribeToNotificationNavigation((url) => router.push(url as never));
+    void getLastNotificationUrl().then((url) => {
+      if (url) router.push(url as never);
+    });
+    return unsubscribe;
+  }, []);
 
   return (
     <>

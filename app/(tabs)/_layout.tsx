@@ -72,6 +72,10 @@ export default function TabsLayout() {
         options={{ title: 'Challenges', tabBarIcon: ({ color }) => <Symbol name="trophy.fill" size={19} color={tabIconColor(color)} /> }}
       />
       <Tabs.Screen
+        name="todos"
+        options={{ title: 'To Do', tabBarIcon: ({ color }) => <Symbol name="checklist" size={19} color={tabIconColor(color)} /> }}
+      />
+      <Tabs.Screen
         name="settings"
         options={{ title: 'Profil', tabBarIcon: ({ color }) => <Symbol name="person" size={19} color={tabIconColor(color)} /> }}
       />
