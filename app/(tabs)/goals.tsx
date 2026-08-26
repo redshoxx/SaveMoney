@@ -1,79 +1,89 @@
 import { router } from 'expo-router';
-import type { ReactNode } from 'react';
 import { Alert, Pressable, ScrollView, Text, View } from 'react-native';
 
-import { NeonCard, NeonProgress } from '@/components/neon-ui';
-import { EmptyState, Symbol } from '@/components/ui';
-import { accents, colors } from '@/constants/theme';
+import { NeonProgress } from '@/components/neon-ui';
+import { Symbol } from '@/components/ui';
+import { colors } from '@/constants/theme';
 import { useAppStore } from '@/store/app-store';
 import type { Goal } from '@/types/models';
 import { formatMoney, progress } from '@/utils/money';
 
-function savedThisMonth(contributions: ReturnType<typeof useAppStore>['contributions'], goalId: string) {
+function isCurrentMonth(value: string) {
+  const date = new Date(value);
   const now = new Date();
+  return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth();
+}
+
+function savedThisMonth(contributions: ReturnType<typeof useAppStore>['contributions'], goalId: string) {
   return Math.max(0, contributions.reduce((sum, item) => {
-    if (item.sourceType !== 'goal' || item.sourceId !== goalId) return sum;
-    const date = new Date(item.createdAt);
-    return date.getFullYear() === now.getFullYear() && date.getMonth() === now.getMonth() ? sum + item.amount : sum;
+    if (item.sourceType !== 'goal' || item.sourceId !== goalId || !isCurrentMonth(item.createdAt)) return sum;
+    return sum + item.amount;
   }, 0));
 }
 
-function IconTile({ goal, accent }: { goal: Goal; accent: string }) {
-  return (
-    <View style={{ width: 38, height: 38, borderRadius: 11, backgroundColor: accent, alignItems: 'center', justifyContent: 'center' }}>
-      <Symbol name={goal.icon} size={17} color="#FFFFFF" />
-    </View>
-  );
-}
-
-function GoalRow({ goal, monthSaved, accent, onDelete }: { goal: Goal; monthSaved: number; accent: string; onDelete: () => void }) {
+function GoalCard({ goal, monthSaved, onDelete }: { goal: Goal; monthSaved: number; onDelete: () => void }) {
   const recurring = goal.mode === 'recurring';
   const target = recurring ? Math.max(0, goal.recurringAmount ?? goal.targetAmount) : Math.max(0, goal.targetAmount);
   const current = recurring ? monthSaved : Math.max(0, goal.savedAmount);
   const percentage = progress(current, target);
+  const remaining = Math.max(0, target - Math.min(current, target));
+  const completed = !recurring && remaining <= 0;
 
   return (
-    <Pressable
-      accessibilityRole="button"
-      onPress={() => router.push({ pathname: '/goal-detail', params: { goalId: goal.id } })}
-      onLongPress={onDelete}
-      style={({ pressed }) => ({ opacity: pressed ? 0.72 : 1 })}
-    >
-      <NeonCard style={{ padding: 12, gap: 9 }}>
-        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-          <IconTile goal={goal} accent={accent} />
-          <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
-            <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 13, fontWeight: '800' }}>{goal.title}</Text>
-            <NeonProgress value={percentage} color={accent} height={4} />
-          </View>
-          <View style={{ alignItems: 'flex-end', gap: 2 }}>
-            <Text selectable style={{ color: colors.text, fontSize: 11.5, fontWeight: '800', fontVariant: ['tabular-nums'] }}>{formatMoney(current)} / {formatMoney(target)}</Text>
-            <Text style={{ color: colors.textMuted, fontSize: 9.5 }}>{Math.round(percentage * 100)}%</Text>
-          </View>
-          <Symbol name="chevron.right" size={9} color={colors.textMuted} />
+    <View style={{ borderRadius: 18, borderCurve: 'continuous', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, padding: 14, gap: 12 }}>
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
+        <View style={{ width: 42, height: 42, borderRadius: 13, backgroundColor: `${goal.color}18`, alignItems: 'center', justifyContent: 'center' }}>
+          <Symbol name={goal.icon} size={18} color={goal.color} />
         </View>
-      </NeonCard>
-    </Pressable>
+        <View style={{ flex: 1, minWidth: 0, gap: 3 }}>
+          <Text selectable numberOfLines={1} style={{ color: colors.text, fontSize: 14, fontWeight: '900' }}>{goal.title}</Text>
+          <Text selectable style={{ color: colors.textMuted, fontSize: 10.5 }}>{recurring ? 'Monatliche Rücklage' : completed ? 'Ziel erreicht' : 'Sparziel'}</Text>
+        </View>
+        {!completed ? (
+          <Pressable accessibilityLabel="Erinnerung einstellen" onPress={() => router.push({ pathname: '/reminders', params: { kind: 'goal', id: goal.id } })} style={({ pressed }) => ({ width: 36, height: 36, borderRadius: 11, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.6 : 1 })}>
+            <Symbol name="bell" size={14} color={colors.textMuted} />
+          </Pressable>
+        ) : null}
+        <Pressable accessibilityLabel="Ziel verwalten" onPress={onDelete} style={({ pressed }) => ({ width: 36, height: 36, borderRadius: 11, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}>
+          <Symbol name="ellipsis" size={14} color={colors.textMuted} />
+        </Pressable>
+      </View>
+
+      <View style={{ gap: 7 }}>
+        <View style={{ flexDirection: 'row', alignItems: 'flex-end', gap: 8 }}>
+          <Text selectable style={{ flex: 1, color: colors.text, fontSize: 19, fontWeight: '900', fontVariant: ['tabular-nums'] }}>{formatMoney(current)}</Text>
+          <Text selectable style={{ color: colors.textMuted, fontSize: 10.5 }}>von {formatMoney(target)}</Text>
+        </View>
+        <NeonProgress value={percentage} color={completed ? colors.success : goal.color} height={6} />
+        <Text selectable style={{ color: completed ? colors.success : colors.textMuted, fontSize: 10.5, fontWeight: completed ? '800' : '600' }}>
+          {completed ? 'Geschafft' : recurring ? `${formatMoney(remaining)} fehlen diesen Monat` : `${formatMoney(remaining)} fehlen noch`}
+        </Text>
+      </View>
+
+      {!completed ? (
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          <Pressable onPress={() => router.push({ pathname: '/save', params: { goalId: goal.id, mode: 'save' } })} style={({ pressed }) => ({ flex: 1, minHeight: 46, borderRadius: 14, backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 7, opacity: pressed ? 0.7 : 1 })}>
+            <Symbol name="plus" size={13} color="#FFFFFF" />
+            <Text selectable style={{ color: '#FFFFFF', fontSize: 12, fontWeight: '900' }}>Einzahlen</Text>
+          </Pressable>
+          <Pressable onPress={() => router.push({ pathname: '/goal-detail', params: { goalId: goal.id } })} style={({ pressed }) => ({ minWidth: 92, minHeight: 46, borderRadius: 14, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.65 : 1 })}>
+            <Text selectable style={{ color: colors.text, fontSize: 11.5, fontWeight: '800' }}>Details</Text>
+          </Pressable>
+        </View>
+      ) : (
+        <Pressable onPress={() => router.push({ pathname: '/goal-detail', params: { goalId: goal.id } })} style={({ pressed }) => ({ minHeight: 44, borderRadius: 13, backgroundColor: colors.surfaceMuted, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.65 : 1 })}>
+          <Text selectable style={{ color: colors.text, fontSize: 11.5, fontWeight: '800' }}>Ziel ansehen</Text>
+        </Pressable>
+      )}
+    </View>
   );
 }
 
-function Section({ title, subtitle, onAdd, children }: { title: string; subtitle?: string; onAdd: () => void; children: ReactNode }) {
+function SectionHeader({ title, body }: { title: string; body: string }) {
   return (
-    <View style={{ gap: 9 }}>
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text selectable style={{ color: colors.text, fontSize: 13, fontWeight: '800' }}>{title}</Text>
-          {subtitle ? <Text style={{ color: colors.textMuted, fontSize: 10 }}>{subtitle}</Text> : null}
-        </View>
-        <Pressable
-          accessibilityRole="button"
-          onPress={onAdd}
-          style={({ pressed }) => ({ width: 30, height: 30, borderRadius: 10, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.65 : 1 })}
-        >
-          <Symbol name="plus" size={13} color={colors.text} />
-        </Pressable>
-      </View>
-      {children}
+    <View style={{ gap: 2 }}>
+      <Text selectable style={{ color: colors.text, fontSize: 15, fontWeight: '900' }}>{title}</Text>
+      <Text selectable style={{ color: colors.textMuted, fontSize: 10.5, lineHeight: 15 }}>{body}</Text>
     </View>
   );
 }
@@ -84,74 +94,69 @@ export default function GoalsScreen() {
   const activeTargets = store.goals.filter((goal) => goal.mode === 'target' && goal.savedAmount < goal.targetAmount);
   const completedTargets = store.goals.filter((goal) => goal.mode === 'target' && goal.savedAmount >= goal.targetAmount);
 
-  const remove = (goal: Goal) => {
-    Alert.alert('Sparziel verwalten', goal.title, [
+  const manage = (goal: Goal) => {
+    Alert.alert(goal.title, 'Was möchtest du tun?', [
       { text: 'Abbrechen', style: 'cancel' },
-      { text: 'Löschen', style: 'destructive', onPress: () => void store.deleteGoal(goal.id) },
+      { text: 'Details öffnen', onPress: () => router.push({ pathname: '/goal-detail', params: { goalId: goal.id } }) },
+      { text: 'Ziel löschen', style: 'destructive', onPress: () => void store.deleteGoal(goal.id) },
     ]);
   };
 
-  const addGoal = () => router.push('/add-goal');
-
   return (
-    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 12, paddingBottom: 106, gap: 18 }}>
+    <ScrollView contentInsetAdjustmentBehavior="automatic" contentContainerStyle={{ paddingHorizontal: 15, paddingTop: 12, paddingBottom: 112, gap: 20 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: 10 }}>
-        <Text selectable style={{ flex: 1, color: colors.text, fontSize: 23, fontWeight: '800', letterSpacing: -0.6 }}>Meine Ziele</Text>
-        <Pressable
-          accessibilityRole="button"
-          onPress={() => Alert.alert('Ziele', 'Lange auf ein Ziel drücken, um es zu verwalten.')}
-          style={({ pressed }) => ({ width: 34, height: 34, borderRadius: 11, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.55 : 1 })}
-        >
-          <Symbol name="slider.horizontal.3" size={17} color={colors.text} />
+        <View style={{ flex: 1, minWidth: 0, gap: 2 }}>
+          <Text selectable style={{ color: colors.text, fontSize: 24, fontWeight: '900', letterSpacing: -0.6 }}>Ziele</Text>
+          <Text selectable style={{ color: colors.textMuted, fontSize: 11 }}>Hier siehst du, wofür du sparst.</Text>
+        </View>
+        <Pressable onPress={() => router.push('/add-goal')} style={({ pressed }) => ({ minHeight: 42, paddingHorizontal: 12, borderRadius: 13, backgroundColor: colors.primary, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: pressed ? 0.7 : 1 })}>
+          <Symbol name="plus" size={13} color="#FFFFFF" />
+          <Text selectable style={{ color: '#FFFFFF', fontSize: 11, fontWeight: '900' }}>Neues Ziel</Text>
         </Pressable>
       </View>
 
       {store.goals.length === 0 ? (
-        <EmptyState icon="target" title="Noch kein Sparziel" body="Lege deine erste Rücklage oder ein Sparziel an." />
+        <View style={{ borderRadius: 20, borderCurve: 'continuous', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, padding: 18, gap: 12, alignItems: 'center' }}>
+          <View style={{ width: 50, height: 50, borderRadius: 16, backgroundColor: colors.primarySoft, alignItems: 'center', justifyContent: 'center' }}>
+            <Symbol name="target" size={22} color={colors.primary} />
+          </View>
+          <View style={{ gap: 4, alignItems: 'center' }}>
+            <Text selectable style={{ color: colors.text, fontSize: 15, fontWeight: '900' }}>Starte mit einem Ziel</Text>
+            <Text selectable style={{ color: colors.textMuted, fontSize: 11, lineHeight: 16, textAlign: 'center' }}>Zum Beispiel Urlaub, Notgroschen oder eine monatliche Rücklage.</Text>
+          </View>
+          <Pressable onPress={() => router.push('/add-goal')} style={({ pressed }) => ({ minHeight: 48, alignSelf: 'stretch', borderRadius: 14, backgroundColor: colors.primary, alignItems: 'center', justifyContent: 'center', opacity: pressed ? 0.7 : 1 })}>
+            <Text selectable style={{ color: '#FFFFFF', fontWeight: '900' }}>Erstes Ziel anlegen</Text>
+          </Pressable>
+        </View>
       ) : (
         <>
-          <Section title="Monatliche Rücklagen" subtitle="Regelmäßige Beträge für Fixkosten und Rücklagen" onAdd={addGoal}>
-            <View style={{ gap: 8 }}>
-              {recurringGoals.length ? recurringGoals.map((goal, index) => (
-                <GoalRow
-                  key={goal.id}
-                  goal={goal}
-                  monthSaved={savedThisMonth(store.contributions, goal.id)}
-                  accent={accents[index % accents.length] ?? colors.primary}
-                  onDelete={() => remove(goal)}
-                />
-              )) : <Text style={{ color: colors.textMuted, fontSize: 11 }}>Noch keine monatliche Rücklage.</Text>}
-            </View>
-          </Section>
-
-          <Section title="Sparziele" subtitle="Konkrete Ziele mit Zielbetrag" onAdd={addGoal}>
-            <View style={{ gap: 8 }}>
-              {activeTargets.length ? activeTargets.map((goal, index) => (
-                <GoalRow
-                  key={goal.id}
-                  goal={goal}
-                  monthSaved={0}
-                  accent={accents[(index + recurringGoals.length) % accents.length] ?? colors.primary}
-                  onDelete={() => remove(goal)}
-                />
-              )) : <Text style={{ color: colors.textMuted, fontSize: 11 }}>Noch kein aktives Sparziel.</Text>}
-            </View>
-          </Section>
-
-          {completedTargets.length ? (
-            <Section title="Erreicht" subtitle="Abgeschlossene Ziele" onAdd={addGoal}>
-              <View style={{ gap: 8 }}>
-                {completedTargets.map((goal) => (
-                  <GoalRow
-                    key={goal.id}
-                    goal={goal}
-                    monthSaved={0}
-                    accent={colors.success}
-                    onDelete={() => remove(goal)}
-                  />
+          {recurringGoals.length ? (
+            <View style={{ gap: 9 }}>
+              <SectionHeader title="Jeden Monat zurücklegen" body="Für Fixkosten, Rücklagen oder Beträge, die jeden Monat wiederkommen." />
+              <View style={{ gap: 9 }}>
+                {recurringGoals.map((goal) => (
+                  <GoalCard key={goal.id} goal={goal} monthSaved={savedThisMonth(store.contributions, goal.id)} onDelete={() => manage(goal)} />
                 ))}
               </View>
-            </Section>
+            </View>
+          ) : null}
+
+          {activeTargets.length ? (
+            <View style={{ gap: 9 }}>
+              <SectionHeader title="Für etwas sparen" body="Ein Zielbetrag, den du Schritt für Schritt erreichen möchtest." />
+              <View style={{ gap: 9 }}>
+                {activeTargets.map((goal) => <GoalCard key={goal.id} goal={goal} monthSaved={0} onDelete={() => manage(goal)} />)}
+              </View>
+            </View>
+          ) : null}
+
+          {completedTargets.length ? (
+            <View style={{ gap: 9 }}>
+              <SectionHeader title="Geschafft" body="Diese Ziele hast du bereits erreicht." />
+              <View style={{ gap: 9 }}>
+                {completedTargets.map((goal) => <GoalCard key={goal.id} goal={goal} monthSaved={0} onDelete={() => manage(goal)} />)}
+              </View>
+            </View>
           ) : null}
         </>
       )}
