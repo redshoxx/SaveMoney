@@ -12,10 +12,10 @@
       "versions": [
         {
           "version": "3.3.0",
-          "date": "2026-08-26T10:24:58Z",
+          "date": "2026-08-26T10:54:26Z",
           "localizedDescription": "SparFlow 3.3 mit neuem dynamischen Neon-Design, zentralen Schnellaktionen, überarbeiteter Startseite, lebendigen Challenges und Einstellungen außerhalb der Navigation.",
           "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-          "size": 13625049,
+          "size": 13626538,
           "minOSVersion": "16.4"
         },
         {
@@ -108,10 +108,10 @@
         }
       ],
       "version": "3.3.0",
-      "versionDate": "2026-08-26T10:24:58Z",
+      "versionDate": "2026-08-26T10:54:26Z",
       "versionDescription": "SparFlow 3.3 mit neuem dynamischen Neon-Design, zentralen Schnellaktionen, überarbeiteter Startseite, lebendigen Challenges und Einstellungen außerhalb der Navigation.",
       "downloadURL": "https://github.com/redshoxx/SaveMoney/releases/download/sidestore-latest/SparFlow.ipa",
-      "size": 13625049
+      "size": 13626538
     }
   ]
 }
